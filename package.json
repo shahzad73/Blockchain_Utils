@@ -1,0 +1,32 @@
+{
+  "name": "Base",
+  "version": "1.0.0",
+  "description": "Blockchain Utitlties",
+  "main": "app.js",
+  "scripts": {
+    "start": "node app.js",
+    "test": "node_modules/.bin/mocha tests/**"
+  },
+  "keywords": [
+    "base",
+    "project",
+    "node",
+    "express",
+    "structure"
+  ],
+  "author": "Shahzad Aslam",
+  "license": "Private",
+  "dependencies": {
+    "async": "^2.6.1",
+    "dotenv": "^6.1.0",
+    "knex": "^0.16.2",
+    "mysql": "^2.16.0",
+    "request": "^2.88.0",
+    "stellar-sdk": "^0.11.0",
+    "web3": "^0.20.6"
+  },
+  "devDependencies": {
+    "mocha": "^2.2.4",
+    "should": "^6.0.1"
+  }
+}

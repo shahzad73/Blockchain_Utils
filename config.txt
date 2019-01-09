@@ -1,0 +1,15 @@
+Browser_Caption = "Steller Network - test"
+Stellar_Server = "https://horizon-testnet.stellar.org"
+DB_SERVER = "localhost"
+DB_USER = "root"
+DB_PASSWORD = ""
+DB_Database = "block1"
+NODE_ENV = "development"
+SESSION_SECRET = "^#$5sX(Hf6KUo!#65^"
+COOKIE_PARSER_SECRET = "6xH$*CYY*u44gcUN57%H"
+SERVER_PORT = 3001
+POST_REQUEST_DATA_SIZE_EXCEED_MESSAGE = "Yoru cannot send more infromation in post"
+PASSWORD_SALT = "7fa73b47df808d36c5fe328546ddef8b9011b2c6"
+PrivateKey_PASSWORD_SALT = "kmfwf7wefb32nbfnl8324nrgerg4nvxlfsabw"
+ENCRIPTION_IV_LENGTH = 16
+Secret_Config_File = "F:\\secret.json"
