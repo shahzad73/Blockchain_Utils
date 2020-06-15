@@ -416,7 +416,7 @@ var privateKey = "0xf676c99a7823dc3f6e51bba014864d714306b8b0f6be86e7b19c3d3905f0
 
 if (process.argv[2] == "EncryptKey") {
     
-    // node EthereumUtils EncryptKey 0x6f94fb1eb8bdf8101f7ddf3a5f720f390bf69914fa3b28a4df605f49de762218 Allahis1 f:\fil1.txt
+    // node EthereumUtils EncryptKey 0x10b74b21fbd76b922c68ab06e9d0c72766a8286220e655623f974239b868cc05 Allahis1 f:\fil1.txt
 
      var data = ethereum.encryptKey(process.argv[3], process.argv[4]); 
      fs.writeFileSync(process.argv[5], JSON.stringify(data));

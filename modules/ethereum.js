@@ -4,7 +4,7 @@ const Accounts = require('web3-eth-accounts');
 //const Personal = require('web3-eth-personal');
 //const Eth = require('web3-eth');
 
-//var web3 = new Web3( new Web3.providers.HttpProvider('http://localhost:8545') );
+var web3 = new Web3( new Web3.providers.HttpProvider('http://127.0.0.1:7545') );
 //const accounts = new Accounts('ws://127.0.0.1:8545');
 //const personal = new Personal(Personal.givenProvider || 'ws://127.0.0.1:8545');
 //const eth = new Eth(Eth.givenProvider || 'ws://127.0.0.1:8545');
