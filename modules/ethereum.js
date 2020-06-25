@@ -1,193 +1,728 @@
 const Web3 = require('web3');
 const ethereumjs = require('ethereumjs-tx');
-const Accounts = require('web3-eth-accounts');
-//const Personal = require('web3-eth-personal');
-//const Eth = require('web3-eth');
+var Accounts = require('web3-eth-accounts');
+const async = require('async');
 
-var web3 = new Web3( new Web3.providers.HttpProvider('http://127.0.0.1:7545') );
-//const accounts = new Accounts('ws://127.0.0.1:8545');
-//const personal = new Personal(Personal.givenProvider || 'ws://127.0.0.1:8545');
-//const eth = new Eth(Eth.givenProvider || 'ws://127.0.0.1:8545');
+
+const accounts = new Accounts('ws://127.0.0.1:7545');
 
 
 module.exports = {
 
-    encryptKey: function(key, password) {
+    encryptKey: function(key, password, web3Address) {
+        var web3 = new Web3(new Web3.providers.HttpProvider(web3Address));
         return web3.eth.accounts.encrypt(key, password);
     },
 
-    decryptKey: function(key, password) {
+    decryptKey: function(key, password, web3Address) {
+        var web3 = new Web3(new Web3.providers.HttpProvider(web3Address));
         return web3.eth.accounts.decrypt(key, password);
     },
-
-    getCoinBase: function() {
-        eth.getCoinbase().then(console.log);    
-    },
-    
-    getDefaultAccount: function() {
-        return eth.defaultAccount;
-    },
-    
-    setDefaultAccount: function(acc) {
-        eth.defaultAccount= acc;
-    },
-    
-    getGasPrice: function() {
+            
+    getGas: function(web3Address) {
         
-        return new Promise(function(resolve, reject) 
-        {	         
-            eth.getGasPrice().then(function(data){
-                resolve(data);
-            });
-        }); 
-        
-        //ethereum.getGasPrice().then(function(data){  console.log(data); })        
-    },
-        
-    getTransactionCount: function(address) {
-        
-        return new Promise(function(resolve, reject) 
-        {	         
-            eth.getTransactionCount(address).then(function(data){
-                resolve(data);
-            });
-        }); 
-        
-        //ethereum.getAccountBalance("0x108e10b96e1ed7a41df6de923480c44b7fcaad28 ").then(function(data){  console.log(data); })        
-    },
-
-
-	
-    sendTokens: function(fromAddress, sendAddress, amountToSend, abi, contractAddress, web3Address) {
-
         return new Promise(function(resolve, reject) {
-			
-				var web3 = new Web3(new Web3.providers.HttpProvider(web3Address));
-
-				if(web3.isConnected()) {
-					
-					  //var acc = Accounts.privateKeyToAccount('0xc0270793c6d211618dbef578aa380e744547e417e21fb295235ee2d4c94cd04e');
-					var account = web3.eth.accounts.privateKeyToAccount("0xc0270793c6d211618dbef578aa380e744547e417e21fb295235ee2d4c94cd04e");
-					
-					  //console.log(acc);
-	
-					
-					  var contract = web3.eth.contract(abi);
-
-					  var incubator = contract.at(contractAddress);				
-					
-					  const transactionObject = {
-						 from: account,
-						 gas: 2000000,
-						 gasPrice: 4
-					  };
-
-					  incubator.transfer.sendTransaction 
-					  ( sendAddress, amountToSend, transactionObject, (error, result)=> {
-						  	resolve({"code":"1", data: result})
-					  }); 
-
-
-					/*var count = web3.eth.getTransactionCount("0x64aa9045ed3f11af8981458db106bef048a0dc47");
-					var count = web3.eth.getTransactionCount(fromAddress);
-					var contract = web3.eth.contract(abi).at(contractAddress);
-					var rawTransaction = {
-						"from": fromAddress,
-						"nonce": web3.toHex(count+1),
-						"gasPrice": "0x04e3b29200",
-						"gasLimit": "0x7458",
-						"to": contractAddress,
-						"value": "0x0",
-						"data": contract.transfer(sendAddress, 10, {from: fromAddress}),
-						"chainId": 0x03
-					};
-
-					var privKey = new Buffer.from('c0270793c6d211618dbef578aa380e744547e417e21fb295235ee2d4c94cd04e', 'hex');
-					var tx = new ethereumjs(rawTransaction);
-
-					tx.sign(privKey);
-					var serializedTx = tx.serialize();
-					
-					
-					web3.eth.sendRawTransaction('0x' + serializedTx.toString('hex'), function(err, hash) {
-						if (!err)
-							console.log(hash);
-						else
-							console.log(err);
-					});	*/				
-
-
-				} else {
-					resolve({"code":"0", "message":"connection error"})
-				}
-			
+            
+            var web3 = new Web3(new Web3.providers.HttpProvider(web3Address));
+            
+            web3.eth.getGasPrice()
+            .then((data)=>
+                resolve(data)
+            );
+            
 		})
         
     },
-
-    getAccountBalance: function(address, abi, contractAddress, web3Address) {
+	
+    getAccountEtherBalance: function(address, abi, contractAddress, web3Address) {
 		
-		//node EthereumUtils balance 0xb1e5b680fc802f086b5857bd73b62b79c6dfc235
         return new Promise(function(resolve, reject) {
+            var web3 = new Web3(new Web3.providers.HttpProvider(web3Address));
 
-				var web3 = new Web3(new Web3.providers.HttpProvider(web3Address));
-
-				if(web3.isConnected()) {
-
-					  var contract = web3.eth.contract(abi);
-
-					  var incubator = contract.at(contractAddress);
-
-					  //web3.eth.defaultAccount= address;
-					  //var currentMetaMaskUser = web3.eth.accounts[0];	
-					  //console.log(currentMetaMaskUser);									
-					  
-					  incubator.balanceOf.call(address, {}, 
-					  (error, result)=> {
-						  resolve({"code":"0", "data": result.toString()});
-					  });
-					  
-				} else {
-					resolve({"code":"0", "message":"connection error"})
-				}
+            web3.eth.getBalance(address)
+            .then((data)=>
+                resolve(data)
+            );
 		});
  
     },
-	
-	createNewToken: function(abi, contractAddress, web3Address) {
-		
-        return new Promise(function(resolve, reject) {		
-		
-				var web3 = new Web3(new Web3.providers.HttpProvider(web3Address));
 
-				if(web3.isConnected()) {
-					
-					  var contract = web3.eth.contract(abi);
+    checkIsInvestorWhitelistedInService: function(address, abi, contractAddress, web3Address, fromAddress) {
 
-					  var incubator = contract.at(contractAddress);				
-					
-					  const transactionObject = {
-						 from: "0xb1e5b680fc802f086b5857bd73b62b79c6dfc235",
-						 gas: 2000000,
-						 gasPrice: 4
-					  };
+        return new Promise(function(resolve, reject) {
+            
+            var web3 = new Web3(new Web3.providers.HttpProvider(web3Address));
+            
+            var contract = new web3.eth.Contract(abi, contractAddress);
+            
+            contract.methods.isInvestorWhiteListed(address).call({from: fromAddress})
+            .then ( (data) => { 
+                 
+                 console.log(data);
+                 
+                 if(data == true)
+                     resolve(true);
+                 else 
+                     resolve(false);
+            });
+            
+		})
+        
+        
+    },    
 
-					  incubator.mint.sendTransaction 
-					  ( "0xb1e5b680fc802f086b5857bd73b62b79c6dfc235", 10000, transactionObject, (error, result)=> {
-						  	resolve({"code":"1", data: result})
-					  });
+    whiteListInvestorInService: function(address, abi, contractAddress, web3Address) {
 
-				} else {
-					resolve({"code":"0", "message":"connection error"})
-				}
+        return new Promise(function(resolve, reject) {
+            
+            var web3 = new Web3(new Web3.providers.HttpProvider(web3Address));
+            
+            var contract = new web3.eth.Contract(abi, contractAddress);
+            
+            var account = web3.eth.accounts.privateKeyToAccount("0x10b74b21fbd76b922c68ab06e9d0c72766a8286220e655623f974239b868cc05");
+            
+            contract.methods.isInvestorWhiteListed(address).send({from: "0xcF1Ee43b7A7E3D9a4C948acF894F26c118278d94"})
+             .on("connected", function(subscriptionId){
+                console.log("conected : " + subscriptionId);
+             })
+             .on('data', function(event){
+                console.log("data" + event);
+             })
+             .on('receipt', function(data){
+                 resolve( "receipt" + JSON.stringify(data) );
+             })            
+             .on('changed', function(event){
+                 console.log("changed" + event);
+             })
+             .on('error', function(error, receipt) { 
+                 
+             });
 
 		})
+        
+        
+    },
+
+    getAccountStoBalance: function(address, abi, contractAddress, web3Address) {
+        
+		return new Promise(((resolve, reject) => {
+			try {
+				const web3 = new Web3(new Web3.providers.HttpProvider(web3Address));
+
+				web3.eth.net.isListening().then(() => {
+					const contract = new web3.eth.Contract(abi, contractAddress);
+
+					contract.methods.balanceOf(address).call().then((balance) => {
+						resolve(balance.toString());
+					}).catch((err) => {
+						reject({ code: '0', message: `${err.message}. Error calling balanceOf method in getAccountBalance` });
+					});
+
+				}).catch(() => {
+					reject({ code: '0', message: 'Ethereum network connection error in getAccountBalance' });
+				});
+			} catch (err) {
+				reject({ code: '0', message: `${err.message}. Error occured in getAccountBalance` });
+			}
+		}));
+        
+    },
+
+	whitelisAddress: function(distributionPublciKey, publicKeyUser, authoeize, ethereumPrivateKey, ethereumContractAddress, ethereumWhitelistAddress, web3Address, whitelistAbi) {
+		// authorize = true   add user to whitelist
+		// authorize = false  remove user from whitelist
+
+        /*return new Promise((resolve, reject) => {
+            
+            const contract = new web3.eth.Contract(whitelistAbi, ethereumWhitelistAddress);
+            var functionData = "";
+
+            if (authoeize === 'true') 
+                functionData = contract.methods.addWhitelistAddress(publicKeyUser).encodeABI();
+            else 
+                functionData = contract.methods.removeWhitelistAddress(publicKeyUser).encodeABI();
+
+            console.log("----------------");
+            module.exports.sendTransactionToEthereumNetwork(web3Address, contract, ethereumContractAddress, ethereumPrivateKey, distributionPublciKey, functionData, "WhiteListing").then((data) => {
+                resolve(data);
+                console.log(done);
+            }).catch((err) => {
+                reject({ code: '0', message: `${err.message}.  Ethereum network connection error in whitelisAddress` });
+            });
+        });*/
+        
+		return new Promise(((resolve, reject) => {
+			try {
+				const web3 = new Web3(new Web3.providers.HttpProvider(web3Address));
+                
+				web3.eth.net.isListening().then(() => {
+					const contract = new web3.eth.Contract(whitelistAbi, ethereumWhitelistAddress);
+					const privateKey = Buffer.from(ethereumPrivateKey, 'hex');
+					const contractAddress = ethereumWhitelistAddress;
+					web3.eth.defaultAccount = distributionPublciKey;
+					let estimateGasPromise = '';
+
+					if (authoeize === 'true') {
+						estimateGasPromise = web3.eth.estimateGas({
+							to: contractAddress,
+							data: contract.methods.addWhitelistAddress(publicKeyUser).encodeABI(),
+						});
+					} else {
+						estimateGasPromise = web3.eth.estimateGas({
+							to: contractAddress,
+							data: contract.methods.removeWhitelistAddress(publicKeyUser).encodeABI(),
+						});
+					}
+
+					const nouncePromise = web3.eth.getTransactionCount(distributionPublciKey, 'pending');
+
+					const allPromises = Promise.all([estimateGasPromise, nouncePromise]);
+
+
+					allPromises.then((results) => {
+						// creating raw tranaction
+                        
+						const rawTransaction = {
+							from: distributionPublciKey,
+							gasPrice: web3.utils.toHex(120 * 1e9),
+							gasLimit: web3.utils.toHex(results[0] + 1000000),
+							to: contractAddress,
+							value: '0x0',
+							nonce: web3.utils.toHex(results[1]),
+						};
+                        
+						if (authoeize === 'true') { rawTransaction.data = contract.methods.addWhitelistAddress(publicKeyUser).encodeABI(); } else { rawTransaction.data = contract.methods.removeWhitelistAddress(publicKeyUser).encodeABI(); }
+                        
+                        
+						// creating tranaction via ethereumjs-tx
+						const transaction = new ethereumjs(rawTransaction);
+                        
+						// signing transaction with private key
+						transaction.sign(privateKey);
+                        
+						// sending transacton via web3 module
+						const serializedTx = transaction.serialize();
+
+						console.log(`whitelisAddress transaction  address-${publicKeyUser}  authorize-${authoeize} Sending transaction`);
+
+						web3.eth.sendSignedTransaction(`0x${serializedTx.toString('hex')}`, (err, txId) => {
+                            
+							if (err) {
+								reject({ code: '0', message: `${err.message}. Error calling sendSignedTransaction in whitelisAddress` });
+							} else {
+								async.retry(
+									{ times: 5, interval: 1000 },
+									(callbackRetry) => {
+										web3.eth.getTransactionReceipt(txId).then((data) => {
+											if (data == null) {
+												callbackRetry('error', 0);
+											} else {
+												callbackRetry(null, 1);
+											}
+										});
+									}, (err2, result) => {
+										if (err2 != null) {
+											console.log(`whitelisAddress - Some error occured and execution cannot be confirmed ${err2.toString()} ${result}`);
+											return;
+										}
+										console.log(`whitelisAddress transaction completed with txId-${txId}`);
+										resolve('ok');
+									},
+								);
+							}
+						});
+					}).catch((err) => {
+				        reject({ code: '0', message: `${err.message}. Error in one of the Promises in allPromises in whitelisAddress` });
+					});
+				})
+				.catch((err) => {
+				    reject({ code: '0', message: `${err.message}.  Ethereum network connection error in whitelisAddress` });
+				});
+			} catch (err) {
+				reject({ code: '0', message: `${err.message}. Error occured in whitelisAddress` });
+			}
+		}));
+	},
+
+	sendTokens: function(myAddress, toAddress, amountToSend, ethereumPrivateKey, ethereumContractAddress, ethereumWhitelistAddress, web3Address, contractabi) {
+
+        return new Promise(((resolve, reject) => {
+    
+			try {
+				const web3 = new Web3(new Web3.providers.HttpProvider(web3Address));
+                
+				web3.eth.net.isListening().then(() => {
+                    
+					const contract = new web3.eth.Contract(contractabi, ethereumContractAddress);
+					const privateKey = Buffer.from(ethereumPrivateKey, 'hex');
+                    const amount = web3.utils.toHex(amountToSend);
+					const contractAddress = ethereumContractAddress;
+                    
+					web3.eth.defaultAccount = myAddress;
+                    
+                    
+					let estimateGasPromise = '';
+                    
+                    estimateGasPromise = web3.eth.estimateGas({
+                        to: ethereumContractAddress,
+                        data: contract.methods.transfer(toAddress, amount).encodeABI(),
+                    });
+                    
+					const nouncePromise = web3.eth.getTransactionCount(myAddress, 'pending');
+                    
+					const allPromises = Promise.all([estimateGasPromise, nouncePromise]);
+
+                    
+					allPromises.then((results) => {
+						// creating raw tranaction
+                                
+						const rawTransaction = {
+							from: myAddress,
+							gasPrice: web3.utils.toHex(120 * 1e9),
+							gasLimit: web3.utils.toHex(results[0] + 1000000),
+							to: ethereumContractAddress,
+							value: '0x0',
+                            data: contract.methods.transfer(toAddress, amount).encodeABI(),
+							nonce: web3.utils.toHex(results[1]),
+						};
+
+
+						// creating tranaction via ethereumjs-tx
+						const transaction = new ethereumjs(rawTransaction);
+
+						// signing transaction with private key
+						transaction.sign(privateKey);
+
+						// sending transacton via web3 module
+						const serializedTx = transaction.serialize();
+
+						console.log( `Sending transaction`);
+
+						web3.eth.sendSignedTransaction(`0x${serializedTx.toString('hex')}`, (err, txId) => {
+                            
+							if (err) {
+								reject({ code: '0', message: `${err.message}. Error calling sendSignedTransaction in whitelisAddress` });
+							} else {
+								async.retry(
+									{ times: 5, interval: 1000 },
+									(callbackRetry) => {
+										web3.eth.getTransactionReceipt(txId).then((data) => {
+											if (data == null) {
+												callbackRetry('error', 0);
+											} else {
+												callbackRetry(null, 1);
+											}
+										});
+									}, (err2, result) => {
+										if (err2 != null) {
+											console.log(`whitelisAddress - Some error occured and execution cannot be confirmed ${err2.toString()} ${result}`);
+											return;
+										}
+										console.log(`whitelisAddress transaction completed with txId-${txId}`);
+										resolve('ok');
+									},
+								);
+							}
+						});
+
+					}).catch((err) => {
+				        reject({ code: '0', message: `${err.message}. Error in one of the Promises in allPromises in whitelisAddress` });
+					});
+				})
+				.catch((err) => {
+				    reject({ code: '0', message: `${err.message}.  Ethereum network connection error in whitelisAddress` });
+				});
+			} catch (err) {
+				reject({ code: '0', message: `${err.message}. Error occured in whitelisAddress` });
+			}
+		}));
+
+	},
+
+    forceTransfer: function(fromAddress, toAddress, amountToSend, ethereumPrivateKey, ethereumContractAddress, ethereumWhitelistAddress, web3Address, contractabi) {
+
+        return new Promise(((resolve, reject) => {
+    
+			try {
+				const web3 = new Web3(new Web3.providers.HttpProvider(web3Address));
+                
+				web3.eth.net.isListening().then(() => {
+                    
+					const contract = new web3.eth.Contract(contractabi, ethereumContractAddress);
+					const privateKey = Buffer.from(ethereumPrivateKey, 'hex');
+                    const amount = web3.utils.toHex(amountToSend);
+					const contractAddress = ethereumContractAddress;
+                    
+					web3.eth.defaultAccount = toAddress;
+                    
+                    
+					let estimateGasPromise = '';
+                    
+                    estimateGasPromise = web3.eth.estimateGas({
+                        to: ethereumContractAddress,
+                        data: contract.methods.forceTransfer(fromAddress, toAddress, amount).encodeABI(),
+                    });
+                    
+					const nouncePromise = web3.eth.getTransactionCount(toAddress, 'pending');
+                    
+					const allPromises = Promise.all([estimateGasPromise, nouncePromise]);
+
+                    
+					allPromises.then((results) => {
+						// creating raw tranaction
+                                
+						const rawTransaction = {
+							from: toAddress,
+							gasPrice: web3.utils.toHex(120 * 1e9),
+							gasLimit: web3.utils.toHex(results[0] + 1000000),
+							to: ethereumContractAddress,
+							value: '0x0',
+                            data: contract.methods.forceTransfer(fromAddress, toAddress, amount).encodeABI(),
+							nonce: web3.utils.toHex(results[1]),
+						};
+
+
+						// creating tranaction via ethereumjs-tx
+						const transaction = new ethereumjs(rawTransaction);
+
+						// signing transaction with private key
+						transaction.sign(privateKey);
+
+						// sending transacton via web3 module
+						const serializedTx = transaction.serialize();
+
+						console.log( `Sending force transaction`);
+
+						web3.eth.sendSignedTransaction(`0x${serializedTx.toString('hex')}`, (err, txId) => {
+                            
+							if (err) {
+								reject({ code: '0', message: `${err.message}. Error calling sendSignedTransaction in forceTransfer` });
+							} else {
+								async.retry(
+									{ times: 5, interval: 1000 },
+									(callbackRetry) => {
+										web3.eth.getTransactionReceipt(txId).then((data) => {
+											if (data == null) {
+												callbackRetry('error', 0);
+											} else {
+												callbackRetry(null, 1);
+											}
+										});
+									}, (err2, result) => {
+										if (err2 != null) {
+											console.log(`forceTransfer - Some error occured and execution cannot be confirmed ${err2.toString()} ${result}`);
+											return;
+										}
+										console.log(`forceTransfer transaction completed with txId-${txId}`);
+										resolve('ok');
+									},
+								);
+							}
+						});
+					}).catch((err) => {
+				        reject({ code: '0', message: `${err.message}. Error in one of the Promises in allPromises in forceTransfer` });
+					});
+				})
+				.catch((err) => {
+				    reject({ code: '0', message: `${err.message}.  Ethereum network connection error in forceTransfer` });
+				});
+			} catch (err) {
+				reject({ code: '0', message: `${err.message}. Error occured in forceTransfer` });
+			}
+		}));                
+        
+    },
+
+	createNewToken: function(myAddress, amountToSend, ethereumPrivateKey, ethereumContractAddress, web3Address, contractabi) {
+        
+       return new Promise(((resolve, reject) => {
+    
+			try {
+				const web3 = new Web3(new Web3.providers.HttpProvider(web3Address));
+                
+				web3.eth.net.isListening().then(() => {
+                    
+					const contract = new web3.eth.Contract(contractabi, ethereumContractAddress);
+					const privateKey = Buffer.from(ethereumPrivateKey, 'hex');
+                    const amount = web3.utils.toHex(amountToSend);
+					const contractAddress = ethereumContractAddress;
+                    
+					web3.eth.defaultAccount = myAddress;
+                    
+                    
+					let estimateGasPromise = '';
+                    
+                    estimateGasPromise = web3.eth.estimateGas({
+                        to: ethereumContractAddress,
+                        data: contract.methods.mint(myAddress, amount).encodeABI(),
+                    });
+                    
+					const nouncePromise = web3.eth.getTransactionCount(myAddress, 'pending');
+                    
+					const allPromises = Promise.all([estimateGasPromise, nouncePromise]);
+
+                    
+					allPromises.then((results) => {
+						// creating raw tranaction
+                                
+						const rawTransaction = {
+							from: myAddress,
+							gasPrice: web3.utils.toHex(120 * 1e9),
+							gasLimit: web3.utils.toHex(results[0] + 1000000),
+							to: ethereumContractAddress,
+							value: '0x0',
+                            data: contract.methods.mint(myAddress, amount).encodeABI(),
+							nonce: web3.utils.toHex(results[1]),
+						};
+
+
+						// creating tranaction via ethereumjs-tx
+						const transaction = new ethereumjs(rawTransaction);
+
+						// signing transaction with private key
+						transaction.sign(privateKey);
+
+						// sending transacton via web3 module
+						const serializedTx = transaction.serialize();
+
+						console.log( `Sending transaction to mint tokens`);
+
+						web3.eth.sendSignedTransaction(`0x${serializedTx.toString('hex')}`, (err, txId) => {
+                            
+							if (err) {
+								reject({ code: '0', message: `${err.message}. Error calling sendSignedTransaction in mint tokens` });
+							} else {
+								async.retry(
+									{ times: 5, interval: 1000 },
+									(callbackRetry) => {
+										web3.eth.getTransactionReceipt(txId).then((data) => {
+											if (data == null) {
+												callbackRetry('error', 0);
+											} else {
+												callbackRetry(null, 1);
+											}
+										});
+									}, (err2, result) => {
+										if (err2 != null) {
+											console.log(`mint tokens - Some error occured and execution cannot be confirmed ${err2.toString()} ${result}`);
+											return;
+										}
+										console.log(`mint tokens transaction completed with txId-${txId}`);
+										resolve('ok');
+									},
+								);
+							}
+						});
+					}).catch((err) => {
+				        reject({ code: '0', message: `${err.message}. Error in one of the Promises in allPromises in whitelisAddress` });
+					});
+				})
+				.catch((err) => {
+				    reject({ code: '0', message: `${err.message}.  Ethereum network connection error in whitelisAddress` });
+				});
+			} catch (err) {
+				reject({ code: '0', message: `${err.message}. Error occured in whitelisAddress` });
+			}
+		}));
 	
+	},
+
+	burnToken: function(myAddress, amountToSend, ethereumPrivateKey, ethereumContractAddress, web3Address, contractabi) {
+
+       return new Promise(((resolve, reject) => {
+    
+			try {
+				const web3 = new Web3(new Web3.providers.HttpProvider(web3Address));
+                
+				web3.eth.net.isListening().then(() => {
+                    
+					const contract = new web3.eth.Contract(contractabi, ethereumContractAddress);
+					const privateKey = Buffer.from(ethereumPrivateKey, 'hex');
+                    const amount = web3.utils.toHex(amountToSend);
+					const contractAddress = ethereumContractAddress;
+                    
+					web3.eth.defaultAccount = myAddress;
+                    
+                    
+					let estimateGasPromise = '';
+                    
+                    estimateGasPromise = web3.eth.estimateGas({
+                        to: ethereumContractAddress,
+                        data: contract.methods.burn(amount).encodeABI(),
+                    });
+                    
+					const nouncePromise = web3.eth.getTransactionCount(myAddress, 'pending');
+                    
+					const allPromises = Promise.all([estimateGasPromise, nouncePromise]);
+
+                    
+					allPromises.then((results) => {
+						// creating raw tranaction
+                                
+						const rawTransaction = {
+							from: myAddress,
+							gasPrice: web3.utils.toHex(120 * 1e9),
+							gasLimit: web3.utils.toHex(results[0] + 1000000),
+							to: ethereumContractAddress,
+							value: '0x0',
+                            data: contract.methods.burn(amount).encodeABI(),
+							nonce: web3.utils.toHex(results[1]),
+						};
+
+
+						// creating tranaction via ethereumjs-tx
+						const transaction = new ethereumjs(rawTransaction);
+
+						// signing transaction with private key
+						transaction.sign(privateKey);
+
+						// sending transacton via web3 module
+						const serializedTx = transaction.serialize();
+
+						console.log( `Sending transaction to burn tokens`);
+
+						web3.eth.sendSignedTransaction(`0x${serializedTx.toString('hex')}`, (err, txId) => {
+                            
+							if (err) {
+								reject({ code: '0', message: `${err.message}. Error calling sendSignedTransaction in burn tokens` });
+							} else {
+								async.retry(
+									{ times: 5, interval: 1000 },
+									(callbackRetry) => {
+										web3.eth.getTransactionReceipt(txId).then((data) => {
+											if (data == null) {
+												callbackRetry('error', 0);
+											} else {
+												callbackRetry(null, 1);
+											}
+										});
+									}, (err2, result) => {
+										if (err2 != null) {
+											console.log(`burn tokens - Some error occured and execution cannot be confirmed ${err2.toString()} ${result}`);
+											return;
+										}
+										console.log(`burn tokens transaction completed with txId-${txId}`);
+										resolve('ok');
+									},
+								);
+							}
+						});
+					}).catch((err) => {
+				        reject({ code: '0', message: `${err.message}. Error in one of the Promises in allPromises in burn` });
+					});
+				})
+				.catch((err) => {
+				    reject({ code: '0', message: `${err.message}.  Ethereum network connection error in burn` });
+				});
+			} catch (err) {
+				reject({ code: '0', message: `${err.message}. Error occured in burn` });
+			}
+		}));
 	
-	}
-	
-	
-}
+	},
+    
+    sendTransactionToEthereumNetwork: function(web3Address, contract, ethereumContractAddress, ethereumPrivateKey, fromAddress, functionDataABI, logTransactionName) {
+        
+        return new Promise((resolve, reject) => {
+    
+			try {
+				const web3 = new Web3(new Web3.providers.HttpProvider(web3Address));
+
+				web3.eth.net.isListening().then(() => {
+                    
+					const privateKey = Buffer.from(ethereumPrivateKey, 'hex');
+					web3.eth.defaultAccount = fromAddress;
+                    
+					let estimateGasPromise = "";
+
+                    estimateGasPromise = web3.eth.estimateGas({
+                        to: ethereumContractAddress,
+                        data: functionDataABI,
+                    });
+
+					const nouncePromise = web3.eth.getTransactionCount(fromAddress, 'pending');
+
+					const allPromises = Promise.all([estimateGasPromise, nouncePromise]);
+
+					allPromises.then((results) => {
+						// creating raw tranaction
+                        
+                        console.log(results);
+                        
+						const rawTransaction = {
+							from: fromAddress,
+							gasPrice: web3.utils.toHex(120 * 1e9),
+							gasLimit: web3.utils.toHex(results[0] + 1000000),
+							to: ethereumContractAddress,
+							value: '0x0',
+                            data: functionDataABI,
+							nonce: web3.utils.toHex(results[1]),
+						};
+
+
+						// creating tranaction via ethereumjs-tx
+						const transaction = new ethereumjs(rawTransaction);
+
+						// signing transaction with private key
+						transaction.sign(privateKey);
+
+						// sending transacton via web3 module
+						const serializedTx = transaction.serialize();
+
+						console.log( `${logTransactionName} - Sending transaction`);
+
+						web3.eth.sendSignedTransaction(`0x${serializedTx.toString('hex')}`, (err, txId) => {
+                            
+							if (err) {
+								reject( err.message );
+							} else {
+								async.retry(
+									{ times: 5, interval: 1000 },
+									(callbackRetry) => {
+										web3.eth.getTransactionReceipt(txId).then((data) => {
+											if (data == null) {
+												callbackRetry('error', 0);
+											} else {
+												callbackRetry(null, 1);
+											}
+										});
+									}, (err2, result) => {
+										if (err2 != null) {
+											console.log(`${logTransactionName} - Some error occured and execution cannot be confirmed ${err2.toString()}`);
+											reject( err.message );
+										}
+										console.log(`${logTransactionName} - Transaction completed with txId-${txId}`);
+										resolve('ok');
+									},
+								);
+							}
+						});
+
+					}).catch((err) => {
+				        reject( err.message );
+					});
+				})
+				.catch((err) => {
+				    reject( err.message );
+				});
+			} catch (err) {
+				reject( err.message );
+			}
+		});
+        
+    },
+        
+    test: function() {
+        return new Promise(((resolve, reject) => {
+            
+            
+            
+            
+            
+            
+        }));
+    }
+};
 
 
 

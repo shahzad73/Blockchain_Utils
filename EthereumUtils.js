@@ -11,26 +11,38 @@ const fs = require('fs');
 // deploy the contract without truffle with node
 // https://medium.com/coinmonks/deploy-smart-contract-with-web3js-account-private-key-no-truffle-solidity-tutorial-2-5926fface340
 
-
 //https://github.com/ethereum/wiki/wiki/JavaScript-API#example-45
 
 
+/*
+    node EthereumUtils getGas
+    node EthereumUtils EncryptKey 10b74b21fbd76b922c68ab06e9d0c72766a8286220e655623f974239b868cc05 Allahis1 f:\keystore.txt
+    node EthereumUtils DecryptKey Allahis1 f:\keystore.txt
+    node EthereumUtils etherBalance 0x9B71184d9d0641E58FB42e7Cd09c7e773992dB96
+    node EthereumUtils stoTokenBalance 0xcF1Ee43b7A7E3D9a4C948acF894F26c118278d94
+    
+    node EthereumUtils checkInvestorWhiteListed 0x140D6b0D42f90BFC62aCD45bF770DdeF18ebe910
+    node EthereumUtils whiteListInvestor Allahis1 f:\keystore.txt 0xcF1Ee43b7A7E3D9a4C948acF894F26c118278d94 true
+    node EthereumUtils sendTokens Allahis1 f:\keystore.txt 0x9B71184d9d0641E58FB42e7Cd09c7e773992dB96 1000
+    node EthereumUtils forceTransfer Allahis1 f:\keystore.txt 0x9B71184d9d0641E58FB42e7Cd09c7e773992dB96 105
+    node EthereumUtils create Allahis1 f:\keystore.txt 1000
+    node EthereumUtils burn Allahis1 f:\keystore.txt 1000
+
+
+    0xcF1Ee43b7A7E3D9a4C948acF894F26c118278d94
+    0x9B71184d9d0641E58FB42e7Cd09c7e773992dB96
+    0x3C631Fa75dFa9Cf8844faaD9Fa177cECD4aA19C9
+    0xD7d28a048Ca8e389CE628cdb2beE64549E85e777
+    0x140D6b0D42f90BFC62aCD45bF770DdeF18ebe910
+*/
+
+
+
+
+
+
+
 var abi_contract = [
-    {
-      "constant": true,
-      "inputs": [],
-      "name": "name",
-      "outputs": [
-        {
-          "name": "",
-          "type": "string"
-        }
-      ],
-      "payable": false,
-      "stateMutability": "view",
-      "type": "function",
-      "signature": "0x06fdde03"
-    },
     {
       "constant": false,
       "inputs": [
@@ -52,8 +64,7 @@ var abi_contract = [
       ],
       "payable": false,
       "stateMutability": "nonpayable",
-      "type": "function",
-      "signature": "0x095ea7b3"
+      "type": "function"
     },
     {
       "constant": true,
@@ -67,66 +78,7 @@ var abi_contract = [
       ],
       "payable": false,
       "stateMutability": "view",
-      "type": "function",
-      "signature": "0x18160ddd"
-    },
-    {
-      "constant": false,
-      "inputs": [
-        {
-          "name": "from",
-          "type": "address"
-        },
-        {
-          "name": "to",
-          "type": "address"
-        },
-        {
-          "name": "value",
-          "type": "uint256"
-        }
-      ],
-      "name": "transferFrom",
-      "outputs": [
-        {
-          "name": "",
-          "type": "bool"
-        }
-      ],
-      "payable": false,
-      "stateMutability": "nonpayable",
-      "type": "function",
-      "signature": "0x23b872dd"
-    },
-    {
-      "constant": true,
-      "inputs": [],
-      "name": "totalSupplyToken",
-      "outputs": [
-        {
-          "name": "",
-          "type": "uint256"
-        }
-      ],
-      "payable": false,
-      "stateMutability": "view",
-      "type": "function",
-      "signature": "0x27213345"
-    },
-    {
-      "constant": true,
-      "inputs": [],
-      "name": "decimals",
-      "outputs": [
-        {
-          "name": "",
-          "type": "uint32"
-        }
-      ],
-      "payable": false,
-      "stateMutability": "view",
-      "type": "function",
-      "signature": "0x313ce567"
+      "type": "function"
     },
     {
       "constant": false,
@@ -149,8 +101,7 @@ var abi_contract = [
       ],
       "payable": false,
       "stateMutability": "nonpayable",
-      "type": "function",
-      "signature": "0x39509351"
+      "type": "function"
     },
     {
       "constant": false,
@@ -173,8 +124,21 @@ var abi_contract = [
       ],
       "payable": false,
       "stateMutability": "nonpayable",
-      "type": "function",
-      "signature": "0x40c10f19"
+      "type": "function"
+    },
+    {
+      "constant": false,
+      "inputs": [
+        {
+          "name": "value",
+          "type": "uint256"
+        }
+      ],
+      "name": "burn",
+      "outputs": [],
+      "payable": false,
+      "stateMutability": "nonpayable",
+      "type": "function"
     },
     {
       "constant": true,
@@ -193,23 +157,76 @@ var abi_contract = [
       ],
       "payable": false,
       "stateMutability": "view",
-      "type": "function",
-      "signature": "0x70a08231"
+      "type": "function"
+    },
+    {
+      "constant": false,
+      "inputs": [],
+      "name": "renounceOwnership",
+      "outputs": [],
+      "payable": false,
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "constant": false,
+      "inputs": [
+        {
+          "name": "from",
+          "type": "address"
+        },
+        {
+          "name": "value",
+          "type": "uint256"
+        }
+      ],
+      "name": "burnFrom",
+      "outputs": [],
+      "payable": false,
+      "stateMutability": "nonpayable",
+      "type": "function"
     },
     {
       "constant": true,
       "inputs": [],
-      "name": "symbol",
+      "name": "registry",
       "outputs": [
         {
           "name": "",
-          "type": "string"
+          "type": "address"
         }
       ],
       "payable": false,
       "stateMutability": "view",
-      "type": "function",
-      "signature": "0x95d89b41"
+      "type": "function"
+    },
+    {
+      "constant": true,
+      "inputs": [],
+      "name": "owner",
+      "outputs": [
+        {
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "payable": false,
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "constant": true,
+      "inputs": [],
+      "name": "isOwner",
+      "outputs": [
+        {
+          "name": "",
+          "type": "bool"
+        }
+      ],
+      "payable": false,
+      "stateMutability": "view",
+      "type": "function"
     },
     {
       "constant": false,
@@ -223,8 +240,7 @@ var abi_contract = [
       "outputs": [],
       "payable": false,
       "stateMutability": "nonpayable",
-      "type": "function",
-      "signature": "0x983b2d56"
+      "type": "function"
     },
     {
       "constant": false,
@@ -233,8 +249,7 @@ var abi_contract = [
       "outputs": [],
       "payable": false,
       "stateMutability": "nonpayable",
-      "type": "function",
-      "signature": "0x98650275"
+      "type": "function"
     },
     {
       "constant": false,
@@ -257,32 +272,7 @@ var abi_contract = [
       ],
       "payable": false,
       "stateMutability": "nonpayable",
-      "type": "function",
-      "signature": "0xa457c2d7"
-    },
-    {
-      "constant": false,
-      "inputs": [
-        {
-          "name": "to",
-          "type": "address"
-        },
-        {
-          "name": "value",
-          "type": "uint256"
-        }
-      ],
-      "name": "transfer",
-      "outputs": [
-        {
-          "name": "",
-          "type": "bool"
-        }
-      ],
-      "payable": false,
-      "stateMutability": "nonpayable",
-      "type": "function",
-      "signature": "0xa9059cbb"
+      "type": "function"
     },
     {
       "constant": true,
@@ -301,8 +291,7 @@ var abi_contract = [
       ],
       "payable": false,
       "stateMutability": "view",
-      "type": "function",
-      "signature": "0xaa271e1a"
+      "type": "function"
     },
     {
       "constant": true,
@@ -325,15 +314,81 @@ var abi_contract = [
       ],
       "payable": false,
       "stateMutability": "view",
-      "type": "function",
-      "signature": "0xdd62ed3e"
+      "type": "function"
     },
     {
-      "inputs": [],
+      "constant": false,
+      "inputs": [
+        {
+          "name": "newOwner",
+          "type": "address"
+        }
+      ],
+      "name": "transferOwnership",
+      "outputs": [],
       "payable": false,
       "stateMutability": "nonpayable",
-      "type": "constructor",
-      "signature": "constructor"
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "name": "_registry",
+          "type": "address"
+        }
+      ],
+      "payable": false,
+      "stateMutability": "nonpayable",
+      "type": "constructor"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": false,
+          "name": "reason",
+          "type": "uint8"
+        },
+        {
+          "indexed": true,
+          "name": "spender",
+          "type": "address"
+        },
+        {
+          "indexed": true,
+          "name": "from",
+          "type": "address"
+        },
+        {
+          "indexed": true,
+          "name": "to",
+          "type": "address"
+        },
+        {
+          "indexed": false,
+          "name": "value",
+          "type": "uint256"
+        }
+      ],
+      "name": "CheckStatus",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "name": "previousOwner",
+          "type": "address"
+        },
+        {
+          "indexed": true,
+          "name": "newOwner",
+          "type": "address"
+        }
+      ],
+      "name": "OwnershipTransferred",
+      "type": "event"
     },
     {
       "anonymous": false,
@@ -345,8 +400,7 @@ var abi_contract = [
         }
       ],
       "name": "MinterAdded",
-      "type": "event",
-      "signature": "0x6ae172837ea30b801fbfcdd4108aa1d5bf8ff775444fd70256b44e6bf3dfc3f6"
+      "type": "event"
     },
     {
       "anonymous": false,
@@ -358,8 +412,7 @@ var abi_contract = [
         }
       ],
       "name": "MinterRemoved",
-      "type": "event",
-      "signature": "0xe94479a9f7e1952cc78f2d6baab678adc1b772d936c6583def489e524cb66692"
+      "type": "event"
     },
     {
       "anonymous": false,
@@ -381,8 +434,7 @@ var abi_contract = [
         }
       ],
       "name": "Transfer",
-      "type": "event",
-      "signature": "0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef"
+      "type": "event"
     },
     {
       "anonymous": false,
@@ -404,113 +456,421 @@ var abi_contract = [
         }
       ],
       "name": "Approval",
-      "type": "event",
-      "signature": "0x8c5be1e5ebec7d5bd14f71427d1e84f3dd0314c0f7b2291e5b200ac8c7c3b925"
+      "type": "event"
+    },
+    {
+      "constant": false,
+      "inputs": [
+        {
+          "name": "_to",
+          "type": "address"
+        },
+        {
+          "name": "_value",
+          "type": "uint256"
+        }
+      ],
+      "name": "transfer",
+      "outputs": [
+        {
+          "name": "",
+          "type": "bool"
+        }
+      ],
+      "payable": false,
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "constant": false,
+      "inputs": [
+        {
+          "name": "_from",
+          "type": "address"
+        },
+        {
+          "name": "_to",
+          "type": "address"
+        },
+        {
+          "name": "_value",
+          "type": "uint256"
+        }
+      ],
+      "name": "transferFrom",
+      "outputs": [
+        {
+          "name": "",
+          "type": "bool"
+        }
+      ],
+      "payable": false,
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "constant": false,
+      "inputs": [
+        {
+          "name": "_from",
+          "type": "address"
+        },
+        {
+          "name": "_to",
+          "type": "address"
+        },
+        {
+          "name": "_value",
+          "type": "uint256"
+        }
+      ],
+      "name": "forceTransfer",
+      "outputs": [
+        {
+          "name": "",
+          "type": "bool"
+        }
+      ],
+      "payable": false,
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "constant": true,
+      "inputs": [],
+      "name": "_service",
+      "outputs": [
+        {
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "payable": false,
+      "stateMutability": "view",
+      "type": "function"
     }
   ]
-var contract_address = "0x50Cfea66d012A8e0F47a15e3dA999a67807959f5";
-var privateKey = "0xf676c99a7823dc3f6e51bba014864d714306b8b0f6be86e7b19c3d3905f043d0"
+var abi_service =  [
+    {
+      "constant": false,
+      "inputs": [],
+      "name": "renounceOwnership",
+      "outputs": [],
+      "payable": false,
+      "stateMutability": "nonpayable",
+      "type": "function",
+      "signature": "0x715018a6"
+    },
+    {
+      "constant": true,
+      "inputs": [],
+      "name": "owner",
+      "outputs": [
+        {
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "payable": false,
+      "stateMutability": "view",
+      "type": "function",
+      "signature": "0x8da5cb5b"
+    },
+    {
+      "constant": true,
+      "inputs": [],
+      "name": "isOwner",
+      "outputs": [
+        {
+          "name": "",
+          "type": "bool"
+        }
+      ],
+      "payable": false,
+      "stateMutability": "view",
+      "type": "function",
+      "signature": "0x8f32d59b"
+    },
+    {
+      "constant": true,
+      "inputs": [
+        {
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "name": "whitelisted",
+      "outputs": [
+        {
+          "name": "",
+          "type": "bool"
+        }
+      ],
+      "payable": false,
+      "stateMutability": "view",
+      "type": "function",
+      "signature": "0xd936547e"
+    },
+    {
+      "constant": false,
+      "inputs": [
+        {
+          "name": "newOwner",
+          "type": "address"
+        }
+      ],
+      "name": "transferOwnership",
+      "outputs": [],
+      "payable": false,
+      "stateMutability": "nonpayable",
+      "type": "function",
+      "signature": "0xf2fde38b"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "name": "previousOwner",
+          "type": "address"
+        },
+        {
+          "indexed": true,
+          "name": "newOwner",
+          "type": "address"
+        }
+      ],
+      "name": "OwnershipTransferred",
+      "type": "event",
+      "signature": "0x8be0079c531659141344cd1fd0a4f28419497f9722a3daafe3b4186f6b6457e0"
+    },
+    {
+      "constant": false,
+      "inputs": [
+        {
+          "name": "user",
+          "type": "address"
+        }
+      ],
+      "name": "addWhitelistAddress",
+      "outputs": [],
+      "payable": false,
+      "stateMutability": "nonpayable",
+      "type": "function",
+      "signature": "0x94a7ef15"
+    },
+    {
+      "constant": false,
+      "inputs": [
+        {
+          "name": "user",
+          "type": "address"
+        }
+      ],
+      "name": "removeWhitelistAddress",
+      "outputs": [],
+      "payable": false,
+      "stateMutability": "nonpayable",
+      "type": "function",
+      "signature": "0xb7ecbaae"
+    },
+    {
+      "constant": true,
+      "inputs": [
+        {
+          "name": "user",
+          "type": "address"
+        }
+      ],
+      "name": "isInvestorWhiteListed",
+      "outputs": [
+        {
+          "name": "",
+          "type": "bool"
+        }
+      ],
+      "payable": false,
+      "stateMutability": "view",
+      "type": "function",
+      "signature": "0xf3c6e993"
+    },
+    {
+      "constant": false,
+      "inputs": [
+        {
+          "name": "_token",
+          "type": "address"
+        },
+        {
+          "name": "_spender",
+          "type": "address"
+        },
+        {
+          "name": "_from",
+          "type": "address"
+        },
+        {
+          "name": "_to",
+          "type": "address"
+        },
+        {
+          "name": "_amount",
+          "type": "uint256"
+        }
+      ],
+      "name": "check",
+      "outputs": [
+        {
+          "name": "",
+          "type": "uint8"
+        }
+      ],
+      "payable": false,
+      "stateMutability": "nonpayable",
+      "type": "function",
+      "signature": "0x803fcd43"
+    }
+  ]
 
+var contract_address = "0x6E6AB1A1F2c0935e60Ad34118992302d5E1E33ec";
+var service_address = "0x5d9dA85044eEbd8b8e80959151A954EFEEeeC1D1";
+var linkToBlockchainServer = "http://localhost:7545";
 
-
-
-if (process.argv[2] == "EncryptKey") {
+if (process.argv[2] == "getGas") {
+    // node EthereumUtils getGas
     
-    // node EthereumUtils EncryptKey 0x10b74b21fbd76b922c68ab06e9d0c72766a8286220e655623f974239b868cc05 Allahis1 f:\fil1.txt
+    ethereum.getGas(linkToBlockchainServer).then(function(data){
+		console.log(data);
+        process.exit(0);
+	})
+}
 
-     var data = ethereum.encryptKey(process.argv[3], process.argv[4]); 
+if (process.argv[2] == "EncryptKey") { 
+    // node EthereumUtils EncryptKey 10b74b21fbd76b922c68ab06e9d0c72766a8286220e655623f974239b868cc05 Allahis1 f:\keystore.txt
+
+     var data = ethereum.encryptKey(process.argv[3], process.argv[4], linkToBlockchainServer); 
      fs.writeFileSync(process.argv[5], JSON.stringify(data));
-	 console.log(JSON.stringify(data))
+	 console.log(JSON.stringify(data));
+     process.exit(0);
 }
 
 if (process.argv[2] == "DecryptKey") {
-    // node EthereumUtils DecryptKey Allahis1 f:\fil1.txt
-    
-	let data = fs.readFileSync(process.argv[4], 'utf8')
-    let data2 = ethereum.decryptKey(data, process.argv[3]);
+    // node EthereumUtils DecryptKey Allahis1 f:\keystore.txt
+
+    let data2 = decryptKeyFromFile(process.argv[4], process.argv[3]);
     console.log(data2.privateKey);
     console.log(data2.address);
+    process.exit(0);
 }
 
-if (process.argv[2] == "send") {
+if (process.argv[2] == "etherBalance") {
 
-    //node EthereumUtils send 0x64aa9045ed3f11af8981458db106bef048a0dc47  0xe53e1915a883b29e9da61d146effc11ccc515615
-
-    ethereum.sendTokens(process.argv[3], process.argv[4], 10, abi_contract, contract_address ,'http://localhost:8545').then(function(data){
+	// node EthereumUtils etherBalance 0x9B71184d9d0641E58FB42e7Cd09c7e773992dB96
+	ethereum.getAccountEtherBalance( process.argv[3], abi_contract, contract_address, linkToBlockchainServer).then(function(data){
 		console.log(data);
+        process.exit(0);
 	})
 
 }
 
-if (process.argv[2] == "balance") {
+if (process.argv[2] == "stoTokenBalance") {
+	// node EthereumUtils stoTokenBalance 0xcF1Ee43b7A7E3D9a4C948acF894F26c118278d94
+    // node EthereumUtils stoTokenBalance 0x9B71184d9d0641E58FB42e7Cd09c7e773992dB96
+
+	ethereum.getAccountStoBalance( process.argv[3], abi_contract, contract_address, linkToBlockchainServer).then(function(data){
+		console.log(data);
+        process.exit(0);
+	})
+
+}
+
+if (process.argv[2] == "checkInvestorWhiteListed") {
+    //node EthereumUtils checkInvestorWhiteListed 0xcF1Ee43b7A7E3D9a4C948acF894F26c118278d94
+
+	ethereum.checkIsInvestorWhitelistedInService( process.argv[3], abi_service, service_address, linkToBlockchainServer).then(function(data){
+		console.log(data);
+        process.exit(0);
+	})
+}
+
+if (process.argv[2] == "whiteListInvestor") {
+
+    //node EthereumUtils whiteListInvestor Allahis1 f:\keystore.txt 0xcF1Ee43b7A7E3D9a4C948acF894F26c118278d94 true
+
+    let data2 = decryptKeyFromFile(process.argv[4], process.argv[3]);
+    
+    ethereum.whitelisAddress(data2.address, process.argv[5], process.argv[6], data2.privateKey.substring(2), contract_address, service_address, linkToBlockchainServer, abi_service).then(function(data){
+		console.log(data);
+        process.exit(0);
+	})
+
+}
+
+if (process.argv[2] == "sendTokens") {
+
+    //node EthereumUtils sendTokens Allahis1 f:\keystore.txt 0x9B71184d9d0641E58FB42e7Cd09c7e773992dB96 100
+    
+    let data2 = decryptKeyFromFile(process.argv[4], process.argv[3]);
+    
+    ethereum.sendTokens(data2.address, process.argv[5], parseInt(process.argv[6]),  data2.privateKey.substring(2), contract_address, service_address, linkToBlockchainServer, abi_contract).then(function(data){
+		console.log(data);
+        process.exit(0);
+	});
+
+}
+
+if (process.argv[2] == "forceTransfer") {
+    //node EthereumUtils forceTransfer Allahis1 f:\keystore.txt 0xcF1Ee43b7A7E3D9a4C948acF894F26c118278d94 100
+
+    let data2 = decryptKeyFromFile(process.argv[4], process.argv[3]);
+    
+    ethereum.forceTransfer( process.argv[5], data2.address, parseInt(process.argv[6]),  data2.privateKey.substring(2), contract_address, service_address, linkToBlockchainServer, abi_contract ).then(function(data){
+		console.log(data);
+        process.exit(0);
+	});
+
+}
+
+if (process.argv[2] == "create") {
+
+	// node EthereumUtils create Allahis1 f:\keystore.txt 1000
+    
+    let data2 = decryptKeyFromFile(process.argv[4], process.argv[3]);
+    
+	ethereum.createNewToken(data2.address, parseInt(process.argv[5]), data2.privateKey.substring(2), contract_address, linkToBlockchainServer, abi_contract).then(function(data){
+		console.log("done");
+        process.exit(0);
+	})
 	
-	// node EthereumUtils balance 0xb1e5b680fc802f086b5857bd73b62b79c6dfc235
-	
-	ethereum.getAccountBalance( process.argv[3], abi_contract, contract_address ,'http://localhost:8545').then(function(data){
-		console.log(data)
+}
+
+if (process.argv[2] == "burn") {
+
+	// node EthereumUtils burn Allahis1 f:\keystore.txt 1000
+    
+    let data2 = decryptKeyFromFile(process.argv[4], process.argv[3]);
+    
+	ethereum.burnToken(data2.address,  parseInt(process.argv[5]),  data2.privateKey.substring(2), contract_address, linkToBlockchainServer, abi_contract).then(function(data){
+		console.log("done");
+        process.exit(0);
 	})
 	
 }
 
 if (process.argv[2] == "test") {
-	
-	//node EthereumUtils test\
-	
-	const Web3 = require('web3');
-	const ethereumjs = require('ethereumjs-tx');
-	
-	var web3 = new Web3(new Web3.providers.HttpProvider("http://localhost:8545"));
-	
-	var fromAddress = "0xb1CE379F10f8eC52DB8D97652e890B5DEeFa64EB";
-	
-	var count = web3.eth.getTransactionCount(fromAddress);
-	var contract = web3.eth.contract(abi_contract).at(contract_address);
-	var rawTransaction = {
-		"from": fromAddress,
-		"nonce": web3.toHex(count+1),
-		"gasPrice": "0x04e3b29200",
-		"gasLimit": "0x7458",
-		"to": contract_address,
-		"value": "0x0",
-		"data": contract.balanceOf(fromAddress),
-		"chainId": 0x03
-	};
-
-	var tx = new ethereumjs(rawTransaction);
-	var serializedTx = tx.serialize();
-	
-	var result = web3.eth.call({
-	   to: contract_address, 
-	   data: serializedTx
-	});
-	console.log(result);	
-	
-	
-}
-
-if (process.argv[2] == "create") {
-	
-	//node EthereumUtils 
-	ethereum.createNewToken(abi_contract, contract_address ,'http://localhost:8545').then(function(data){
-		console.log("done")
-	})
-		
-	
+    //node EthereumUtils test
+    
+    ethereum.test().then(function(data) {
+        console.log(data);
+        process.exit(0);
+    });
 }
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+function decryptKeyFromFile(file, password) {
+	let data = fs.readFileSync(file, 'utf8')
+    return ethereum.decryptKey(data, password, linkToBlockchainServer);
+    
+    //return    {"privateKey": "", "address": ""}
+}
