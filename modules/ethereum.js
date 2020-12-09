@@ -3,9 +3,7 @@ const ethereumjs = require('ethereumjs-tx');
 var Accounts = require('web3-eth-accounts');
 const async = require('async');
 
-
-const accounts = new Accounts('ws://127.0.0.1:7545');
-
+//const accounts = new Accounts('ws://127.0.0.1:7545');
 
 module.exports = {
 
@@ -40,9 +38,10 @@ module.exports = {
             var web3 = new Web3(new Web3.providers.HttpProvider(web3Address));
 
             web3.eth.getBalance(address)
-            .then((data)=>
+            .then((data)=> {
+                  console.log(data);
                 resolve(data)
-            );
+            });
 		});
  
     },
@@ -57,8 +56,6 @@ module.exports = {
             
             contract.methods.isInvestorWhiteListed(address).call({from: fromAddress})
             .then ( (data) => { 
-                 
-                 console.log(data);
                  
                  if(data == true)
                      resolve(true);
@@ -128,7 +125,7 @@ module.exports = {
         
     },
 
-	whitelisAddress: function(distributionPublciKey, publicKeyUser, authoeize, ethereumPrivateKey, ethereumContractAddress, ethereumWhitelistAddress, web3Address, whitelistAbi) {
+	whitelisAddress: function(protocol, distributionPublciKey, publicKeyUser, authoeize, ethereumPrivateKey, ethereumContractAddress, ethereumWhitelistAddress, web3Address, whitelistAbi) {
 		// authorize = true   add user to whitelist
 		// authorize = false  remove user from whitelist
 
@@ -162,10 +159,18 @@ module.exports = {
 					web3.eth.defaultAccount = distributionPublciKey;
 					let estimateGasPromise = '';
 
+                    console.log(protocol)
+                    
 					if (authoeize === 'true') {
+                        var tempData = "";
+                        if(protocol == 1)    
+                                tempData = contract.methods.addWhitelistAddress(publicKeyUser).encodeABI();                        
+                        else if(protocol == 2)    
+                                tempData = contract.methods.modifyKYCData(publicKeyUser, 1893463200, 1893463200, 1893463200).encodeABI();
+
 						estimateGasPromise = web3.eth.estimateGas({
 							to: contractAddress,
-							data: contract.methods.addWhitelistAddress(publicKeyUser).encodeABI(),
+							data: tempData
 						});
 					} else {
 						estimateGasPromise = web3.eth.estimateGas({
@@ -181,7 +186,7 @@ module.exports = {
 
 					allPromises.then((results) => {
 						// creating raw tranaction
-                        
+
 						const rawTransaction = {
 							from: distributionPublciKey,
 							gasPrice: web3.utils.toHex(120 * 1e9),
@@ -191,7 +196,17 @@ module.exports = {
 							nonce: web3.utils.toHex(results[1]),
 						};
                         
-						if (authoeize === 'true') { rawTransaction.data = contract.methods.addWhitelistAddress(publicKeyUser).encodeABI(); } else { rawTransaction.data = contract.methods.removeWhitelistAddress(publicKeyUser).encodeABI(); }
+						if (authoeize === 'true') { 
+                            var tempData2 = "";
+                            if(protocol == 1)    
+                                    tempData2 = contract.methods.addWhitelistAddress(publicKeyUser).encodeABI();                      
+                            else if(protocol == 2)    
+                                    tempData2 = contract.methods.modifyKYCData(publicKeyUser, 1262304000, 1262304000, 1893463200).encodeABI();
+                            
+                            rawTransaction.data = tempData2; 
+                        } else { 
+                            rawTransaction.data = contract.methods.removeWhitelistAddress(publicKeyUser).encodeABI(); 
+                        }
                         
                         
 						// creating tranaction via ethereumjs-tx
@@ -245,21 +260,19 @@ module.exports = {
 	},
 
 	sendTokens: function(myAddress, toAddress, amountToSend, ethereumPrivateKey, ethereumContractAddress, ethereumWhitelistAddress, web3Address, contractabi) {
-
+        
         return new Promise(((resolve, reject) => {
-    
+            
 			try {
 				const web3 = new Web3(new Web3.providers.HttpProvider(web3Address));
                 
 				web3.eth.net.isListening().then(() => {
-                    
 					const contract = new web3.eth.Contract(contractabi, ethereumContractAddress);
-					const privateKey = Buffer.from(ethereumPrivateKey, 'hex');
+					const privateKey = Buffer.from(ethereumPrivateKey, 'hex');                    
                     const amount = web3.utils.toHex(amountToSend);
 					const contractAddress = ethereumContractAddress;
                     
 					web3.eth.defaultAccount = myAddress;
-                    
                     
 					let estimateGasPromise = '';
                     
@@ -267,23 +280,22 @@ module.exports = {
                         to: ethereumContractAddress,
                         data: contract.methods.transfer(toAddress, amount).encodeABI(),
                     });
-                    
-					const nouncePromise = web3.eth.getTransactionCount(myAddress, 'pending');
-                    
-					const allPromises = Promise.all([estimateGasPromise, nouncePromise]);
 
+					const nouncePromise = web3.eth.getTransactionCount(myAddress, 'pending');
+
+					const allPromises = Promise.all([nouncePromise, estimateGasPromise]);
                     
 					allPromises.then((results) => {
+
 						// creating raw tranaction
-                                
 						const rawTransaction = {
 							from: myAddress,
 							gasPrice: web3.utils.toHex(120 * 1e9),
-							gasLimit: web3.utils.toHex(results[0] + 1000000),
+							gasLimit: 93399 + 1000000,
 							to: ethereumContractAddress,
-							value: '0x0',
+							value: 0x0,
                             data: contract.methods.transfer(toAddress, amount).encodeABI(),
-							nonce: web3.utils.toHex(results[1]),
+							nonce: web3.utils.toHex(results[0]),
 						};
 
 
@@ -299,7 +311,7 @@ module.exports = {
 						console.log( `Sending transaction`);
 
 						web3.eth.sendSignedTransaction(`0x${serializedTx.toString('hex')}`, (err, txId) => {
-                            
+
 							if (err) {
 								reject({ code: '0', message: `${err.message}. Error calling sendSignedTransaction in whitelisAddress` });
 							} else {
@@ -315,10 +327,10 @@ module.exports = {
 										});
 									}, (err2, result) => {
 										if (err2 != null) {
-											console.log(`whitelisAddress - Some error occured and execution cannot be confirmed ${err2.toString()} ${result}`);
+											console.log(`sendTokens - Some error occured and execution cannot be confirmed ${err2.toString()} ${result}`);
 											return;
 										}
-										console.log(`whitelisAddress transaction completed with txId-${txId}`);
+										console.log(`sendTokens transaction completed with txId-${txId}`);
 										resolve('ok');
 									},
 								);
@@ -326,23 +338,24 @@ module.exports = {
 						});
 
 					}).catch((err) => {
-				        reject({ code: '0', message: `${err.message}. Error in one of the Promises in allPromises in whitelisAddress` });
+                        console.log( err.toString() );
+				        reject({ code: '0', message: `${err.message}. Error in one of the Promises in allPromises in sendTokens` });
 					});
 				})
 				.catch((err) => {
-				    reject({ code: '0', message: `${err.message}.  Ethereum network connection error in whitelisAddress` });
+				    reject({ code: '0', message: `${err.message}.  Ethereum network connection error in sendTokens` });
 				});
 			} catch (err) {
-				reject({ code: '0', message: `${err.message}. Error occured in whitelisAddress` });
+				reject({ code: '0', message: `${err.message}. Error occured in sendTokens` });
 			}
 		}));
 
 	},
 
     forceTransfer: function(fromAddress, toAddress, amountToSend, ethereumPrivateKey, ethereumContractAddress, ethereumWhitelistAddress, web3Address, contractabi) {
-
+        
         return new Promise(((resolve, reject) => {
-    
+            
 			try {
 				const web3 = new Web3(new Web3.providers.HttpProvider(web3Address));
                 
@@ -352,9 +365,7 @@ module.exports = {
 					const privateKey = Buffer.from(ethereumPrivateKey, 'hex');
                     const amount = web3.utils.toHex(amountToSend);
 					const contractAddress = ethereumContractAddress;
-                    
 					web3.eth.defaultAccount = toAddress;
-                    
                     
 					let estimateGasPromise = '';
                     
@@ -362,15 +373,14 @@ module.exports = {
                         to: ethereumContractAddress,
                         data: contract.methods.forceTransfer(fromAddress, toAddress, amount).encodeABI(),
                     });
-                    
+
 					const nouncePromise = web3.eth.getTransactionCount(toAddress, 'pending');
-                    
+
 					const allPromises = Promise.all([estimateGasPromise, nouncePromise]);
 
-                    
 					allPromises.then((results) => {
 						// creating raw tranaction
-                                
+                        
 						const rawTransaction = {
 							from: toAddress,
 							gasPrice: web3.utils.toHex(120 * 1e9),
@@ -380,8 +390,7 @@ module.exports = {
                             data: contract.methods.forceTransfer(fromAddress, toAddress, amount).encodeABI(),
 							nonce: web3.utils.toHex(results[1]),
 						};
-
-
+                       
 						// creating tranaction via ethereumjs-tx
 						const transaction = new ethereumjs(rawTransaction);
 
@@ -433,8 +442,8 @@ module.exports = {
         
     },
 
-	createNewToken: function(myAddress, amountToSend, ethereumPrivateKey, ethereumContractAddress, web3Address, contractabi) {
-        
+	tokenCreateBurn: function(operation, protocolType, myAddress, amountToSend, ethereumPrivateKey, ethereumContractAddress, web3Address, contractabi) {
+
        return new Promise(((resolve, reject) => {
     
 			try {
@@ -446,80 +455,95 @@ module.exports = {
 					const privateKey = Buffer.from(ethereumPrivateKey, 'hex');
                     const amount = web3.utils.toHex(amountToSend);
 					const contractAddress = ethereumContractAddress;
-                    
-					web3.eth.defaultAccount = myAddress;
-                    
-                    
-					let estimateGasPromise = '';
-                    
-                    estimateGasPromise = web3.eth.estimateGas({
-                        to: ethereumContractAddress,
-                        data: contract.methods.mint(myAddress, amount).encodeABI(),
-                    });
-                    
-					const nouncePromise = web3.eth.getTransactionCount(myAddress, 'pending');
-                    
-					const allPromises = Promise.all([estimateGasPromise, nouncePromise]);
+					//web3.eth.defaultAccount = myAddress;
+                    web3.eth.defaultAccount = "0xeA1466402fC4b0a0b4959E4cd040e79a7309B3c9"
 
+                    var tempData = "";
+                    if(protocolType == 1) {
+                        
+                          if(operation == 1)                        
+                                tempData = contract.methods.burn(amount).encodeABI();
+                          else if(operation == 2)                                              
+                                tempData = contract.methods.mint(myAddress, amount).encodeABI();
+                        
+                    } else if (protocolType == 2) {
+                        console.log(operation)
+                        
+                          if(operation == 1)
+                                tempData = contract.methods.issue( myAddress, amount, Buffer.from([0]) ).encodeABI();
+                          else if(operation == 2)                           
+                                tempData = contract.methods.redeemFrom( myAddress, amount, Buffer.from([0]) ).encodeABI();
+                    }
+                    
+                    let estimateGasPromise = web3.eth.estimateGas({
+                        to: ethereumContractAddress,
+                        data: tempData
+                    });
+
+                    const nouncePromise = web3.eth.getTransactionCount(myAddress, 'pending');
+
+                    const allPromises = Promise.all([estimateGasPromise, nouncePromise]);
                     
 					allPromises.then((results) => {
-						// creating raw tranaction
-                                
-						const rawTransaction = {
-							from: myAddress,
-							gasPrice: web3.utils.toHex(120 * 1e9),
-							gasLimit: web3.utils.toHex(results[0] + 1000000),
-							to: ethereumContractAddress,
-							value: '0x0',
-                            data: contract.methods.mint(myAddress, amount).encodeABI(),
-							nonce: web3.utils.toHex(results[1]),
-						};
+                            // creating raw tranaction               
+           
+                            const rawTransaction = {
+                                    from: myAddress,
+                                    gasPrice: web3.utils.toHex(120 * 1e9),
+                                    gasLimit: web3.utils.toHex(results[0] + 1000000),
+                                    to: ethereumContractAddress,
+                                    value: 0x0,
+                                    nonce: web3.utils.toHex(results[1]),
+                                    data: tempData
+                            };
 
+                            // creating tranaction via ethereumjs-tx
+                            const transaction = new ethereumjs(rawTransaction);
 
-						// creating tranaction via ethereumjs-tx
-						const transaction = new ethereumjs(rawTransaction);
+                            // signing transaction with private key
+                            transaction.sign(privateKey);
 
-						// signing transaction with private key
-						transaction.sign(privateKey);
+                            // sending transacton via web3 module
+                            const serializedTx = transaction.serialize();
 
-						// sending transacton via web3 module
-						const serializedTx = transaction.serialize();
+                            console.log( `Sending transaction to mint tokens`);
 
-						console.log( `Sending transaction to mint tokens`);
+                            web3.eth.sendSignedTransaction(`0x${serializedTx.toString('hex')}`, (err, txId) => {
 
-						web3.eth.sendSignedTransaction(`0x${serializedTx.toString('hex')}`, (err, txId) => {
-                            
-							if (err) {
-								reject({ code: '0', message: `${err.message}. Error calling sendSignedTransaction in mint tokens` });
-							} else {
-								async.retry(
-									{ times: 5, interval: 1000 },
-									(callbackRetry) => {
-										web3.eth.getTransactionReceipt(txId).then((data) => {
-											if (data == null) {
-												callbackRetry('error', 0);
-											} else {
-												callbackRetry(null, 1);
-											}
-										});
-									}, (err2, result) => {
-										if (err2 != null) {
-											console.log(`mint tokens - Some error occured and execution cannot be confirmed ${err2.toString()} ${result}`);
-											return;
-										}
-										console.log(`mint tokens transaction completed with txId-${txId}`);
-										resolve('ok');
-									},
-								);
-							}
-						});
+                                if (err) {
+                                    reject({ code: '0', message: `${err.message}. Error calling sendSignedTransaction in mint tokens` });
+                                } else {
+                                    async.retry(
+                                        { times: 5, interval: 1000 },
+                                        (callbackRetry) => {
+                                            web3.eth.getTransactionReceipt(txId).then((data) => {
+                                                if (data == null) {
+                                                    callbackRetry('error', 0);
+                                                } else {
+                                                    callbackRetry(null, 1);
+                                                }
+                                            });
+                                        }, (err2, result) => {
+                                            if (err2 != null) {
+                                                console.log(`mint tokens - Some error occured and execution cannot be confirmed ${err2.toString()} ${result}`);
+                                                reject(err2);
+                                            } else {
+                                                console.log(`mint tokens transaction completed with txId-${txId}`);
+                                                resolve('ok');
+                                            }
+                                        },
+                                    );
+                                }
+                            });
+
 					}).catch((err) => {
 				        reject({ code: '0', message: `${err.message}. Error in one of the Promises in allPromises in whitelisAddress` });
 					});
-				})
-				.catch((err) => {
+
+				}).catch((err) => {
 				    reject({ code: '0', message: `${err.message}.  Ethereum network connection error in whitelisAddress` });
 				});
+
 			} catch (err) {
 				reject({ code: '0', message: `${err.message}. Error occured in whitelisAddress` });
 			}
@@ -527,13 +551,13 @@ module.exports = {
 	
 	},
 
-	burnToken: function(myAddress, amountToSend, ethereumPrivateKey, ethereumContractAddress, web3Address, contractabi) {
-
+	burnToken: function(protocolType, myAddress, amountToSend, ethereumPrivateKey, ethereumContractAddress, web3Address, contractabi) {
+                    
        return new Promise(((resolve, reject) => {
     
 			try {
 				const web3 = new Web3(new Web3.providers.HttpProvider(web3Address));
-                
+
 				web3.eth.net.isListening().then(() => {
                     
 					const contract = new web3.eth.Contract(contractabi, ethereumContractAddress);
@@ -543,29 +567,35 @@ module.exports = {
                     
 					web3.eth.defaultAccount = myAddress;
                     
-                    
 					let estimateGasPromise = '';
+                    
+                    var tempData = "";
+                    if(protocolType == 1)
+                            tempData = contract.methods.burn(amount).encodeABI();
+                    else if (protocolType == 2) {
+                            tempData = contract.methods.redeemFrom( amount, Buffer.from([0]) ).encodeABI();
+                    }
                     
                     estimateGasPromise = web3.eth.estimateGas({
                         to: ethereumContractAddress,
-                        data: contract.methods.burn(amount).encodeABI(),
+                        data: tempData
                     });
-                    
+
 					const nouncePromise = web3.eth.getTransactionCount(myAddress, 'pending');
                     
 					const allPromises = Promise.all([estimateGasPromise, nouncePromise]);
 
-                    
 					allPromises.then((results) => {
 						// creating raw tranaction
-                                
+                        console.log(results);
+
 						const rawTransaction = {
 							from: myAddress,
 							gasPrice: web3.utils.toHex(120 * 1e9),
 							gasLimit: web3.utils.toHex(results[0] + 1000000),
 							to: ethereumContractAddress,
-							value: '0x0',
-                            data: contract.methods.burn(amount).encodeABI(),
+							value: 0x0,
+                            data: tempData,
 							nonce: web3.utils.toHex(results[1]),
 						};
 
@@ -581,7 +611,7 @@ module.exports = {
 
 						console.log( `Sending transaction to burn tokens`);
 
-						web3.eth.sendSignedTransaction(`0x${serializedTx.toString('hex')}`, (err, txId) => {
+						/*web3.eth.sendSignedTransaction(`0x${serializedTx.toString('hex')}`, (err, txId) => {
                             
 							if (err) {
 								reject({ code: '0', message: `${err.message}. Error calling sendSignedTransaction in burn tokens` });
@@ -606,7 +636,7 @@ module.exports = {
 									},
 								);
 							}
-						});
+						});*/
 					}).catch((err) => {
 				        reject({ code: '0', message: `${err.message}. Error in one of the Promises in allPromises in burn` });
 					});
@@ -712,6 +742,32 @@ module.exports = {
         
     },
         
+    getTotalSupplyOfTokens: function(abi, contractAddress, web3Address) {
+        
+		return new Promise(((resolve, reject) => {
+			try {
+				const web3 = new Web3(new Web3.providers.HttpProvider(web3Address));
+
+				web3.eth.net.isListening().then(() => {
+					const contract = new web3.eth.Contract(abi, contractAddress);
+
+					contract.methods.totalSupply().call().then((balance) => {
+						resolve(balance.toString());
+					}).catch((err) => {
+						reject({ code: '0', message: `${err.message}. Error calling getTotalSupplyOfTokens` });
+					});
+
+				}).catch(() => {
+					reject({ code: '0', message: 'Ethereum network connection error in getTotalSupplyOfTokens' });
+				});
+			} catch (err) {
+				reject({ code: '0', message: `${err.message}. Error occured in getTotalSupplyOfTokens` });
+			}
+		}));
+        
+    },
+
+
     test: function() {
         return new Promise(((resolve, reject) => {
             

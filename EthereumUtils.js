@@ -13,34 +13,20 @@ const fs = require('fs');
 
 //https://github.com/ethereum/wiki/wiki/JavaScript-API#example-45
 
-
 /*
     node EthereumUtils getGas
-    node EthereumUtils EncryptKey 10b74b21fbd76b922c68ab06e9d0c72766a8286220e655623f974239b868cc05 Allahis1 f:\keystore.txt
-    node EthereumUtils DecryptKey Allahis1 f:\keystore.txt
-    node EthereumUtils etherBalance 0x9B71184d9d0641E58FB42e7Cd09c7e773992dB96
-    node EthereumUtils stoTokenBalance 0xcF1Ee43b7A7E3D9a4C948acF894F26c118278d94
-    
-    node EthereumUtils checkInvestorWhiteListed 0x140D6b0D42f90BFC62aCD45bF770DdeF18ebe910
-    node EthereumUtils whiteListInvestor Allahis1 f:\keystore.txt 0xcF1Ee43b7A7E3D9a4C948acF894F26c118278d94 true
-    node EthereumUtils sendTokens Allahis1 f:\keystore.txt 0x9B71184d9d0641E58FB42e7Cd09c7e773992dB96 1000
-    node EthereumUtils forceTransfer Allahis1 f:\keystore.txt 0x9B71184d9d0641E58FB42e7Cd09c7e773992dB96 105
-    node EthereumUtils create Allahis1 f:\keystore.txt 1000
-    node EthereumUtils burn Allahis1 f:\keystore.txt 1000
-
-
-    0xcF1Ee43b7A7E3D9a4C948acF894F26c118278d94
-    0x9B71184d9d0641E58FB42e7Cd09c7e773992dB96
-    0x3C631Fa75dFa9Cf8844faaD9Fa177cECD4aA19C9
-    0xD7d28a048Ca8e389CE628cdb2beE64549E85e777
-    0x140D6b0D42f90BFC62aCD45bF770DdeF18ebe910
+    node EthereumUtils EncryptKey 03fd0b64a5a5204da6690c2e3c7478fc38a90b2fb819fd52615157c02ab1b35c aaa ~/keystore0forPolyMath.txt
+    node EthereumUtils DecryptKey aaa ~/keystore.txt
+    node EthereumUtils etherBalance 0xDB0d238BAeF0bDE591841a66eC886f3dC7A8De48
+    node EthereumUtils stoTokenBalance 0x9c2F684cCA0Bc981e96Af82BF82A56ae3997BcA1
+    node EthereumUtils TotalSupply
+    node EthereumUtils checkInvestorWhiteListed 0xB520234B0530a4EE5737Fca29636B840AfB6EbD2
+    node EthereumUtils whiteListInvestor aaa ~/keystore.txt 0xB520234B0530a4EE5737Fca29636B840AfB6EbD2 true
+    node EthereumUtils sendTokens aaa ~/keystore.txt 0xB520234B0530a4EE5737Fca29636B840AfB6EbD2 1000
+    node EthereumUtils forceTransfer aaa ~/keystore.txt 0xDB0d238BAeF0bDE591841a66eC886f3dC7A8De48  100
+    node EthereumUtils create aaa ~/keystore.txt 1000
+    node EthereumUtils burn aaa ~/keystore.txt 1000
 */
-
-
-
-
-
-
 
 var abi_contract = [
     {
@@ -549,7 +535,7 @@ var abi_contract = [
       "stateMutability": "view",
       "type": "function"
     }
-  ]
+  ];
 var abi_service =  [
     {
       "constant": false,
@@ -730,10 +716,10 @@ var abi_service =  [
       "type": "function",
       "signature": "0x803fcd43"
     }
-  ]
+  ];
 
-var contract_address = "0x6E6AB1A1F2c0935e60Ad34118992302d5E1E33ec";
-var service_address = "0x5d9dA85044eEbd8b8e80959151A954EFEEeeC1D1";
+var contract_address = "0x1568EC612A91bae720c05224Ab56150B2FBF4e85";
+var service_address = "0x9F2a7Ab9494b857EFd3C70168440A8F4F3e97e09";
 var linkToBlockchainServer = "http://localhost:7545";
 
 if (process.argv[2] == "getGas") {
@@ -746,12 +732,21 @@ if (process.argv[2] == "getGas") {
 }
 
 if (process.argv[2] == "EncryptKey") { 
-    // node EthereumUtils EncryptKey 10b74b21fbd76b922c68ab06e9d0c72766a8286220e655623f974239b868cc05 Allahis1 f:\keystore.txt
+    // node EthereumUtils EncryptKey 03fd0b64a5a5204da6690c2e3c7478fc38a90b2fb819fd52615157c02ab1b35c aaa \home\shahzad\polymathkey.txt
 
      var data = ethereum.encryptKey(process.argv[3], process.argv[4], linkToBlockchainServer); 
      fs.writeFileSync(process.argv[5], JSON.stringify(data));
 	 console.log(JSON.stringify(data));
      process.exit(0);
+}
+
+if (process.argv[2] == "TotalSupply") {
+    //// node EthereumUtils TotalSupply
+	ethereum.getTotalSupplyOfTokens( abi_contract, contract_address, linkToBlockchainServer).then(function(data){
+		console.log(data);
+        process.exit(0);
+	})
+
 }
 
 if (process.argv[2] == "DecryptKey") {
@@ -774,8 +769,8 @@ if (process.argv[2] == "etherBalance") {
 }
 
 if (process.argv[2] == "stoTokenBalance") {
-	// node EthereumUtils stoTokenBalance 0xcF1Ee43b7A7E3D9a4C948acF894F26c118278d94
-    // node EthereumUtils stoTokenBalance 0x9B71184d9d0641E58FB42e7Cd09c7e773992dB96
+	// node EthereumUtils stoTokenBalance 0xF735763f57b62a388E371A394FE610fD258C6Bf7
+    // node EthereumUtils stoTokenBalance 0xDB0d238BAeF0bDE591841a66eC886f3dC7A8De48
 
 	ethereum.getAccountStoBalance( process.argv[3], abi_contract, contract_address, linkToBlockchainServer).then(function(data){
 		console.log(data);
@@ -785,7 +780,7 @@ if (process.argv[2] == "stoTokenBalance") {
 }
 
 if (process.argv[2] == "checkInvestorWhiteListed") {
-    //node EthereumUtils checkInvestorWhiteListed 0xcF1Ee43b7A7E3D9a4C948acF894F26c118278d94
+    //node EthereumUtils checkInvestorWhiteListed 0xF735763f57b62a388E371A394FE610fD258C6Bf7
 
 	ethereum.checkIsInvestorWhitelistedInService( process.argv[3], abi_service, service_address, linkToBlockchainServer).then(function(data){
 		console.log(data);
@@ -795,11 +790,11 @@ if (process.argv[2] == "checkInvestorWhiteListed") {
 
 if (process.argv[2] == "whiteListInvestor") {
 
-    //node EthereumUtils whiteListInvestor Allahis1 f:\keystore.txt 0xcF1Ee43b7A7E3D9a4C948acF894F26c118278d94 true
+    //node EthereumUtils whiteListInvestor aaa ~/WorkingDocuments/Ethereum_localkey.txt 0xF735763f57b62a388E371A394FE610fD258C6Bf7 true
 
     let data2 = decryptKeyFromFile(process.argv[4], process.argv[3]);
     
-    ethereum.whitelisAddress(data2.address, process.argv[5], process.argv[6], data2.privateKey.substring(2), contract_address, service_address, linkToBlockchainServer, abi_service).then(function(data){
+    ethereum.whitelisAddress(1, data2.address, process.argv[5], process.argv[6], data2.privateKey.substring(2), contract_address, service_address, linkToBlockchainServer, abi_service).then(function(data){
 		console.log(data);
         process.exit(0);
 	})
@@ -808,7 +803,7 @@ if (process.argv[2] == "whiteListInvestor") {
 
 if (process.argv[2] == "sendTokens") {
 
-    //node EthereumUtils sendTokens Allahis1 f:\keystore.txt 0x9B71184d9d0641E58FB42e7Cd09c7e773992dB96 100
+    //node EthereumUtils sendTokens aaa ~/WorkingDocuments/Ethereum_localkey.txt 0xF735763f57b62a388E371A394FE610fD258C6Bf7 10
     
     let data2 = decryptKeyFromFile(process.argv[4], process.argv[3]);
     
@@ -820,10 +815,9 @@ if (process.argv[2] == "sendTokens") {
 }
 
 if (process.argv[2] == "forceTransfer") {
-    //node EthereumUtils forceTransfer Allahis1 f:\keystore.txt 0xcF1Ee43b7A7E3D9a4C948acF894F26c118278d94 100
 
     let data2 = decryptKeyFromFile(process.argv[4], process.argv[3]);
-    
+        
     ethereum.forceTransfer( process.argv[5], data2.address, parseInt(process.argv[6]),  data2.privateKey.substring(2), contract_address, service_address, linkToBlockchainServer, abi_contract ).then(function(data){
 		console.log(data);
         process.exit(0);
@@ -837,7 +831,7 @@ if (process.argv[2] == "create") {
     
     let data2 = decryptKeyFromFile(process.argv[4], process.argv[3]);
     
-	ethereum.createNewToken(data2.address, parseInt(process.argv[5]), data2.privateKey.substring(2), contract_address, linkToBlockchainServer, abi_contract).then(function(data){
+	ethereum.createNewToken(1, data2.address, parseInt(process.argv[5]), data2.privateKey.substring(2), contract_address, linkToBlockchainServer, abi_contract).then(function(data){
 		console.log("done");
         process.exit(0);
 	})

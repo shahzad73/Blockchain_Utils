@@ -386,8 +386,6 @@ module.exports = {
 };
 
 
-  
-  
   /*
         multi sig  issuing account 
            set threshholds of the accounts
