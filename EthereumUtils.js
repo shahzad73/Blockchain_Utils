@@ -718,9 +718,11 @@ var abi_service =  [
     }
   ];
 
-var contract_address = "0x1568EC612A91bae720c05224Ab56150B2FBF4e85";
-var service_address = "0x9F2a7Ab9494b857EFd3C70168440A8F4F3e97e09";
-var linkToBlockchainServer = "http://localhost:7545";
+//https://kovan.infura.io/v3/fe41724da6f24b76a782f376b2698ee8
+
+var contract_address = "0xF2A6143Bf60885d2044a744943d09ca1C05EF66F";
+var service_address = "0x3a3dfefaC4290Ea514d397ccA69D188f036129D9";
+var linkToBlockchainServer = "https://kovan.infura.io/v3/fe41724da6f24b76a782f376b2698ee8";
 
 if (process.argv[2] == "getGas") {
     // node EthereumUtils getGas
@@ -732,7 +734,7 @@ if (process.argv[2] == "getGas") {
 }
 
 if (process.argv[2] == "EncryptKey") { 
-    // node EthereumUtils EncryptKey 03fd0b64a5a5204da6690c2e3c7478fc38a90b2fb819fd52615157c02ab1b35c aaa \home\shahzad\polymathkey.txt
+    // node EthereumUtils EncryptKey 674a573f837f781532997136904883eddb562608c8b36a41719ed04a2d0924c7 a \home\shahzad\Ethereum_localkey_2.txt
 
      var data = ethereum.encryptKey(process.argv[3], process.argv[4], linkToBlockchainServer); 
      fs.writeFileSync(process.argv[5], JSON.stringify(data));
@@ -750,7 +752,7 @@ if (process.argv[2] == "TotalSupply") {
 }
 
 if (process.argv[2] == "DecryptKey") {
-    // node EthereumUtils DecryptKey Allahis1 f:\keystore.txt
+    // node EthereumUtils DecryptKey a  \home\shahzad\Ethereum_localkey.txt
 
     let data2 = decryptKeyFromFile(process.argv[4], process.argv[3]);
     console.log(data2.privateKey);
@@ -760,7 +762,7 @@ if (process.argv[2] == "DecryptKey") {
 
 if (process.argv[2] == "etherBalance") {
 
-	// node EthereumUtils etherBalance 0x9B71184d9d0641E58FB42e7Cd09c7e773992dB96
+	// node EthereumUtils etherBalance 0x3cb6df9845af79ab7c2af9530da0b046bacb6cf9
 	ethereum.getAccountEtherBalance( process.argv[3], abi_contract, contract_address, linkToBlockchainServer).then(function(data){
 		console.log(data);
         process.exit(0);
@@ -769,7 +771,7 @@ if (process.argv[2] == "etherBalance") {
 }
 
 if (process.argv[2] == "stoTokenBalance") {
-	// node EthereumUtils stoTokenBalance 0xF735763f57b62a388E371A394FE610fD258C6Bf7
+	// node EthereumUtils stoTokenBalance 0x3cb6df9845af79ab7c2af9530da0b046bacb6cf9
     // node EthereumUtils stoTokenBalance 0xDB0d238BAeF0bDE591841a66eC886f3dC7A8De48
 
 	ethereum.getAccountStoBalance( process.argv[3], abi_contract, contract_address, linkToBlockchainServer).then(function(data){
@@ -780,7 +782,7 @@ if (process.argv[2] == "stoTokenBalance") {
 }
 
 if (process.argv[2] == "checkInvestorWhiteListed") {
-    //node EthereumUtils checkInvestorWhiteListed 0xF735763f57b62a388E371A394FE610fD258C6Bf7
+    //node EthereumUtils checkInvestorWhiteListed 0xcD063145Fcd75aca7C2c3CaD2675B4328dbd8f83
 
 	ethereum.checkIsInvestorWhitelistedInService( process.argv[3], abi_service, service_address, linkToBlockchainServer).then(function(data){
 		console.log(data);
@@ -790,9 +792,10 @@ if (process.argv[2] == "checkInvestorWhiteListed") {
 
 if (process.argv[2] == "whiteListInvestor") {
 
-    //node EthereumUtils whiteListInvestor aaa ~/WorkingDocuments/Ethereum_localkey.txt 0xF735763f57b62a388E371A394FE610fD258C6Bf7 true
+    //node EthereumUtils whiteListInvestor a ~/WorkingDocuments/Ethereum_localkey.txt  0xcD063145Fcd75aca7C2c3CaD2675B4328dbd8f83 true
 
     let data2 = decryptKeyFromFile(process.argv[4], process.argv[3]);
+    
     
     ethereum.whitelisAddress(1, data2.address, process.argv[5], process.argv[6], data2.privateKey.substring(2), contract_address, service_address, linkToBlockchainServer, abi_service).then(function(data){
 		console.log(data);
@@ -814,6 +817,33 @@ if (process.argv[2] == "sendTokens") {
 
 }
 
+
+
+if (process.argv[2] == "approve") {
+
+    //node EthereumUtils approve a ~/WorkingDocuments/Ethereum_localkey2.txt 0x3cb6df9845af79ab7c2af9530da0b046bacb6cf9 300
+    
+    let data2 = decryptKeyFromFile(process.argv[4], process.argv[3]);
+    
+    ethereum.approve(data2.address, process.argv[5], parseInt(process.argv[6]),  data2.privateKey.substring(2), contract_address, service_address, linkToBlockchainServer, abi_contract).then(function(data){
+		console.log(data);
+        process.exit(0);
+	});
+
+}
+
+if (process.argv[2] == "allowance") {
+	// node EthereumUtils allowance 0xcD063145Fcd75aca7C2c3CaD2675B4328dbd8f83  0x3cb6df9845af79ab7c2af9530da0b046bacb6cf9 
+
+	ethereum.getAccountAllowance( process.argv[3], process.argv[4] , abi_contract, contract_address, linkToBlockchainServer).then(function(data){
+		console.log(data);
+        process.exit(0);
+	})
+
+}
+
+
+
 if (process.argv[2] == "forceTransfer") {
 
     let data2 = decryptKeyFromFile(process.argv[4], process.argv[3]);
@@ -827,11 +857,11 @@ if (process.argv[2] == "forceTransfer") {
 
 if (process.argv[2] == "create") {
 
-	// node EthereumUtils create Allahis1 f:\keystore.txt 1000
+	// node EthereumUtils create a ~/WorkingDocuments/Ethereum_localkey.txt 1000
     
     let data2 = decryptKeyFromFile(process.argv[4], process.argv[3]);
     
-	ethereum.createNewToken(1, data2.address, parseInt(process.argv[5]), data2.privateKey.substring(2), contract_address, linkToBlockchainServer, abi_contract).then(function(data){
+	ethereum.tokenCreateBurn(1, 1, data2.address, parseInt(process.argv[5]), data2.privateKey.substring(2), contract_address, linkToBlockchainServer, abi_contract).then(function(data){
 		console.log("done");
         process.exit(0);
 	})
@@ -840,15 +870,15 @@ if (process.argv[2] == "create") {
 
 if (process.argv[2] == "burn") {
 
-	// node EthereumUtils burn Allahis1 f:\keystore.txt 1000
+	// node EthereumUtils burn a ~/WorkingDocuments/Ethereum_localkey.txt 1000
     
     let data2 = decryptKeyFromFile(process.argv[4], process.argv[3]);
     
-	ethereum.burnToken(data2.address,  parseInt(process.argv[5]),  data2.privateKey.substring(2), contract_address, linkToBlockchainServer, abi_contract).then(function(data){
+	ethereum.tokenCreateBurn(2, 1, data2.address,  parseInt(process.argv[5]),  data2.privateKey.substring(2), contract_address, linkToBlockchainServer, abi_contract).then(function(data){
 		console.log("done");
         process.exit(0);
 	})
-	
+
 }
 
 if (process.argv[2] == "test") {

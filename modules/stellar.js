@@ -3,6 +3,9 @@ var async = require('async');
 var mysql = require("./mysql");
 var request = require('request');
 
+//  Stellar SDK operatins are lised here 
+//  https://stellar.github.io/js-stellar-sdk/Operation.html#.allowTrust
+
 
 module.exports = {
 
@@ -58,8 +61,7 @@ module.exports = {
 	  }, 
 	  CheckTrustLine: function(issuingAccountPublicKey, receiverAccountPublicKey, assetCode) {
 
-		  return new Promise(function(resolve, reject) 
-		  {			  
+		  return new Promise(function(resolve, reject)  {			  
 				
 				StellarSdk.Network.useTestNetwork();
 				var server = new StellarSdk.Server(process.env.Stellar_Server);			
@@ -77,7 +79,6 @@ module.exports = {
 						})
 						.catch(err => console.error(err))
 
-						
 					/*
 					Following trustline information will be returned
 					
@@ -89,13 +90,12 @@ module.exports = {
 						  asset_code: 'Security1',
 						  asset_issuer: 'GDPCNNHAKEYYBPGIQWGZTNRNI5AUA7PYZK6LU2HO2UX3SAL5MD3HJIIE' 
 					 }
-					*/						
-						
+					*/
 		  });
 		  
 	  },
 
-    
+
       //Need issuing account private keys 
 	  AuthrorizeTrustLine: function(issuingAccountSecretKey, receiverAccountPublicKey, assetCode, boolFlag) {
 		  return new Promise(function(resolve, reject) 
@@ -125,7 +125,7 @@ module.exports = {
 							  .addOperation(StellarSdk.Operation.allowTrust({ 
 								   trustor: receiverAccountPublicKey,
 								   assetCode: assetCode,
-							       authorize: flagtmp
+							       authorize: 1
 							  }))
 							  .build();
 
@@ -147,7 +147,40 @@ module.exports = {
           
       },
     
-      
+    
+	  createTrustLine :function(assetCode, assetPublicKey, receiverPrivateKey) {
+		  return new Promise(function(resolve, reject) 
+		  {
+			    
+				StellarSdk.Network.useTestNetwork();
+				var server = new StellarSdk.Server(process.env.Stellar_Server);
+				
+				var receivingKeys = StellarSdk.Keypair.fromSecret(receiverPrivateKey);				
+				
+				var assetToTrust = new StellarSdk.Asset(assetCode, assetPublicKey);
+
+				server.loadAccount(receivingKeys.publicKey()).then(
+				  function(receiver){
+						  var transaction = new StellarSdk.TransactionBuilder(receiver)
+						  // The `changeTrust` operation creates (or alters) a trustline
+						  .addOperation(StellarSdk.Operation.changeTrust({
+							 asset: assetToTrust
+						  }))
+						  .build();
+						
+						  transaction.sign(receivingKeys);
+						  
+						  return server.submitTransaction(transaction);
+				  })
+				  .then(function() {
+						 resolve("Success");
+				  })
+				  .catch(function(error) {
+						reject(error);
+				  });
+		  });
+	  },	      
+
       //these function need only public keys of any account
       watchPayments: function(publicKey, asset) {
           
@@ -240,8 +273,6 @@ module.exports = {
 			  });
 		  });
 	  },
-
-    
     
       //These function used once to set the security token in blockchain
 	  restrictAssetTrustLines :function(assetPrivateKey) {
@@ -276,7 +307,8 @@ module.exports = {
 		  });
 
 	  },    
-    
+
+
       // The function not being used in the application
 	  createTestAccount: async function(publicKey) {
 
@@ -310,39 +342,6 @@ module.exports = {
 				});
 			 });
 	  },
-	  createTrustLine :function(assetCode, assetPublicKey, receiverPrivateKey) {
-		  return new Promise(function(resolve, reject) 
-		  {
-			    
-				StellarSdk.Network.useTestNetwork();
-				var server = new StellarSdk.Server(process.env.Stellar_Server);
-				
-				var receivingKeys = StellarSdk.Keypair.fromSecret(receiverPrivateKey);				
-				
-				var assetToTrust = new StellarSdk.Asset(assetCode, assetPublicKey);
-
-				
-				server.loadAccount(receivingKeys.publicKey()).then(
-				  function(receiver){
-						  var transaction = new StellarSdk.TransactionBuilder(receiver)
-						  // The `changeTrust` operation creates (or alters) a trustline
-						  .addOperation(StellarSdk.Operation.changeTrust({
-							asset: assetToTrust
-						  }))
-						  .build();
-						
-						  transaction.sign(receivingKeys);
-						  
-						  return server.submitTransaction(transaction);
-				  })
-				  .then(function() {
-						 resolve("Success");
-				  })
-				  .catch(function(error) {
-						reject(error);
-				  });
-		  });
-	  },	  
 	  manageStellarOffer: function(sellingAsset, buyingAsset, privateKey) {
 		  return new Promise(function(resolve, reject) 
 		  {			  
@@ -385,7 +384,6 @@ module.exports = {
 
 };
 
-
   /*
         multi sig  issuing account 
            set threshholds of the accounts
@@ -398,17 +396,8 @@ module.exports = {
                 
   
   */
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-/*
+
+  /*
   
   
 partially siging a transaction

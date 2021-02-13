@@ -147,7 +147,7 @@ module.exports = {
                 reject({ code: '0', message: `${err.message}.  Ethereum network connection error in whitelisAddress` });
             });
         });*/
-        
+
 		return new Promise(((resolve, reject) => {
 			try {
 				const web3 = new Web3(new Web3.providers.HttpProvider(web3Address));
@@ -159,23 +159,27 @@ module.exports = {
 					web3.eth.defaultAccount = distributionPublciKey;
 					let estimateGasPromise = '';
 
-                    console.log(protocol)
-                    
 					if (authoeize === 'true') {
                         var tempData = "";
                         if(protocol == 1)    
                                 tempData = contract.methods.addWhitelistAddress(publicKeyUser).encodeABI();                        
                         else if(protocol == 2)    
-                                tempData = contract.methods.modifyKYCData(publicKeyUser, 1893463200, 1893463200, 1893463200).encodeABI();
+                                tempData = contract.methods.modifyKYCData(publicKeyUser, 0, 0, 1893463200).encodeABI();
 
 						estimateGasPromise = web3.eth.estimateGas({
 							to: contractAddress,
 							data: tempData
 						});
 					} else {
+                        var tempData = "";
+                        if(protocol == 1)    
+                                tempData = contract.methods.removeWhitelistAddress(publicKeyUser).encodeABI();                        
+                        else if(protocol == 2)    
+                                tempData = contract.methods.modifyKYCData(publicKeyUser, 1893463200, 1893463200, 1893463200).encodeABI();
+
 						estimateGasPromise = web3.eth.estimateGas({
 							to: contractAddress,
-							data: contract.methods.removeWhitelistAddress(publicKeyUser).encodeABI(),
+							data: tempData
 						});
 					}
 
@@ -195,19 +199,24 @@ module.exports = {
 							value: '0x0',
 							nonce: web3.utils.toHex(results[1]),
 						};
-                        
+
 						if (authoeize === 'true') { 
                             var tempData2 = "";
                             if(protocol == 1)    
                                     tempData2 = contract.methods.addWhitelistAddress(publicKeyUser).encodeABI();                      
                             else if(protocol == 2)    
-                                    tempData2 = contract.methods.modifyKYCData(publicKeyUser, 1262304000, 1262304000, 1893463200).encodeABI();
-                            
+                                    tempData2 = contract.methods.modifyKYCData(publicKeyUser, 0, 0, 1893463200).encodeABI();
+
                             rawTransaction.data = tempData2; 
                         } else { 
-                            rawTransaction.data = contract.methods.removeWhitelistAddress(publicKeyUser).encodeABI(); 
+                            if(protocol == 1)    
+                                    tempData2 = contract.methods.removeWhitelistAddress(publicKeyUser).encodeABI();
+                            else if(protocol == 2)    
+                                    tempData2 = contract.methods.modifyKYCData(publicKeyUser, 1893463200, 1893463200, 1893463200).encodeABI();
+
+                            rawTransaction.data = tempData2;                             
                         }
-                        
+
                         
 						// creating tranaction via ethereumjs-tx
 						const transaction = new ethereumjs(rawTransaction);
@@ -275,7 +284,7 @@ module.exports = {
 					web3.eth.defaultAccount = myAddress;
                     
 					let estimateGasPromise = '';
-                    
+
                     estimateGasPromise = web3.eth.estimateGas({
                         to: ethereumContractAddress,
                         data: contract.methods.transfer(toAddress, amount).encodeABI(),
@@ -352,6 +361,126 @@ module.exports = {
 
 	},
 
+    
+	approve: function(myAddress, toAddress, amountToSend, ethereumPrivateKey, ethereumContractAddress, ethereumWhitelistAddress, web3Address, contractabi) {
+        
+        return new Promise(((resolve, reject) => {
+            
+			try {
+				const web3 = new Web3(new Web3.providers.HttpProvider(web3Address));
+                
+				web3.eth.net.isListening().then(() => {
+					const contract = new web3.eth.Contract(contractabi, ethereumContractAddress);
+					const privateKey = Buffer.from(ethereumPrivateKey, 'hex');                    
+                    const amount = web3.utils.toHex(amountToSend);
+					const contractAddress = ethereumContractAddress;
+                    
+					web3.eth.defaultAccount = myAddress;
+                    
+					let estimateGasPromise = '';
+
+                    estimateGasPromise = web3.eth.estimateGas({
+                        to: ethereumContractAddress,
+                        data: contract.methods.approve(toAddress, amount).encodeABI(),
+                    });
+
+					const nouncePromise = web3.eth.getTransactionCount(myAddress, 'pending');
+
+					const allPromises = Promise.all([nouncePromise, estimateGasPromise]);
+                    
+					allPromises.then((results) => {
+
+						// creating raw tranaction
+						const rawTransaction = {
+							from: myAddress,
+							gasPrice: web3.utils.toHex(120 * 1e9),
+							gasLimit: 93399 + 1000000,
+							to: ethereumContractAddress,
+							value: 0x0,
+                            data: contract.methods.approve(toAddress, amount).encodeABI(),
+							nonce: web3.utils.toHex(results[0]),
+						};
+
+
+						// creating tranaction via ethereumjs-tx
+						const transaction = new ethereumjs(rawTransaction);
+
+						// signing transaction with private key
+						transaction.sign(privateKey);
+
+						// sending transacton via web3 module
+						const serializedTx = transaction.serialize();
+
+						console.log( `Sending transaction`);
+
+						web3.eth.sendSignedTransaction(`0x${serializedTx.toString('hex')}`, (err, txId) => {
+
+							if (err) {
+								reject({ code: '0', message: `${err.message}. Error calling sendSignedTransaction in whitelisAddress` });
+							} else {
+								async.retry(
+									{ times: 5, interval: 1000 },
+									(callbackRetry) => {
+										web3.eth.getTransactionReceipt(txId).then((data) => {
+											if (data == null) {
+												callbackRetry('error', 0);
+											} else {
+												callbackRetry(null, 1);
+											}
+										});
+									}, (err2, result) => {
+										if (err2 != null) {
+											console.log(`sendTokens - Some error occured and execution cannot be confirmed ${err2.toString()} ${result}`);
+											return;
+										}
+										console.log(`sendTokens transaction completed with txId-${txId}`);
+										resolve('ok');
+									},
+								);
+							}
+						});
+
+					}).catch((err) => {
+                        console.log( err.toString() );
+				        reject({ code: '0', message: `${err.message}. Error in one of the Promises in allPromises in sendTokens` });
+					});
+				})
+				.catch((err) => {
+				    reject({ code: '0', message: `${err.message}.  Ethereum network connection error in sendTokens` });
+				});
+			} catch (err) {
+				reject({ code: '0', message: `${err.message}. Error occured in sendTokens` });
+			}
+		}));
+
+	},
+    
+    getAccountAllowance: function(fromaddress, toaddress, abi, contractAddress, web3Address) {
+        
+		return new Promise(((resolve, reject) => {
+			try {
+				const web3 = new Web3(new Web3.providers.HttpProvider(web3Address));
+
+				web3.eth.net.isListening().then(() => {
+					const contract = new web3.eth.Contract(abi, contractAddress);
+
+					contract.methods.allowance(fromaddress, toaddress).call().then((balance) => {
+						resolve(balance.toString());
+					}).catch((err) => {
+						reject({ code: '0', message: `${err.message}. Error calling balanceOf method in getAccountAllowance` });
+					});
+
+				}).catch(() => {
+					reject({ code: '0', message: 'Ethereum network connection error in getAccountAllowance' });
+				});
+			} catch (err) {
+				reject({ code: '0', message: `${err.message}. Error occured in getAccountAllowance` });
+			}
+		}));
+        
+    },
+    
+    
     forceTransfer: function(fromAddress, toAddress, amountToSend, ethereumPrivateKey, ethereumContractAddress, ethereumWhitelistAddress, web3Address, contractabi) {
         
         return new Promise(((resolve, reject) => {
@@ -455,26 +584,25 @@ module.exports = {
 					const privateKey = Buffer.from(ethereumPrivateKey, 'hex');
                     const amount = web3.utils.toHex(amountToSend);
 					const contractAddress = ethereumContractAddress;
-					//web3.eth.defaultAccount = myAddress;
-                    web3.eth.defaultAccount = "0xeA1466402fC4b0a0b4959E4cd040e79a7309B3c9"
+					web3.eth.defaultAccount = myAddress;
+                    //web3.eth.defaultAccount = "0xeA1466402fC4b0a0b4959E4cd040e79a7309B3c9"
 
                     var tempData = "";
                     if(protocolType == 1) {
-                        
-                          if(operation == 1)                        
-                                tempData = contract.methods.burn(amount).encodeABI();
-                          else if(operation == 2)                                              
-                                tempData = contract.methods.mint(myAddress, amount).encodeABI();
+                            //R Token
+                            if(operation == 1)                        
+                                    tempData = contract.methods.mint(myAddress, amount).encodeABI();
+                            else if(operation == 2)                                              
+                                    tempData = contract.methods.burn(amount).encodeABI();                                    
                         
                     } else if (protocolType == 2) {
-                        console.log(operation)
-                        
-                          if(operation == 1)
-                                tempData = contract.methods.issue( myAddress, amount, Buffer.from([0]) ).encodeABI();
-                          else if(operation == 2)                           
-                                tempData = contract.methods.redeemFrom( myAddress, amount, Buffer.from([0]) ).encodeABI();
+                            //PolyMath
+                            if(operation == 1)
+                                    tempData = contract.methods.issue( myAddress, amount, Buffer.from([0]) ).encodeABI();
+                            else if(operation == 2)                           
+                                    tempData = contract.methods.redeemFrom( myAddress, amount, Buffer.from([0]) ).encodeABI();
                     }
-                    
+
                     let estimateGasPromise = web3.eth.estimateGas({
                         to: ethereumContractAddress,
                         data: tempData
@@ -650,7 +778,7 @@ module.exports = {
 		}));
 	
 	},
-    
+
     sendTransactionToEthereumNetwork: function(web3Address, contract, ethereumContractAddress, ethereumPrivateKey, fromAddress, functionDataABI, logTransactionName) {
         
         return new Promise((resolve, reject) => {
@@ -762,6 +890,31 @@ module.exports = {
 				});
 			} catch (err) {
 				reject({ code: '0', message: `${err.message}. Error occured in getTotalSupplyOfTokens` });
+			}
+		}));
+        
+    },
+
+    getKYCData: function(address, abi, contractAddress, web3Address) {
+        
+		return new Promise(((resolve, reject) => {
+			try {
+				const web3 = new Web3(new Web3.providers.HttpProvider(web3Address));
+
+				web3.eth.net.isListening().then(() => {
+					const contract = new web3.eth.Contract(abi, contractAddress);
+
+					contract.methods.getKYCData(address).call().then((balance) => {
+						resolve(balance);
+					}).catch((err) => {
+						reject({ code: '0', message: `${err.message}. Error calling balanceOf method in getAccountBalance` });
+					});
+
+				}).catch(() => {
+					reject({ code: '0', message: 'Ethereum network connection error in getAccountBalance' });
+				});
+			} catch (err) {
+				reject({ code: '0', message: `${err.message}. Error occured in getAccountBalance` });
 			}
 		}));
         

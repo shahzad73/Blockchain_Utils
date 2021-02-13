@@ -82,7 +82,7 @@ if (process.argv[2] == "burn") {
 }
 
 if (process.argv[2] == "whiteListInvestor") {
-    //node PolyMath whiteListInvestor aaa ~/WorkingDocuments/Ethereum_polymathkey.txt 0x5b31fC93a7a120D467651BF2aD15b0940E0Fcbd5 true
+    //node PolyMath whiteListInvestor a ~/WorkingDocuments/Ethereum_polymathkey.txt 0x5b31fC93a7a120D467651BF2aD15b0940E0Fcbd5 true
 
     let data2 = decryptKeyFromFile(process.argv[4], process.argv[3]);
 
@@ -90,7 +90,7 @@ if (process.argv[2] == "whiteListInvestor") {
         console.log(data);
         process.exit(0);
     }).catch((err) => {
-        console.log("ddddd");
+        console.log(err.message);
         process.exit(0);
     });
 
@@ -111,7 +111,18 @@ if (process.argv[2] == "sendTokens") {
 
 }
 
+if (process.argv[2] == "getKYCData") {
+	// node PolyMath getKYCData 0xeA1466402fC4b0a0b4959E4cd040e79a7309B3c9
 
+	ethereum.getKYCData( process.argv[3], abi_service, service_address, linkToBlockchainServer).then(function(data){
+		console.log(data);
+        process.exit(0);
+	}).catch((err) => {
+        console.log(err.message);
+        process.exit(0);
+    });
+
+}
 
 function decryptKeyFromFile(file, password) {
 	let data = fs.readFileSync(file, 'utf8')

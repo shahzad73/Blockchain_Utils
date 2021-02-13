@@ -13,7 +13,6 @@ module.exports = {
         return iv.toString('hex') + ':' + encrypted.toString('hex');
     },
 
-    
     decryptData: function(text, password) {
         var passhash = crypto.createHash('sha256').update(password).digest('hex')
         var passhash2 = passhash.substring(0, (passhash.length / 2));
