@@ -479,8 +479,8 @@ module.exports = {
 		}));
         
     },
-    
-    
+
+
     forceTransfer: function(fromAddress, toAddress, amountToSend, ethereumPrivateKey, ethereumContractAddress, ethereumWhitelistAddress, web3Address, contractabi) {
         
         return new Promise(((resolve, reject) => {

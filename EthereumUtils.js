@@ -720,7 +720,7 @@ var abi_service =  [
 
 //https://kovan.infura.io/v3/fe41724da6f24b76a782f376b2698ee8
 
-var contract_address = "0xF2A6143Bf60885d2044a744943d09ca1C05EF66F";
+var contract_address = "0x7Cf01fbAd42d2FEa2b0D697aa7Ee022801cD2154";
 var service_address = "0x3a3dfefaC4290Ea514d397ccA69D188f036129D9";
 var linkToBlockchainServer = "https://kovan.infura.io/v3/fe41724da6f24b76a782f376b2698ee8";
 

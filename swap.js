@@ -33,9 +33,9 @@ if (process.argv[2] == "open") {
             let data2 = decryptKeyFromFile(process.argv[4], process.argv[3]);
 
 			try {
-				const web3 = new Web3(new Web3.providers.HttpProvider(web3Address));
+				    const web3 = new Web3(new Web3.providers.HttpProvider(web3Address));
                 
-				web3.eth.net.isListening().then(() => {
+				    web3.eth.net.isListening().then(() => {
 
 					const contract = new web3.eth.Contract(contractabi, contract_address);
 					const privateKey = Buffer.from( data2.privateKey.substring(2)  , 'hex');                    
@@ -75,8 +75,7 @@ if (process.argv[2] == "open") {
 							nonce: web3.utils.toHex(results[0]),
 						};
 
-
-						// creating tranaction via ethereumjs-tx
+                        // creating tranaction via ethereumjs-tx
 						const transaction = new ethereumjs(rawTransaction);
 
 						// signing transaction with private key
@@ -127,8 +126,6 @@ if (process.argv[2] == "open") {
 			}
 
 
-
-    
 }
 
 if (process.argv[2] == "expire") {
