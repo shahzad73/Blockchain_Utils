@@ -585,7 +585,6 @@ module.exports = {
                     const amount = web3.utils.toHex(amountToSend);
 					const contractAddress = ethereumContractAddress;
 					web3.eth.defaultAccount = myAddress;
-                    //web3.eth.defaultAccount = "0xeA1466402fC4b0a0b4959E4cd040e79a7309B3c9"
 
                     var tempData = "";
                     if(protocolType == 1) {
@@ -603,25 +602,30 @@ module.exports = {
                                     tempData = contract.methods.redeemFrom( myAddress, amount, Buffer.from([0]) ).encodeABI();
                     }
 
+                    
                     let estimateGasPromise = web3.eth.estimateGas({
                         to: ethereumContractAddress,
                         data: tempData
                     });
+                    
 
                     const nouncePromise = web3.eth.getTransactionCount(myAddress, 'pending');
 
-                    const allPromises = Promise.all([estimateGasPromise, nouncePromise]);
+                    //const allPromises = Promise.all([estimateGasPromise, nouncePromise]);
+                    const allPromises = Promise.all([nouncePromise]);
                     
 					allPromises.then((results) => {
                             // creating raw tranaction               
-           
+
                             const rawTransaction = {
                                     from: myAddress,
                                     gasPrice: web3.utils.toHex(120 * 1e9),
-                                    gasLimit: web3.utils.toHex(results[0] + 1000000),
+                                    //gasLimit: web3.utils.toHex(results[0] + 1000000),
+                                    gasLimit: web3.utils.toHex(1000000),                                
                                     to: ethereumContractAddress,
                                     value: 0x0,
-                                    nonce: web3.utils.toHex(results[1]),
+                                    //nonce: web3.utils.toHex(results[1]),
+                                    nonce: web3.utils.toHex(results[0]),                                
                                     data: tempData
                             };
 
@@ -665,15 +669,15 @@ module.exports = {
                             });
 
 					}).catch((err) => {
-				        reject({ code: '0', message: `${err.message}. Error in one of the Promises in allPromises in whitelisAddress` });
+				        reject({ code: '0', message: `${err.message}. Error in one of the Promises in allPromises in 1 tokenCreateBurn` });
 					});
 
 				}).catch((err) => {
-				    reject({ code: '0', message: `${err.message}.  Ethereum network connection error in whitelisAddress` });
+				    reject({ code: '0', message: `${err.message}.  Ethereum network connection error in 2 tokenCreateBurn` });
 				});
 
 			} catch (err) {
-				reject({ code: '0', message: `${err.message}. Error occured in whitelisAddress` });
+				reject({ code: '0', message: `${err.message}. Error occured in 3 tokenCreateBurn` });
 			}
 		}));
 	

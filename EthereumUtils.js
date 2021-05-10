@@ -720,8 +720,8 @@ var abi_service =  [
 
 //https://kovan.infura.io/v3/fe41724da6f24b76a782f376b2698ee8
 
-var contract_address = "0x7Cf01fbAd42d2FEa2b0D697aa7Ee022801cD2154";
-var service_address = "0x3a3dfefaC4290Ea514d397ccA69D188f036129D9";
+var contract_address = "0xd8272d26a012c319c8eaa9683e857b205ea4d500";
+var service_address = "0xCF9a2B7334490F4E154D35fEB9E1a76D5f2Fc65C";
 var linkToBlockchainServer = "https://kovan.infura.io/v3/fe41724da6f24b76a782f376b2698ee8";
 
 if (process.argv[2] == "getGas") {
@@ -752,7 +752,7 @@ if (process.argv[2] == "TotalSupply") {
 }
 
 if (process.argv[2] == "DecryptKey") {
-    // node EthereumUtils DecryptKey a  \home\shahzad\Ethereum_localkey.txt
+    // node EthereumUtils DecryptKey a  /home/shahzad/WorkingDocuments/data/Ethereum_polymathkey.txt
 
     let data2 = decryptKeyFromFile(process.argv[4], process.argv[3]);
     console.log(data2.privateKey);
@@ -782,7 +782,7 @@ if (process.argv[2] == "stoTokenBalance") {
 }
 
 if (process.argv[2] == "checkInvestorWhiteListed") {
-    //node EthereumUtils checkInvestorWhiteListed 0xcD063145Fcd75aca7C2c3CaD2675B4328dbd8f83
+    //node EthereumUtils checkInvestorWhiteListed 0x3cb6df9845af79ab7c2af9530da0b046bacb6cf9
 
 	ethereum.checkIsInvestorWhitelistedInService( process.argv[3], abi_service, service_address, linkToBlockchainServer).then(function(data){
 		console.log(data);
@@ -792,7 +792,7 @@ if (process.argv[2] == "checkInvestorWhiteListed") {
 
 if (process.argv[2] == "whiteListInvestor") {
 
-    //node EthereumUtils whiteListInvestor a ~/WorkingDocuments/Ethereum_localkey.txt  0xcD063145Fcd75aca7C2c3CaD2675B4328dbd8f83 true
+    //node EthereumUtils whiteListInvestor a ~/WorkingDocuments/Ethereum_localkey.txt  0x3cb6df9845af79ab7c2af9530da0b046bacb6cf9 true
 
     let data2 = decryptKeyFromFile(process.argv[4], process.argv[3]);
     
@@ -857,10 +857,10 @@ if (process.argv[2] == "forceTransfer") {
 
 if (process.argv[2] == "create") {
 
-	// node EthereumUtils create a ~/WorkingDocuments/Ethereum_localkey.txt 1000
+	// node EthereumUtils create a ~/WorkingDocuments/Ethereum_polymathkey.txt 1000
     
     let data2 = decryptKeyFromFile(process.argv[4], process.argv[3]);
-    
+    console.log(data2)
 	ethereum.tokenCreateBurn(1, 1, data2.address, parseInt(process.argv[5]), data2.privateKey.substring(2), contract_address, linkToBlockchainServer, abi_contract).then(function(data){
 		console.log("done");
         process.exit(0);

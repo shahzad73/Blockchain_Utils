@@ -17,9 +17,10 @@ var abi_service =  [{"constant":true,"inputs":[],"name":"getAllKYCData","outputs
 //infura link
 //https://ropsten.infura.io/v3/fe41724da6f24b76a782f376b2698ee8
 
-var contract_address = "0xd8272d26a012c319c8eaa9683e857b205ea4d500";
+var contract_address = "0x68bd9e78f74b8a8eadC6E9bFAcBAc715937B7Cbb";
 var service_address= "0x65d5b5811a64872b799d72edfb225eabfc924c09";
 var linkToBlockchainServer = "https://kovan.infura.io/v3/fe41724da6f24b76a782f376b2698ee8";
+//var linkToBlockchainServer = "http://127.0.0.1:7545";
 
 //let data2 = decryptKeyFromFile(process.argv[3], process.argv[2]);
 
@@ -53,7 +54,7 @@ if (process.argv[2] == "TotalSupply") {
 }
 
 if (process.argv[2] == "issue") {
-	// node PolyMath issue aaa ~/WorkingDocuments/Ethereum_polymathkey.txt 50000000000000000000000000
+	// node PolyMath issue a ~/WorkingDocuments/data/Ethereum_polymathkey.txt 50000000000000000000000000
 
     let data2 = decryptKeyFromFile(process.argv[4], process.argv[3]);
     console.log(data2.address)
@@ -82,7 +83,7 @@ if (process.argv[2] == "burn") {
 }
 
 if (process.argv[2] == "whiteListInvestor") {
-    //node PolyMath whiteListInvestor a ~/WorkingDocuments/Ethereum_polymathkey.txt 0x5b31fC93a7a120D467651BF2aD15b0940E0Fcbd5 true
+    //node PolyMath whiteListInvestor a ~/WorkingDocuments/data/Ethereum_polymathkey.txt 0x0CfEc6Ad847fa8DEdbf165E488F332BE0411afB8 true
 
     let data2 = decryptKeyFromFile(process.argv[4], process.argv[3]);
 
