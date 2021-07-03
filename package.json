@@ -19,6 +19,7 @@
   "dependencies": {
     "async": "^2.6.1",
     "atob": "^2.1.2",
+    "axios": "^0.21.1",
     "btoa": "^1.2.1",
     "coinbase": "^2.0.8",
     "dotenv": "^6.1.0",
