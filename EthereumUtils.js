@@ -720,9 +720,9 @@ var abi_service =  [
 
 //https://kovan.infura.io/v3/fe41724da6f24b76a782f376b2698ee8
 
-var contract_address = "0xd8272d26a012c319c8eaa9683e857b205ea4d500";
-var service_address = "0xCF9a2B7334490F4E154D35fEB9E1a76D5f2Fc65C";
-var linkToBlockchainServer = "https://kovan.infura.io/v3/fe41724da6f24b76a782f376b2698ee8";
+var contract_address = "0x8E1c3E77d853cD4f95de3726344c9a7c42efc6Ca";
+var service_address = "0xd4e40A8F31Eb9467884d3615c7dF4d1f74CcC4F1";
+var linkToBlockchainServer = "http://127.0.0.1:7545";
 
 if (process.argv[2] == "getGas") {
     // node EthereumUtils getGas
@@ -734,7 +734,7 @@ if (process.argv[2] == "getGas") {
 }
 
 if (process.argv[2] == "EncryptKey") { 
-    // node EthereumUtils EncryptKey 674a573f837f781532997136904883eddb562608c8b36a41719ed04a2d0924c7 a \home\shahzad\Ethereum_localkey_2.txt
+    // node EthereumUtils EncryptKey 03fd0b64a5a5204da6690c2e3c7478fc38a90b2fb819fd52615157c02ab1b35c a /home/shahzad/WorkingDocuments/data/Ethereum_localkey.txt
 
      var data = ethereum.encryptKey(process.argv[3], process.argv[4], linkToBlockchainServer); 
      fs.writeFileSync(process.argv[5], JSON.stringify(data));
@@ -752,7 +752,7 @@ if (process.argv[2] == "TotalSupply") {
 }
 
 if (process.argv[2] == "DecryptKey") {
-    // node EthereumUtils DecryptKey a  /home/shahzad/WorkingDocuments/data/Ethereum_polymathkey.txt
+    // node EthereumUtils DecryptKey a  /home/shahzad/WorkingDocuments/data/Ethereum_localkey.txt
 
     let data2 = decryptKeyFromFile(process.argv[4], process.argv[3]);
     console.log(data2.privateKey);
@@ -771,7 +771,7 @@ if (process.argv[2] == "etherBalance") {
 }
 
 if (process.argv[2] == "stoTokenBalance") {
-	// node EthereumUtils stoTokenBalance 0x3cb6df9845af79ab7c2af9530da0b046bacb6cf9
+	// node EthereumUtils stoTokenBalance 0xB520234B0530a4EE5737Fca29636B840AfB6EbD2
     // node EthereumUtils stoTokenBalance 0xDB0d238BAeF0bDE591841a66eC886f3dC7A8De48
 
 	ethereum.getAccountStoBalance( process.argv[3], abi_contract, contract_address, linkToBlockchainServer).then(function(data){
@@ -782,7 +782,7 @@ if (process.argv[2] == "stoTokenBalance") {
 }
 
 if (process.argv[2] == "checkInvestorWhiteListed") {
-    //node EthereumUtils checkInvestorWhiteListed 0x3cb6df9845af79ab7c2af9530da0b046bacb6cf9
+    //node EthereumUtils checkInvestorWhiteListed 0xDB0d238BAeF0bDE591841a66eC886f3dC7A8De48
 
 	ethereum.checkIsInvestorWhitelistedInService( process.argv[3], abi_service, service_address, linkToBlockchainServer).then(function(data){
 		console.log(data);
@@ -792,7 +792,7 @@ if (process.argv[2] == "checkInvestorWhiteListed") {
 
 if (process.argv[2] == "whiteListInvestor") {
 
-    //node EthereumUtils whiteListInvestor a ~/WorkingDocuments/Ethereum_localkey.txt  0x3cb6df9845af79ab7c2af9530da0b046bacb6cf9 true
+    //node EthereumUtils whiteListInvestor a /home/shahzad/WorkingDocuments/data/Ethereum_localkey_De48_Pass_a.txt 0xDB0d238BAeF0bDE591841a66eC886f3dC7A8De48 true
 
     let data2 = decryptKeyFromFile(process.argv[4], process.argv[3]);
     
