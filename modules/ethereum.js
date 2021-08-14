@@ -108,9 +108,10 @@ module.exports = {
 
 				web3.eth.net.isListening().then(() => {
 					const contract = new web3.eth.Contract(abi, contractAddress);
-
 					contract.methods.balanceOf(address).call().then((balance) => {
-						resolve(balance.toString());
+						console.log(balance)
+						val = parseFloat(   web3.utils.fromWei(balance.toString(), 'ether') , 10   );
+						resolve(val);
 					}).catch((err) => {
 						reject({ code: '0', message: `${err.message}. Error calling balanceOf method in getAccountBalance` });
 					});

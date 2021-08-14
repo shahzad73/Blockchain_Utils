@@ -720,8 +720,8 @@ var abi_service =  [
 
 //https://kovan.infura.io/v3/fe41724da6f24b76a782f376b2698ee8
 
-var contract_address = "0x8E1c3E77d853cD4f95de3726344c9a7c42efc6Ca";
-var service_address = "0xd4e40A8F31Eb9467884d3615c7dF4d1f74CcC4F1";
+var contract_address = "0x3Fda31bF757670eCeA2567f2674bCc02D978A0E6";
+var service_address = "0x13d9806E2B756079B09ECff7945e76a44AB02370";
 var linkToBlockchainServer = "http://127.0.0.1:7545";
 
 if (process.argv[2] == "getGas") {
@@ -771,8 +771,7 @@ if (process.argv[2] == "etherBalance") {
 }
 
 if (process.argv[2] == "stoTokenBalance") {
-	// node EthereumUtils stoTokenBalance 0xB520234B0530a4EE5737Fca29636B840AfB6EbD2
-    // node EthereumUtils stoTokenBalance 0xDB0d238BAeF0bDE591841a66eC886f3dC7A8De48
+	// node EthereumUtils stoTokenBalance 0xeA1466402fC4b0a0b4959E4cd040e79a7309B3c9
 
 	ethereum.getAccountStoBalance( process.argv[3], abi_contract, contract_address, linkToBlockchainServer).then(function(data){
 		console.log(data);
@@ -782,7 +781,7 @@ if (process.argv[2] == "stoTokenBalance") {
 }
 
 if (process.argv[2] == "checkInvestorWhiteListed") {
-    //node EthereumUtils checkInvestorWhiteListed 0xDB0d238BAeF0bDE591841a66eC886f3dC7A8De48
+    //node EthereumUtils checkInvestorWhiteListed 0xcD063145Fcd75aca7C2c3CaD2675B4328dbd8f83
 
 	ethereum.checkIsInvestorWhitelistedInService( process.argv[3], abi_service, service_address, linkToBlockchainServer).then(function(data){
 		console.log(data);
@@ -792,7 +791,7 @@ if (process.argv[2] == "checkInvestorWhiteListed") {
 
 if (process.argv[2] == "whiteListInvestor") {
 
-    //node EthereumUtils whiteListInvestor a /home/shahzad/WorkingDocuments/data/Ethereum_localkey_De48_Pass_a.txt 0xDB0d238BAeF0bDE591841a66eC886f3dC7A8De48 true
+    //node EthereumUtils whiteListInvestor a /home/shahzad/WorkingDocuments/data/Ethereum_polymathkey_B3c9_Pass_a.txt 0xeA1466402fC4b0a0b4959E4cd040e79a7309B3c9 true
 
     let data2 = decryptKeyFromFile(process.argv[4], process.argv[3]);
     
