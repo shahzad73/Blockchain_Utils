@@ -17,10 +17,9 @@ var abi_service =  [{"constant":true,"inputs":[],"name":"getAllKYCData","outputs
 //infura link
 //https://ropsten.infura.io/v3/fe41724da6f24b76a782f376b2698ee8
 
-var contract_address = "0x68bd9e78f74b8a8eadC6E9bFAcBAc715937B7Cbb";
-var service_address= "0x65d5b5811a64872b799d72edfb225eabfc924c09";
+var contract_address = "0x61101299D1996eC54A92488f6B97FBCe5fB5939F";
+var service_address= "0x856C6f6d2ad69434ab955278195c510867eb3559";
 var linkToBlockchainServer = "https://kovan.infura.io/v3/fe41724da6f24b76a782f376b2698ee8";
-//var linkToBlockchainServer = "http://127.0.0.1:7545";
 
 //let data2 = decryptKeyFromFile(process.argv[3], process.argv[2]);
 
@@ -83,7 +82,9 @@ if (process.argv[2] == "burn") {
 }
 
 if (process.argv[2] == "whiteListInvestor") {
-    //node PolyMath whiteListInvestor a ~/WorkingDocuments/data/Ethereum_polymathkey.txt 0x0CfEc6Ad847fa8DEdbf165E488F332BE0411afB8 true
+    //node PolyMath whiteListInvestor a ~/WorkingDocuments/data/Ethereum_polymathkey_B3c9_Pass_a.txt 0xB520234B0530a4EE5737Fca29636B840AfB6EbD2 true
+	
+	//node PolyMath whiteListInvestor aaa ~/Ethereum_Faer.txt 0x1E25705ef660E69999CC6b8D8F6Bd6514E5bd862 true	
 
     let data2 = decryptKeyFromFile(process.argv[4], process.argv[3]);
 

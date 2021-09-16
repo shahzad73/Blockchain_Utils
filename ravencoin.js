@@ -7,7 +7,28 @@ const CONFIG = getConfig();
 const serverLink = "http://127.0.0.1:8766";
 //  http://127.0.0.1:8766        main net
 //  http://127.0.0.1:18766      testnet
-  
+
+/*
+node ravencoin listaddressesfortag configfile=./data/ravencoinconfig.txt MEGA
+
+node ravencoin listaddressesbyassets configfile=./data/ravencoinconfig.txt MEGATECH
+
+node ravencoin addtagtoaddress configfile=./data/ravencoinconfig.txt MEGA myhyhmRiKnuqgpmyAAeujWoxoTyWpZVUi7
+
+node ravencoin removetagfromaddress configfile=./data/ravencoinconfig.txt MEGA myhyhmRiKnuqgpmyAAeujWoxoTyWpZVUi7
+
+node ravencoin getassetdata configfile=./data/ravencoinconfig.txt     this is used to get total supploy of the token
+
+node ravencoin listassetbalancesbyaddress configfile=./data/ravencoinconfig.txt myxd8nhb8Bh9h9syK2n2u6hKRyrSrAbxZ8
+
+check if investor has a specific tag
+node ravencoin checkaddresstag configfile=./data/ravencoinconfig.txt myhyhmRiKnuqgpmyAAeujWoxoTyWpZVUi7 MEGA    
+
+node ravencoin listtagsforaddress configfile=./data/ravencoinconfig.txt myhyhmRiKnuqgpmyAAeujWoxoTyWpZVUi7
+
+node ravencoin transferfromaddress configfile=./data/ravencoinconfig.txt myxd8nhb8Bh9h9syK2n2u6hKRyrSrAbxZ8 myhyhmRiKnuqgpmyAAeujWoxoTyWpZVUi7 $MEGATECH 20
+
+*/
 
 
 if (process.argv[2] == "test") {
@@ -25,11 +46,11 @@ if (process.argv[2] == "test") {
     
 }
 
-// RVN
+// ---------------- RVN
 if (process.argv[2] == "getaddressbalance") {
     //  node ravencoin getaddressbalance configfile=./data/ravencoinconfig.txt
         
-        rpc("getaddressbalance", ["moCyJzkXNxBpB1PzkLEGc4FQfC11zjSyqT"])
+        rpc("getaddressbalance", ["n4dQ28t5LyJf3pW5w6m8F9mvXaQ6ksWEwM"])
             .then(function (data) {
 
                 console.log("Holders of", CONFIG.asset);
@@ -42,11 +63,12 @@ if (process.argv[2] == "getaddressbalance") {
 }
 
 
-// Assets 
+
+// --------------- Assets 
 if (process.argv[2] == "listaddressesfortag") {
-        // node ravencoin listaddressesfortag configfile=./data/ravencoinconfig.txt
-        
-        rpc("listaddressesfortag", ["#MEGA"])
+        // node ravencoin listaddressesfortag configfile=./data/ravencoinconfig.txt MEGA
+        console.log(process.argv[4])
+        rpc("listaddressesfortag", ["#" + process.argv[4]])
             .then(function (data) {
 
                 console.log(data);
@@ -58,9 +80,9 @@ if (process.argv[2] == "listaddressesfortag") {
 }	
 
 if (process.argv[2] == "listaddressesbyassets") {
-    //  node ravencoin listaddressesbyassets configfile=./data/ravencoinconfig.txt
+    //  node ravencoin listaddressesbyassets configfile=./data/ravencoinconfig.txt MEGATECH
         
-        rpc("listaddressesbyasset", ["$MEGATECH"])
+        rpc("listaddressesbyasset", ["$" + process.argv[4]])
             .then(function (data) {
                 console.log(data);
           })
@@ -72,22 +94,50 @@ if (process.argv[2] == "listaddressesbyassets") {
 
 if (process.argv[2] == "listmyassets") {
     //  node ravencoin listmyassets configfile=./data/ravencoinconfig.txt
-        
         rpc("listmyassets", ["DIGICOIN"])
             .then(function (data) {
-
-                console.log(CONFIG.asset);
                 console.log(data);
           })
           .catch(function (e) {
                 console.error(e.message);
           });
     
-}
+	
+	/*
+			{ MEGATECH: 100000, 'MEGATECH!': 1 }
+			{
+			  '#DIGI': 2,
+			  DIGICOIN: 100000,
+			  'DIGICOIN!': 1,
+			  '$DIGICOIN': 1,
 
+
+			  '#MEGA': 1,
+			  MEGATECH: 100000,  
+			  'MEGATECH!': 1
+			  '$MEGATECH': 100000,
+
+			}	
+	
+	*/
+}   
+
+//-------------
 if (process.argv[2] == "freezerestrictedasset") {
     	//  node ravencoin freezerestrictedasset configfile=./data/ravencoinconfig.txt
         rpc("freezerestrictedasset", ["$DIGICOIN"])
+            .then(function (data) {
+                console.log(data);
+          })
+          .catch(function (e) {
+				console.log("............")
+                console.error(e.message);
+          });    
+}     
+
+if (process.argv[2] == "unfreezerestrictedasset") {
+    	//  node ravencoin unfreezerestrictedasset configfile=./data/ravencoinconfig.txt
+        rpc("unfreezerestrictedasset", ["$DIGICOIN"])
             .then(function (data) {
                 console.log(data);
           })
@@ -120,10 +170,11 @@ if (process.argv[2] == "unfreezeaddress") {
                 console.error(e.message);
           });    
 }
+//-------------
 
 if (process.argv[2] == "listaddressrestrictions") {
     	//  node ravencoin listaddressrestrictions configfile=./data/ravencoinconfig.txt
-        rpc("listaddressrestrictions", ["mvGA9tP6aAD3dcSHLEWcLJADg1ryKf14Pu"])
+        rpc("listaddressrestrictions", ["myxd8nhb8Bh9h9syK2n2u6hKRyrSrAbxZ8"])
             .then(function (data) {
                 console.log(data);
           })
@@ -143,11 +194,30 @@ if (process.argv[2] == "viewmyrestrictedaddresses") {
 				console.log("............")
                 console.error(e.message);
           });    
+	
+	/*
+		  {
+			Address: 'n4dQ28t5LyJf3pW5w6m8F9mvXaQ6ksWEwM',
+			'Asset Name': '$MEGATECH',
+			Derestricted: '2021-09-15 18:34:31'
+		  }
+	*/
 }
 
 if (process.argv[2] == "addtagtoaddress") {
-    	//  node ravencoin addtagtoaddress configfile=./data/ravencoinconfig.txt
-        rpc("addtagtoaddress", ["#MEGA", "myhyhmRiKnuqgpmyAAeujWoxoTyWpZVUi7"])
+    	//  node ravencoin addtagtoaddress configfile=./data/ravencoinconfig.txt MEGA myhyhmRiKnuqgpmyAAeujWoxoTyWpZVUi7
+        rpc("addtagtoaddress", ["#" + process.argv[4], process.argv[5]])
+            .then(function (data) {
+                console.log(data);
+          })
+          .catch(function (e) {
+                console.error(e.message);
+          });
+}
+
+if (process.argv[2] == "removetagfromaddress") {
+    	//  node ravencoin removetagfromaddress configfile=./data/ravencoinconfig.txt MEGA myhyhmRiKnuqgpmyAAeujWoxoTyWpZVUi7
+        rpc("removetagfromaddress",  ["#" + process.argv[4], process.argv[5]])
             .then(function (data) {
                 console.log(data);
           })
@@ -180,7 +250,7 @@ if (process.argv[2] == "listmyassets") {
 
 
 
-// Address
+// ------------- Address
 if (process.argv[2] == "getaddresstxids") {
     //  node ravencoin getaddresstxids configfile=./data/ravencoinconfig.txt
         
@@ -195,9 +265,9 @@ if (process.argv[2] == "getaddresstxids") {
 }
 
 if (process.argv[2] == "getassetdata") {
-    //  node ravencoin getassetdata configfile=./data/ravencoinconfig.txt
+    //  node ravencoin getassetdata configfile=./data/ravencoinconfig.txt 
         
-        rpc("getassetdata", ["DIGICOIN"])
+        rpc("getassetdata", ["$MEGATECH"])
             .then(function (data) {
                 console.log(data);
           })
@@ -208,8 +278,8 @@ if (process.argv[2] == "getassetdata") {
 }
 
 if (process.argv[2] == "listassetbalancesbyaddress") {
-    	//  node ravencoin listassetbalancesbyaddress configfile=./data/ravencoinconfig.txt
-        rpc("listassetbalancesbyaddress", ["myxd8nhb8Bh9h9syK2n2u6hKRyrSrAbxZ8"])
+    	//  node ravencoin listassetbalancesbyaddress configfile=./data/ravencoinconfig.txt myxd8nhb8Bh9h9syK2n2u6hKRyrSrAbxZ8
+        rpc("listassetbalancesbyaddress", [process.argv[4]])
             .then(function (data) {
                 console.log(data);
           })
@@ -219,9 +289,9 @@ if (process.argv[2] == "listassetbalancesbyaddress") {
 }
 
 if (process.argv[2] == "checkaddresstag") {
-        // node ravencoin checkaddresstag configfile=./data/ravencoinconfig.txt
+        // node ravencoin checkaddresstag configfile=./data/ravencoinconfig.txt myhyhmRiKnuqgpmyAAeujWoxoTyWpZVUi7 MEGA
 
-        rpc("checkaddresstag", ["myhyhmRiKnuqgpmyAAeujWoxoTyWpZVUi7", "#MEGA"])
+        rpc("checkaddresstag", [ process.argv[4], "#" + process.argv[5] ])
             .then(function (data) {
 
                 console.log(data);
@@ -233,9 +303,9 @@ if (process.argv[2] == "checkaddresstag") {
 }
 
 if (process.argv[2] == "listtagsforaddress") {
-        // node ravencoin listtagsforaddress configfile=./data/ravencoinconfig.txt
+        // node ravencoin listtagsforaddress configfile=./data/ravencoinconfig.txt myhyhmRiKnuqgpmyAAeujWoxoTyWpZVUi7
 
-        rpc("listtagsforaddress", ["munskw5HqVKW5KKuALq5etxRECurgPYCkQ"])
+        rpc("listtagsforaddress", [process.argv[4]])
             .then(function (data) {
 
                 console.log(data);
@@ -249,7 +319,7 @@ if (process.argv[2] == "listtagsforaddress") {
 
 
 
-//Wallet
+// -----------------  Wallet
 if (process.argv[2] == "listaccounts") {
         // node ravencoin listaccounts configfile=./data/ravencoinconfig.txt
         rpc("listaccounts", [])
@@ -279,9 +349,11 @@ if (process.argv[2] == "getwalletinfo") {
 
 
 if (process.argv[2] == "transferfromaddress") {
-    //  node ravencoin transferfromaddress configfile=./data/ravencoinconfig.txt
+    	 //  node ravencoin transferfromaddress configfile=./data/ravencoinconfig.txt myxd8nhb8Bh9h9syK2n2u6hKRyrSrAbxZ8 myhyhmRiKnuqgpmyAAeujWoxoTyWpZVUi7 MEGATECH 20
         
-        rpc("transferfromaddress", ["$MEGATECH", "n4dQ28t5LyJf3pW5w6m8F9mvXaQ6ksWEwM", 20, "munskw5HqVKW5KKuALq5etxRECurgPYCkQ"])
+		// transferfromaddress "asset_name" "from_address" qty "to_address" "message" expire_time "rvn_change_address" "asset_change_address"
+	
+         rpc("transferfromaddress", ["$" + process.argv[6], process.argv[4], process.argv[7], process.argv[5]])
             .then(function (data) {
 
                 console.log(data);
@@ -289,7 +361,7 @@ if (process.argv[2] == "transferfromaddress") {
           .catch(function (e) {
                 console.error(e.message);
           });
-    //mvzRFJRNPY2JjTi3gY46ofskBnxC6WHpyz
+		  //mvzRFJRNPY2JjTi3gY46ofskBnxC6WHpyz
 }
 
 
@@ -340,8 +412,8 @@ function getConfig() {
     if (argument.startsWith("configfile=") === true) {
       const fileName = argument.replace("configfile=", "");
       if (fs.existsSync(fileName) === false) {
-        console.error("Could not locate file", fileName);
-        process.exit(1);
+			console.error("Could not locate file", fileName);
+			process.exit(1);
       }
       config = JSON.parse(fs.readFileSync(fileName, "utf8"));
     }
@@ -401,3 +473,206 @@ then run the server with    ./raven-qt -testnet
 
 */
 
+
+/*
+== Addressindex ==
+getaddressbalance
+getaddressdeltas
+getaddressmempool
+getaddresstxids
+getaddressutxos
+
+== Assets ==
+getassetdata "asset_name"
+getcacheinfo 
+getsnapshot "asset_name" block_height
+issue "asset_name" qty "( to_address )" "( change_address )" ( units ) ( reissuable ) ( has_ipfs ) "( ipfs_hash )"
+issueunique "root_name" [asset_tags] ( [ipfs_hashes] ) "( to_address )" "( change_address )"
+listaddressesbyasset "asset_name" (onlytotal) (count) (start)
+listassetbalancesbyaddress "address" (onlytotal) (count) (start)
+listassets "( asset )" ( verbose ) ( count ) ( start )
+listmyassets "( asset )" ( verbose ) ( count ) ( start ) (confs) 
+purgesnapshot "asset_name" block_height
+reissue "asset_name" qty "to_address" "change_address" ( reissuable ) ( new_units) "( new_ipfs )" 
+sweep "privkey" ( "asset_name" | "RVN" ) 
+transfer "asset_name" qty "to_address" "message" expire_time "change_address" "asset_change_address"
+transferfromaddress "asset_name" "from_address" qty "to_address" "message" expire_time "rvn_change_address" "asset_change_address"
+transferfromaddresses "asset_name" ["from_addresses"] qty "to_address" "message" expire_time "rvn_change_address" "asset_change_address"
+
+== Blockchain ==
+clearmempool
+decodeblock "blockhex"
+getbestblockhash
+getblock "blockhash" ( verbosity ) 
+getblockchaininfo
+getblockcount
+
+getblockhash height
+getblockhashes timestamp
+getblockheader "hash" ( verbose )
+getchaintips
+getchaintxstats ( nblocks blockhash )
+getdifficulty
+getmempoolancestors txid (verbose)
+getmempooldescendants txid (verbose)
+getmempoolentry txid
+getmempoolinfo
+getrawmempool ( verbose )
+getspentinfo
+gettxout "txid" n ( include_mempool )
+gettxoutproof ["txid",...] ( blockhash )
+gettxoutsetinfo
+preciousblock "blockhash"
+pruneblockchain
+savemempool
+verifychain ( checklevel nblocks )
+verifytxoutproof "proof"
+
+== Control ==
+getinfo
+getmemoryinfo ("mode")
+getrpcinfo
+help ( "command" )
+stop
+uptime
+
+== Generating ==
+generate nblocks ( maxtries )
+generatetoaddress nblocks address (maxtries)
+getgenerate
+setgenerate generate ( genproclimit )
+
+== Messages ==
+clearmessages 
+sendmessage "channel_name" "ipfs_hash" (expire_time)
+subscribetochannel 
+unsubscribefromchannel 
+viewallmessagechannels 
+viewallmessages 
+
+== Mining ==
+getblocktemplate ( TemplateRequest )
+getkawpowhash "header_hash" "mix_hash" nonce, height, "target"
+getmininginfo
+getnetworkhashps ( nblocks height )
+pprpcsb "header_hash" "mix_hash" "nonce"
+prioritisetransaction <txid> <dummy value> <fee delta>
+submitblock "hexdata"  ( "dummy" )
+
+== Network ==
+addnode "node" "add|remove|onetry"
+clearbanned
+disconnectnode "[address]" [nodeid]
+getaddednodeinfo ( "node" )
+getconnectioncount
+getnettotals
+getnetworkinfo
+getpeerinfo
+listbanned
+ping
+setban "subnet" "add|remove" (bantime) (absolute)
+setnetworkactive true|false
+
+== Rawtransactions ==
+combinerawtransaction ["hexstring",...]
+createrawtransaction [{"txid":"id","vout":n},...] {"address":(amount or object),"data":"hex",...}
+decoderawtransaction "hexstring"
+decodescript "hexstring"
+fundrawtransaction "hexstring" ( options )
+getrawtransaction "txid" ( verbose )
+sendrawtransaction "hexstring" ( allowhighfees )
+signrawtransaction "hexstring" ( [{"txid":"id","vout":n,"scriptPubKey":"hex","redeemScript":"hex"},...] ["privatekey1",...] sighashtype )
+testmempoolaccept ["rawtxs"] ( allowhighfees )
+
+== Restricted assets ==
+addtagtoaddress tag_name to_address (change_address) (asset_data)
+checkaddressrestriction address restricted_name
+checkaddresstag address tag_name
+checkglobalrestriction restricted_name
+freezeaddress asset_name address (change_address) (asset_data)
+freezerestrictedasset asset_name (change_address) (asset_data)
+getverifierstring restricted_name
+issuequalifierasset "asset_name" qty "( to_address )" "( change_address )" ( has_ipfs ) "( ipfs_hash )"
+issuerestrictedasset "asset_name" qty "verifier" "to_address" "( change_address )" (units) ( reissuable ) ( has_ipfs ) "( ipfs_hash )"
+isvalidverifierstring verifier_string
+listaddressesfortag tag_name
+listaddressrestrictions address
+listglobalrestrictions
+listtagsforaddress address
+reissuerestrictedasset "asset_name" qty to_address ( change_verifier ) ( "new_verifier" ) "( change_address )" ( new_units ) ( reissuable ) "( new_ipfs )"
+removetagfromaddress tag_name to_address (change_address) (asset_data)
+transferqualifier "qualifier_name" qty "to_address" ("change_address") ("message") (expire_time) 
+unfreezeaddress asset_name address (change_address) (asset_data)
+unfreezerestrictedasset asset_name (change_address) (asset_data)
+
+== Restricted ==
+viewmyrestrictedaddresses 
+viewmytaggedaddresses 
+
+== Rewards ==
+cancelsnapshotrequest "asset_name" block_height
+distributereward "asset_name" snapshot_height "distribution_asset_name" gross_distribution_amount ( "exception_addresses" ) ("change_address") ("dry_run")
+getdistributestatus "asset_name" snapshot_height "distribution_asset_name" gross_distribution_amount ( "exception_addresses" )
+getsnapshotrequest "asset_name" block_height
+listsnapshotrequests ["asset_name" [block_height]]
+requestsnapshot "asset_name" block_height
+
+== Util ==
+createmultisig nrequired ["key",...]
+estimatefee nblocks
+estimatesmartfee conf_target ("estimate_mode")
+signmessagewithprivkey "privkey" "message"
+validateaddress "address"
+verifymessage "address" "signature" "message"
+
+== Wallet ==
+abandontransaction "txid"
+abortrescan
+addmultisigaddress nrequired ["key",...] ( "account" )
+addwitnessaddress "address"
+backupwallet "destination"
+bumpfee has been deprecated on the RVN Wallet.
+dumpprivkey "address"
+dumpwallet "filename"
+encryptwallet "passphrase"
+getaccount "address"
+getaccountaddress "account"
+getaddressesbyaccount "account"
+getbalance ( "account" minconf include_watchonly )
+getmasterkeyinfo
+getmywords ( "account" )
+getnewaddress ( "account" )
+getrawchangeaddress
+getreceivedbyaccount "account" ( minconf )
+getreceivedbyaddress "address" ( minconf )
+gettransaction "txid" ( include_watchonly )
+getunconfirmedbalance
+getwalletinfo
+importaddress "address" ( "label" rescan p2sh )
+importmulti "requests" ( "options" )
+importprivkey "privkey" ( "label" ) ( rescan )
+importprunedfunds
+importpubkey "pubkey" ( "label" rescan )
+importwallet "filename"
+keypoolrefill ( newsize )
+listaccounts ( minconf include_watchonly)
+listaddressgroupings
+listlockunspent
+listreceivedbyaccount ( minconf include_empty include_watchonly)
+listreceivedbyaddress ( minconf include_empty include_watchonly)
+listsinceblock ( "blockhash" target_confirmations include_watchonly include_removed )
+listtransactions ( "account" count skip include_watchonly)
+listunspent ( minconf maxconf  ["addresses",...] [include_unsafe] [query_options])
+listwallets
+lockunspent unlock ([{"txid":"txid","vout":n},...])
+move "fromaccount" "toaccount" amount ( minconf "comment" )
+removeprunedfunds "txid"
+rescanblockchain ("start_height") ("stop_height")
+sendfrom "fromaccount" "toaddress" amount ( minconf "comment" "comment_to" )
+sendfromaddress "from_address" "to_address" amount ( "comment" "comment_to" subtractfeefromamount replaceable conf_target "estimate_mode")
+sendmany "fromaccount" {"address":amount,...} ( minconf "comment" ["address",...] replaceable conf_target "estimate_mode")
+sendtoaddress "address" amount ( "comment" "comment_to" subtractfeefromamount replaceable conf_target "estimate_mode")
+setaccount "address" "account"
+settxfee amount
+signmessage "address" "message"
+*/

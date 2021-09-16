@@ -734,7 +734,7 @@ if (process.argv[2] == "getGas") {
 }
 
 if (process.argv[2] == "EncryptKey") { 
-    // node EthereumUtils EncryptKey 03fd0b64a5a5204da6690c2e3c7478fc38a90b2fb819fd52615157c02ab1b35c a /home/shahzad/WorkingDocuments/data/Ethereum_localkey.txt
+    // node EthereumUtils EncryptKey f3f887c6e21038ba7af59b0261fc21ff49714e24e0ebbc5fb25aaba634da46fa aaa /home/shahzad/Ethereum_Faer.txt
 
      var data = ethereum.encryptKey(process.argv[3], process.argv[4], linkToBlockchainServer); 
      fs.writeFileSync(process.argv[5], JSON.stringify(data));
@@ -752,7 +752,8 @@ if (process.argv[2] == "TotalSupply") {
 }
 
 if (process.argv[2] == "DecryptKey") {
-    // node EthereumUtils DecryptKey a  /home/shahzad/WorkingDocuments/data/Ethereum_localkey.txt
+    // node EthereumUtils DecryptKey a  /home/shahzad/WorkingDocuments/data/Ethereum_polymathkey_B3c9_Pass_a.txt
+    // node EthereumUtils DecryptKey aaa  /home/shahzad/Ethereum_Faer.txt	
 
     let data2 = decryptKeyFromFile(process.argv[4], process.argv[3]);
     console.log(data2.privateKey);
