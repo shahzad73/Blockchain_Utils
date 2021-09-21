@@ -723,6 +723,8 @@ var abi_service =  [
 var contract_address = "0x3Fda31bF757670eCeA2567f2674bCc02D978A0E6";
 var service_address = "0x13d9806E2B756079B09ECff7945e76a44AB02370";
 var linkToBlockchainServer = "http://127.0.0.1:7545";
+// var linkToBlockchainServer = "https://kovan.infura.io/v3/fe41724da6f24b76a782f376b2698ee8";
+
 
 if (process.argv[2] == "getGas") {
     // node EthereumUtils getGas

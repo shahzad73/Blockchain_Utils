@@ -9,25 +9,44 @@ const serverLink = "http://127.0.0.1:8766";
 //  http://127.0.0.1:18766      testnet
 
 /*
-node ravencoin listaddressesfortag configfile=./data/ravencoinconfig.txt MEGA
 
-node ravencoin listaddressesbyassets configfile=./data/ravencoinconfig.txt MEGATECH
+node ravencoin listaddressesfortag configfile=./data/ravencoinconfig.txt SHATAG
 
-node ravencoin addtagtoaddress configfile=./data/ravencoinconfig.txt MEGA myhyhmRiKnuqgpmyAAeujWoxoTyWpZVUi7
+node ravencoin listaddressesbyassets configfile=./data/ravencoinconfig.txt ICOCOIN
+
+node ravencoin addtagtoaddress configfile=./data/ravencoinconfig.txt SHATAG myxd8nhb8Bh9h9syK2n2u6hKRyrSrAbxZ8
 
 node ravencoin removetagfromaddress configfile=./data/ravencoinconfig.txt MEGA myhyhmRiKnuqgpmyAAeujWoxoTyWpZVUi7
 
 node ravencoin getassetdata configfile=./data/ravencoinconfig.txt     this is used to get total supploy of the token
 
-node ravencoin listassetbalancesbyaddress configfile=./data/ravencoinconfig.txt myxd8nhb8Bh9h9syK2n2u6hKRyrSrAbxZ8
+node ravencoin listassetbalancesbyaddress configfile=./data/ravencoinconfig.txt mxogYG3E5Nn5pG2pRK5a53tMYbLe83Kcep
 
 check if investor has a specific tag
 node ravencoin checkaddresstag configfile=./data/ravencoinconfig.txt myhyhmRiKnuqgpmyAAeujWoxoTyWpZVUi7 MEGA    
 
 node ravencoin listtagsforaddress configfile=./data/ravencoinconfig.txt myhyhmRiKnuqgpmyAAeujWoxoTyWpZVUi7
 
-node ravencoin transferfromaddress configfile=./data/ravencoinconfig.txt myxd8nhb8Bh9h9syK2n2u6hKRyrSrAbxZ8 myhyhmRiKnuqgpmyAAeujWoxoTyWpZVUi7 $MEGATECH 20
+node ravencoin transferfromaddress configfile=./data/ravencoinconfig.txt mxogYG3E5Nn5pG2pRK5a53tMYbLe83Kcep myhyhmRiKnuqgpmyAAeujWoxoTyWpZVUi7 SHACOIN 30
 
+
+MEGATECH
+$MEGATECH  myxd8nhb8Bh9h9syK2n2u6hKRyrSrAbxZ8
+#MEGA
+
+SHACOIN    mwHNuJ1MEF4MK9K2WMQXsTvVLwZSWcBZuX   1
+$SHACOIN  mxogYG3E5Nn5pG2pRK5a53tMYbLe83Kcep  100000
+#SHATAG   mxTs5rZGvj2kYgZFo75E3fqpPgc4sWujiF  1
+
+ICOCOIN   mhx8NLZHeyxhHbR9Ji6FyEtKazA4MnLbKx 10000
+
+
+Ravencoin_ServerURL
+Ravencoin_Username
+Ravencoin_Password
+
+AssetName
+AssetTag
 */
 
 
@@ -81,15 +100,15 @@ if (process.argv[2] == "listaddressesfortag") {
 
 if (process.argv[2] == "listaddressesbyassets") {
     //  node ravencoin listaddressesbyassets configfile=./data/ravencoinconfig.txt MEGATECH
-        
-        rpc("listaddressesbyasset", ["$" + process.argv[4]])
+
+        rpc("listaddressesbyasset", [process.argv[4]])
             .then(function (data) {
                 console.log(data);
           })
           .catch(function (e) {
                 console.error(e.message);
           });
-    
+
 }     //get all addresses that has tag + their balances
 
 if (process.argv[2] == "listmyassets") {
@@ -378,7 +397,7 @@ async function rpc(method, params) {
         };
         const data = {
               jsonrpc: "1.0",
-              id: CONFIG.asset,
+              //id: CONFIG.asset,
               method,
               params,
         };
@@ -470,8 +489,11 @@ rpcpassword=supermegasecret
 
 then run the server with    ./raven-qt -testnet 
 
-
 */
+
+
+
+
 
 
 /*
