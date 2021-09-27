@@ -39,7 +39,7 @@ $SHACOIN  mxogYG3E5Nn5pG2pRK5a53tMYbLe83Kcep  100000
 #SHATAG   mxTs5rZGvj2kYgZFo75E3fqpPgc4sWujiF  1
 
 ICOCOIN   mhx8NLZHeyxhHbR9Ji6FyEtKazA4MnLbKx 10000
-
+ 
 
 Ravencoin_ServerURL
 Ravencoin_Username

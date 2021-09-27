@@ -1,6 +1,6 @@
 {
       "rpcUsername": "supermegasecret",
-      "rpcPassword": "supermegasecret",  
+      "rpcPassword":   "supermegasecret",  
       "asset": "#MEGATECH"
 }
 

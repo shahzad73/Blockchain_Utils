@@ -925,7 +925,33 @@ module.exports = {
         
     },
 
+	
+	
+	getWhitelistAddress( address, contractInfoABI, web3Address) {
+		return new Promise(((resolve, reject) => {
+			try {
+				const web3 = new Web3(new Web3.providers.HttpProvider(web3Address));
+				web3.eth.net.isListening().then(() => {
+					const contract = new web3.eth.Contract(contractInfoABI, address);
 
+						//bytes32("GeneralTransferManager")
+					
+						contract.methods.getModulesByName(  web3.utils.asciiToHex("GeneralTransferManager")   ).call().then((balance) => {
+							resolve(balance);
+						}).catch((err) => {
+							reject({ code: '0', message: `${err.message}. Error calling balanceOf method in getAccountBalance` });
+						});
+
+				}).catch(() => {
+					reject({ code: '0', message: 'Ethereum network connection error in getAccountBalance11' });
+				});
+			} catch (err) {
+				reject({ code: '0', message: `${err.message}. Error occured in getAccountBalance` });
+			}
+		}));
+	},
+	
+	
     test: function() {
         return new Promise(((resolve, reject) => {
             

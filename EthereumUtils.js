@@ -756,6 +756,7 @@ if (process.argv[2] == "TotalSupply") {
 if (process.argv[2] == "DecryptKey") {
     // node EthereumUtils DecryptKey a  /home/shahzad/WorkingDocuments/data/Ethereum_polymathkey_B3c9_Pass_a.txt
     // node EthereumUtils DecryptKey aaa  /home/shahzad/Ethereum_Faer.txt	
+	// node EthereumUtils DecryptKey aaa  /home/shahzad/Shahzad/projects/git/keystroe/keystore.txt
 
     let data2 = decryptKeyFromFile(process.argv[4], process.argv[3]);
     console.log(data2.privateKey);
