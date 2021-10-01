@@ -720,10 +720,11 @@ var abi_service =  [
 
 //https://kovan.infura.io/v3/fe41724da6f24b76a782f376b2698ee8
 
-var contract_address = "0x3Fda31bF757670eCeA2567f2674bCc02D978A0E6";
-var service_address = "0x13d9806E2B756079B09ECff7945e76a44AB02370";
-var linkToBlockchainServer = "http://127.0.0.1:7545";
-// var linkToBlockchainServer = "https://kovan.infura.io/v3/fe41724da6f24b76a782f376b2698ee8";
+var contract_address = "0xd8272d26a012c319c8eaa9683e857b205ea4d500";
+var service_address = "0x65d5b5811a64872b799d72edfb225eabfc924c09";
+// var linkToBlockchainServer = "http://127.0.0.1:7545";
+// 0xeA1466402fC4b0a0b4959E4cd040e79a7309B3c9
+ var linkToBlockchainServer = "https://kovan.infura.io/v3/fe41724da6f24b76a782f376b2698ee8";
 
 
 if (process.argv[2] == "getGas") {
@@ -756,7 +757,7 @@ if (process.argv[2] == "TotalSupply") {
 if (process.argv[2] == "DecryptKey") {
     // node EthereumUtils DecryptKey a  /home/shahzad/WorkingDocuments/data/Ethereum_polymathkey_B3c9_Pass_a.txt
     // node EthereumUtils DecryptKey aaa  /home/shahzad/Ethereum_Faer.txt	
-	// node EthereumUtils DecryptKey aaa  /home/shahzad/Shahzad/projects/git/keystroe/keystore.txt
+	// node EthereumUtils DecryptKey password ~/PrivateKeyKeyStore.txt
 
     let data2 = decryptKeyFromFile(process.argv[4], process.argv[3]);
     console.log(data2.privateKey);
@@ -785,7 +786,7 @@ if (process.argv[2] == "stoTokenBalance") {
 }
 
 if (process.argv[2] == "checkInvestorWhiteListed") {
-    //node EthereumUtils checkInvestorWhiteListed 0xcD063145Fcd75aca7C2c3CaD2675B4328dbd8f83
+    //node EthereumUtils checkInvestorWhiteListed 0xeA1466402fC4b0a0b4959E4cd040e79a7309B3c9
 
 	ethereum.checkIsInvestorWhitelistedInService( process.argv[3], abi_service, service_address, linkToBlockchainServer).then(function(data){
 		console.log(data);

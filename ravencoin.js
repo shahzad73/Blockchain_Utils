@@ -14,18 +14,18 @@ node ravencoin listaddressesfortag configfile=./data/ravencoinconfig.txt SHATAG
 
 node ravencoin listaddressesbyassets configfile=./data/ravencoinconfig.txt ICOCOIN
 
-node ravencoin addtagtoaddress configfile=./data/ravencoinconfig.txt SHATAG myxd8nhb8Bh9h9syK2n2u6hKRyrSrAbxZ8
+node ravencoin addtagtoaddress configfile=./data/ravencoinconfig.txt SHATAG RXBurnXXXXXXXXXXXXXXXXXXXXXXWUo9FV
 
-node ravencoin removetagfromaddress configfile=./data/ravencoinconfig.txt MEGA myhyhmRiKnuqgpmyAAeujWoxoTyWpZVUi7
+node ravencoin removetagfromaddress configfile=./data/ravencoinconfig.txt SHATAG myhyhmRiKnuqgpmyAAeujWoxoTyWpZVUi7
 
 node ravencoin getassetdata configfile=./data/ravencoinconfig.txt     this is used to get total supploy of the token
 
 node ravencoin listassetbalancesbyaddress configfile=./data/ravencoinconfig.txt mxogYG3E5Nn5pG2pRK5a53tMYbLe83Kcep
 
 check if investor has a specific tag
-node ravencoin checkaddresstag configfile=./data/ravencoinconfig.txt myhyhmRiKnuqgpmyAAeujWoxoTyWpZVUi7 MEGA    
+node ravencoin checkaddresstag configfile=./data/ravencoinconfig.txt mrkh1G3SAZxEo5ZXoDyAWzdmVMBi9zGLnU SHATAG    
 
-node ravencoin listtagsforaddress configfile=./data/ravencoinconfig.txt myhyhmRiKnuqgpmyAAeujWoxoTyWpZVUi7
+node ravencoin listtagsforaddress configfile=./data/ravencoinconfig.txt mxogYG3E5Nn5pG2pRK5a53tMYbLe83Kcep
 
 node ravencoin transferfromaddress configfile=./data/ravencoinconfig.txt mxogYG3E5Nn5pG2pRK5a53tMYbLe83Kcep myhyhmRiKnuqgpmyAAeujWoxoTyWpZVUi7 SHACOIN 30
 
@@ -69,7 +69,7 @@ if (process.argv[2] == "test") {
 if (process.argv[2] == "getaddressbalance") {
     //  node ravencoin getaddressbalance configfile=./data/ravencoinconfig.txt
         
-        rpc("getaddressbalance", ["n4dQ28t5LyJf3pW5w6m8F9mvXaQ6ksWEwM"])
+        rpc("getaddressbalance", ["n4dQ28t5LyJf3pW5w6m8F9mvXaQ6ksWEw"])
             .then(function (data) {
 
                 console.log("Holders of", CONFIG.asset);
@@ -236,6 +236,7 @@ if (process.argv[2] == "addtagtoaddress") {
 
 if (process.argv[2] == "removetagfromaddress") {
     	//  node ravencoin removetagfromaddress configfile=./data/ravencoinconfig.txt MEGA myhyhmRiKnuqgpmyAAeujWoxoTyWpZVUi7
+
         rpc("removetagfromaddress",  ["#" + process.argv[4], process.argv[5]])
             .then(function (data) {
                 console.log(data);
@@ -368,10 +369,8 @@ if (process.argv[2] == "getwalletinfo") {
 
 
 if (process.argv[2] == "transferfromaddress") {
-    	 //  node ravencoin transferfromaddress configfile=./data/ravencoinconfig.txt myxd8nhb8Bh9h9syK2n2u6hKRyrSrAbxZ8 myhyhmRiKnuqgpmyAAeujWoxoTyWpZVUi7 MEGATECH 20
-        
-		// transferfromaddress "asset_name" "from_address" qty "to_address" "message" expire_time "rvn_change_address" "asset_change_address"
-	
+    	 //  node ravencoin transferfromaddress configfile=./data/ravencoinconfig.txt mxogYG3E5Nn5pG2pRK5a53tMYbLe83Kcep RXBurnXXXXXXXXXXXXXXXXXXXXXXWUo9FV SHACOIN 20
+
          rpc("transferfromaddress", ["$" + process.argv[6], process.argv[4], process.argv[7], process.argv[5]])
             .then(function (data) {
 
@@ -381,6 +380,23 @@ if (process.argv[2] == "transferfromaddress") {
                 console.error(e.message);
           });
 		  //mvzRFJRNPY2JjTi3gY46ofskBnxC6WHpyz
+}
+
+
+
+if (process.argv[2] == "issueNewAssets") {
+    	//  node ravencoin issueNewAssets configfile=./data/ravencoinconfig.txt mxogYG3E5Nn5pG2pRK5a53tMYbLe83Kcep SHACOIN 20
+			
+		// issuerestrictedasset "asset_name" qty "verifier" "to_address" 
+		//reissuerestrictedasset "asset_name" qty to_address ( change_verifier ) ( "new_verifier" ) "( change_address )" ( new_units ) ( reissuable ) "( new_ipfs )"		
+	
+		rpc("reissuerestrictedasset", [process.argv[5], 200, process.argv[4] ] )
+		.then(function (data) {
+			 console.log(data)
+		}).catch(function (e) {
+			 console.log(e.toString())
+		});
+
 }
 
 
@@ -401,6 +417,9 @@ async function rpc(method, params) {
               method,
               params,
         };
+		  
+		console.log(data)
+		  
 
         try {
 

@@ -23,8 +23,8 @@ var contractInfoABI = [{"constant":true,"inputs":[],"name":"name","outputs":[{"n
 //infura link
 //https://ropsten.infura.io/v3/fe41724da6f24b76a782f376b2698ee8
 
-var contract_address = "0x61101299D1996eC54A92488f6B97FBCe5fB5939F";
-var service_address= "0x856C6f6d2ad69434ab955278195c510867eb3559";
+var contract_address = "0xd8272d26a012c319c8eaa9683e857b205ea4d500";
+var service_address= "0x65d5b5811a64872b799d72edfb225eabfc924c09";
 var linkToBlockchainServer = "https://kovan.infura.io/v3/fe41724da6f24b76a782f376b2698ee8";
 
 //let data2 = decryptKeyFromFile(process.argv[3], process.argv[2]);
@@ -90,8 +90,6 @@ if (process.argv[2] == "burn") {
 if (process.argv[2] == "whiteListInvestor") {
     //node PolyMath whiteListInvestor a ~/WorkingDocuments/data/Ethereum_polymathkey_B3c9_Pass_a.txt 0xB520234B0530a4EE5737Fca29636B840AfB6EbD2 true
 	
-	//node PolyMath whiteListInvestor aaa ~/Ethereum_Faer.txt 0x1E25705ef660E69999CC6b8D8F6Bd6514E5bd862 true	
-
     let data2 = decryptKeyFromFile(process.argv[4], process.argv[3]);
 
     ethereum.whitelisAddress(2, data2.address, process.argv[5], process.argv[6], data2.privateKey.substring(2), contract_address, service_address, linkToBlockchainServer, abi_service).then(function(data){
@@ -132,8 +130,11 @@ if (process.argv[2] == "getKYCData") {
 
 }
 
-if (process.argv[2] == "getWhitelistAddress") {
-	// node PolyMath getWhitelistAddress 0xD8272d26a012c319c8eaA9683e857b205EA4d500
+
+
+
+if (process.argv[2] == "getWhitelistAddressOfContract") {
+	// node PolyMath getWhitelistAddressOfContract 0xD8272d26a012c319c8eaA9683e857b205EA4d500
 
 	ethereum.getWhitelistAddress( process.argv[3], contractInfoABI, linkToBlockchainServer).then(function(data){
 		console.log(data);
@@ -144,6 +145,49 @@ if (process.argv[2] == "getWhitelistAddress") {
     });
 
 }
+
+if (process.argv[2] == "getInvestorCount") {
+	// node PolyMath getInvestorCount 0xD8272d26a012c319c8eaA9683e857b205EA4d500 
+
+	ethereum.getInvestorCount( process.argv[3], contractInfoABI, linkToBlockchainServer ).then(function(data){
+		console.log(data);
+        process.exit(0);
+	}).catch((err) => {
+        console.log(err.message);
+        process.exit(0);
+    });
+
+}
+
+if (process.argv[2] == "getInvestors") {
+	// node PolyMath getInvestors 0xD8272d26a012c319c8eaA9683e857b205EA4d500 
+
+	ethereum.getInvestors( process.argv[3], contractInfoABI, linkToBlockchainServer ).then(function(data){
+		console.log(data);
+        process.exit(0);
+	}).catch((err) => {
+        console.log(err.message);
+        process.exit(0);
+    });
+
+}
+
+if (process.argv[2] == "getCheckpointTimes") {
+	// node PolyMath getCheckpointTimes 0xD8272d26a012c319c8eaA9683e857b205EA4d500 
+
+	ethereum.getCheckpointTimes( process.argv[3], contractInfoABI, linkToBlockchainServer ).then(function(data){
+		console.log(data);
+        process.exit(0);
+	}).catch((err) => {
+        console.log(err.message);
+        process.exit(0);
+    });
+
+}
+
+
+
+
 
 
 function decryptKeyFromFile(file, password) {
