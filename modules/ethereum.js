@@ -12,11 +12,13 @@ module.exports = {
         return web3.eth.accounts.encrypt(key, password);
     },
 
+	
     decryptKey: function(key, password, web3Address) {
         var web3 = new Web3(new Web3.providers.HttpProvider(web3Address));
         return web3.eth.accounts.decrypt(key, password);
     },
             
+	
     getGas: function(web3Address) {
         
         return new Promise(function(resolve, reject) {
@@ -32,6 +34,7 @@ module.exports = {
         
     },
 	
+	
     getAccountEtherBalance: function(address, abi, contractAddress, web3Address) {
 		
         return new Promise(function(resolve, reject) {
@@ -46,6 +49,7 @@ module.exports = {
  
     },
 
+	
     checkIsInvestorWhitelistedInService: function(address, abi, contractAddress, web3Address, fromAddress) {
 
         return new Promise(function(resolve, reject) {
@@ -68,6 +72,7 @@ module.exports = {
         
     },    
 
+	
     whiteListInvestorInService: function(address, abi, contractAddress, web3Address) {
 
         return new Promise(function(resolve, reject) {
@@ -100,6 +105,7 @@ module.exports = {
         
     },
 
+	
     getAccountStoBalance: function(address, abi, contractAddress, web3Address) {
         
 		return new Promise(((resolve, reject) => {
@@ -126,6 +132,7 @@ module.exports = {
         
     },
 
+	
 	whitelisAddress: function(protocol, distributionPublciKey, publicKeyUser, authoeize, ethereumPrivateKey, ethereumContractAddress, ethereumWhitelistAddress, web3Address, whitelistAbi) {
 		// authorize = true   add user to whitelist
 		// authorize = false  remove user from whitelist
@@ -269,6 +276,7 @@ module.exports = {
 		}));
 	},
 
+	
 	sendTokens: function(myAddress, toAddress, amountToSend, ethereumPrivateKey, ethereumContractAddress, ethereumWhitelistAddress, web3Address, contractabi) {
         
         return new Promise(((resolve, reject) => {
@@ -455,7 +463,8 @@ module.exports = {
 		}));
 
 	},
-    
+
+	
     getAccountAllowance: function(fromaddress, toaddress, abi, contractAddress, web3Address) {
         
 		return new Promise(((resolve, reject) => {
@@ -481,7 +490,7 @@ module.exports = {
         
     },
 
-
+	
     forceTransfer: function(fromAddress, toAddress, amountToSend, ethereumPrivateKey, ethereumContractAddress, ethereumWhitelistAddress, web3Address, contractabi) {
         
         return new Promise(((resolve, reject) => {
@@ -572,6 +581,7 @@ module.exports = {
         
     },
 
+	
 	tokenCreateBurn: function(operation, protocolType, myAddress, amountToSend, ethereumPrivateKey, ethereumContractAddress, web3Address, contractabi) {
 
        return new Promise(((resolve, reject) => {
@@ -684,6 +694,7 @@ module.exports = {
 	
 	},
 
+	
 	burnToken: function(protocolType, myAddress, amountToSend, ethereumPrivateKey, ethereumContractAddress, web3Address, contractabi) {
                     
        return new Promise(((resolve, reject) => {
@@ -784,6 +795,7 @@ module.exports = {
 	
 	},
 
+	
     sendTransactionToEthereumNetwork: function(web3Address, contract, ethereumContractAddress, ethereumPrivateKey, fromAddress, functionDataABI, logTransactionName) {
         
         return new Promise((resolve, reject) => {
@@ -874,7 +886,8 @@ module.exports = {
 		});
         
     },
-        
+    
+	
     getTotalSupplyOfTokens: function(abi, contractAddress, web3Address) {
         
 		return new Promise(((resolve, reject) => {
@@ -900,33 +913,9 @@ module.exports = {
         
     },
 
-    getKYCData: function(address, abi, contractAddress, web3Address) {
-
-		return new Promise(((resolve, reject) => {
-			try {
-				const web3 = new Web3(new Web3.providers.HttpProvider(web3Address));
-
-				web3.eth.net.isListening().then(() => {
-					const contract = new web3.eth.Contract(abi, contractAddress);
-
-						contract.methods.getKYCData().call().then((status) => {
-							resolve(status);
-						}).catch((err) => {
-							reject({ code: '0', message: `${err.message}. Error calling balanceOf method in getAccountBalance` });
-						});
-
-				}).catch(() => {
-					reject({ code: '0', message: 'Ethereum network connection error in getAccountBalance11' });
-				});
-			} catch (err) {
-				reject({ code: '0', message: `${err.message}. Error occured in getAccountBalance` });
-			}
-		}));
-        
-    },
-
 	
 	
+
 	
 	
 	// ---------------------------------------------------
@@ -1025,7 +1014,140 @@ module.exports = {
 		}));
 	},		
 
+    getKYCData: function(address, abi, contractAddress, web3Address) {
+		return new Promise(((resolve, reject) => {
+			try {
+				const web3 = new Web3(new Web3.providers.HttpProvider(web3Address));
+
+				web3.eth.net.isListening().then(() => {
+					const contract = new web3.eth.Contract(abi, contractAddress);
+
+						contract.methods.getKYCData([address]).call().then((status) => {
+							resolve(status);
+						}).catch((err) => {
+							reject({ code: '0', message: `${err.message}. Error calling balanceOf method in getAccountBalance` });
+						});
+
+				}).catch(() => {
+					reject({ code: '0', message: 'Ethereum network connection error in getAccountBalance11' });
+				});
+			} catch (err) {
+				reject({ code: '0', message: `${err.message}. Error occured in getAccountBalance` });
+			}
+		}));
+        
+    },
+
+    getAllKYCData: function(abi, contractAddress, web3Address) {
+		return new Promise(((resolve, reject) => {
+			try {
+				const web3 = new Web3(new Web3.providers.HttpProvider(web3Address));
+
+				web3.eth.net.isListening().then(() => {
+					const contract = new web3.eth.Contract(abi, contractAddress);
+
+						contract.methods.getAllKYCData().call().then((status) => {
+							resolve(status);
+						}).catch((err) => {
+							reject({ code: '0', message: `${err.message}. Error calling balanceOf method in getAccountBalance` });
+						});
+
+				}).catch(() => {
+					reject({ code: '0', message: 'Ethereum network connection error in getAccountBalance11' });
+				});
+			} catch (err) {
+				reject({ code: '0', message: `${err.message}. Error occured in getAccountBalance` });
+			}
+		}));
+        
+		
+		/*
+
+		Result {
+		  '0': [
+			'0xeA1466402fC4b0a0b4959E4cd040e79a7309B3c9',
+			'0xcD063145Fcd75aca7C2c3CaD2675B4328dbd8f83',
+			'0xa73CF314dF3bA384235181495065d25343E7956F',
+			'0xB520234B0530a4EE5737Fca29636B840AfB6EbD2',
+			'0xF735763f57b62a388E371A394FE610fD258C6Bf7',
+			'0xDD569e104B88c1ede857CcC41fd5639073448D58',
+			'0x5b31fC93a7a120D467651BF2aD15b0940E0Fcbd5',
+			'0xDB0d238BAeF0bDE591841a66eC886f3dC7A8De48',
+			'0x0CfEc6Ad847fa8DEdbf165E488F332BE0411afB8'
+		  ],
+		  '1': [
+			'1262304000', '1262304000',
+			'1262304000', '0',
+			'1262304000', '1262304000',
+			'0',          '0',
+			'0'
+		  ],
+		  '2': [
+			'1262304000', '1262304000',
+			'1262304000', '0',
+			'1262304000', '1262304000',
+			'0',          '0',
+			'0'
+		  ],
+		  '3': [
+			'1893463200',
+			'1893463200',
+			'1893463200',
+			'1893463200',
+			'1893463200',
+			'1893463200',
+			'1893463200',
+			'1893463200',
+			'1893463200'
+		  ],
+		  investors: [
+			'0xeA1466402fC4b0a0b4959E4cd040e79a7309B3c9',
+			'0xcD063145Fcd75aca7C2c3CaD2675B4328dbd8f83',
+			'0xa73CF314dF3bA384235181495065d25343E7956F',
+			'0xB520234B0530a4EE5737Fca29636B840AfB6EbD2',
+			'0xF735763f57b62a388E371A394FE610fD258C6Bf7',
+			'0xDD569e104B88c1ede857CcC41fd5639073448D58',
+			'0x5b31fC93a7a120D467651BF2aD15b0940E0Fcbd5',
+			'0xDB0d238BAeF0bDE591841a66eC886f3dC7A8De48',
+			'0x0CfEc6Ad847fa8DEdbf165E488F332BE0411afB8'
+		  ],
+		  canSendAfters: [
+			'1262304000', '1262304000',
+			'1262304000', '0',
+			'1262304000', '1262304000',
+			'0',          '0',
+			'0'
+		  ],
+		  canReceiveAfters: [
+			'1262304000', '1262304000',
+			'1262304000', '0',
+			'1262304000', '1262304000',
+			'0',          '0',
+			'0'
+		  ],
+		  expiryTimes: [
+			'1893463200',
+			'1893463200',
+			'1893463200',
+			'1893463200',
+			'1893463200',
+			'1893463200',
+			'1893463200',
+			'1893463200',
+			'1893463200'
+		  ]
+		}
+
+
+
+*/
+		
+		
+		
+    },
 	
+	
+		
 	
 	
     test: function() {

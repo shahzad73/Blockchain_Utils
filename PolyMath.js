@@ -119,9 +119,31 @@ if (process.argv[2] == "sendTokens") {
 
 if (process.argv[2] == "getKYCData") {
 	// node PolyMath getKYCData 0xeA1466402fC4b0a0b4959E4cd040e79a7309B3c9
-
+	
 	ethereum.getKYCData( process.argv[3], abi_service, service_address, linkToBlockchainServer).then(function(data){
-		console.log(data);
+
+		if(data[0][0] == 0) 
+			console.log("Not Whitelisted")
+		else {		
+			var d = new Date(0);
+			d.setUTCSeconds(data[0][2] );
+			
+			if(data[0][0] > (Date.now()/1000))
+				console.log("YESSSS Whielisted")
+			else
+				console.log("wwwwwwwww")
+			
+			console.log("_canSendAfter -    " + " " + data[0][0]  + " " +  d.toString() );
+
+			var d1 = new Date(0);		
+			d1.setUTCSeconds(data[1][0] );				
+			console.log("_canReceiveAfter - " + " " + data[1][0]  + " " + d1.toString());
+
+			var d2 = new Date(0);		
+			d2.setUTCSeconds(data[2][0] );			
+			console.log("_expiryTime -      " + " " + data[2][0]  + " " + d2.toString());		
+		}
+			
         process.exit(0);
 	}).catch((err) => {
         console.log(err.message);
@@ -129,6 +151,19 @@ if (process.argv[2] == "getKYCData") {
     });
 
 }
+
+if (process.argv[2] == "getAllKYCData") {
+	// node PolyMath getAllKYCData
+	
+	ethereum.getAllKYCData( abi_service, service_address, linkToBlockchainServer).then(function(data){
+		console.log(data);
+	}).catch((err) => {
+        console.log(err.message);
+        process.exit(0);
+    });
+
+}
+
 
 
 

@@ -7,8 +7,11 @@ const CONFIG = getConfig();
 const serverLink = "http://127.0.0.1:8766";
 //  http://127.0.0.1:8766        main net
 //  http://127.0.0.1:18766      testnet
-
 /*
+npm library
+https://www.npmjs.com/package/ravencore-lib?activeTab=readme  
+
+
 
 node ravencoin listaddressesfortag configfile=./data/ravencoinconfig.txt SHATAG
 
