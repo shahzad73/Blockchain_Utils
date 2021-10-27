@@ -3,6 +3,8 @@ const fs = require('fs');
 const axios = require("axios");
 
 const CONFIG = getConfig();
+const crypto = require ("crypto");
+
 
 const serverLink = "http://127.0.0.1:8766";
 //  http://127.0.0.1:8766        main net
@@ -367,10 +369,6 @@ if (process.argv[2] == "getwalletinfo") {
           });  
 }
 
-
-
-
-
 if (process.argv[2] == "transferfromaddress") {
     	 //  node ravencoin transferfromaddress configfile=./data/ravencoinconfig.txt mxogYG3E5Nn5pG2pRK5a53tMYbLe83Kcep RXBurnXXXXXXXXXXXXXXXXXXXXXXWUo9FV SHACOIN 20
 
@@ -384,8 +382,6 @@ if (process.argv[2] == "transferfromaddress") {
           });
 		  //mvzRFJRNPY2JjTi3gY46ofskBnxC6WHpyz
 }
-
-
 
 if (process.argv[2] == "issueNewAssets") {
     	//  node ravencoin issueNewAssets configfile=./data/ravencoinconfig.txt mxogYG3E5Nn5pG2pRK5a53tMYbLe83Kcep SHACOIN 20
@@ -401,6 +397,43 @@ if (process.argv[2] == "issueNewAssets") {
 		});
 
 }
+
+if (process.argv[2] == "encryptdecrypt") {
+		// node ravencoin encryptdecrypt configfile=./data/ravencoinconfig.txt
+		
+	
+	const secret = 'Allahis@1111';
+	const hash = crypto.createHmac('sha256', secret)
+					   .update('Allahis@1111')
+					   .digest('hex');
+	
+	
+	const algorithm = 'aes-256-ctr';
+	const secretKey =  hash.substring(0,32);     
+	const iv = crypto.randomBytes(16);
+
+    const cipher = crypto.createCipheriv(algorithm, secretKey, iv);
+
+    const encrypted = Buffer.concat([cipher.update("mhx8NLZHeyxhHbR9Ji6FyEtKazA4MnLbKx"), cipher.final()]);
+
+	const data = {
+        iv: iv.toString('hex'),
+        content: encrypted.toString('hex')
+    };
+	
+    console.log (data);	
+	
+	
+    const decipher = crypto.createDecipheriv(algorithm, secretKey, Buffer.from(data.iv, 'hex'));
+
+    const decrpyted = Buffer.concat([decipher.update(Buffer.from(data.content, 'hex')), decipher.final()]);
+
+    console.log( decrpyted.toString() );	
+	
+	
+}
+
+
 
 
 
