@@ -5,6 +5,11 @@ const async = require('async');
 
 //const accounts = new Accounts('ws://127.0.0.1:7545');
 
+// protocol   1=R     2=PolyMath     3=Ravencoin     4=ERC1404
+		
+
+
+
 module.exports = {
 
     encryptKey: function(key, password, web3Address) {
@@ -57,21 +62,21 @@ module.exports = {
             var web3 = new Web3(new Web3.providers.HttpProvider(web3Address));
             
             var contract = new web3.eth.Contract(abi, contractAddress);
-            
-            contract.methods.isInvestorWhiteListed(address).call({from: fromAddress})
-            .then ( (data) => { 
-                 
-                 if(data == true)
-                     resolve(true);
-                 else 
-                     resolve(false);
-            });
+
+					contract.methods.isInvestorWhiteListed(address).call({from: fromAddress})
+					.then ( (data) => { 
+
+						 if(data == true)
+							 resolve(true);
+						 else 
+							 resolve(false);
+					});
             
 		})
-        
-        
     },    
 
+	
+	
 	
     whiteListInvestorInService: function(address, abi, contractAddress, web3Address) {
 
@@ -133,46 +138,61 @@ module.exports = {
     },
 
 	
+	getOwner: function(abi, contractAddress, web3Address) {
+
+		return new Promise(((resolve, reject) => {
+			try {
+				const web3 = new Web3(new Web3.providers.HttpProvider(web3Address));
+
+				web3.eth.net.isListening().then(() => {
+					const contract = new web3.eth.Contract(abi, contractAddress);
+					contract.methods.owner().call().then((owner) => {
+						resolve(owner);
+					}).catch((err) => {
+						reject({ code: '0', message: `${err.message}. Error calling balanceOf method in getAccountBalance` });
+					});
+
+
+				}).catch(() => {
+					reject({ code: '0', message: 'Ethereum network connection error in getAccountBalance' });
+				});
+			} catch (err) {
+				reject({ code: '0', message: `${err.message}. Error occured in getAccountBalance` });
+			}
+		}));
+        
+    },
+
+
+	
 	whitelisAddress: function(protocol, distributionPublciKey, publicKeyUser, authoeize, ethereumPrivateKey, ethereumContractAddress, ethereumWhitelistAddress, web3Address, whitelistAbi) {
+
 		// authorize = true   add user to whitelist
 		// authorize = false  remove user from whitelist
 
-        /*return new Promise((resolve, reject) => {
-            
-            const contract = new web3.eth.Contract(whitelistAbi, ethereumWhitelistAddress);
-            var functionData = "";
 
-            if (authoeize === 'true') 
-                functionData = contract.methods.addWhitelistAddress(publicKeyUser).encodeABI();
-            else 
-                functionData = contract.methods.removeWhitelistAddress(publicKeyUser).encodeABI();
-
-            console.log("----------------");
-            module.exports.sendTransactionToEthereumNetwork(web3Address, contract, ethereumContractAddress, ethereumPrivateKey, distributionPublciKey, functionData, "WhiteListing").then((data) => {
-                resolve(data);
-                console.log(done);
-            }).catch((err) => {
-                reject({ code: '0', message: `${err.message}.  Ethereum network connection error in whitelisAddress` });
-            });
-        });*/
+		
 
 		return new Promise(((resolve, reject) => {
 			try {
 				const web3 = new Web3(new Web3.providers.HttpProvider(web3Address));
                 
 				web3.eth.net.isListening().then(() => {
+					
 					const contract = new web3.eth.Contract(whitelistAbi, ethereumWhitelistAddress);
 					const privateKey = Buffer.from(ethereumPrivateKey, 'hex');
 					const contractAddress = ethereumWhitelistAddress;
 					web3.eth.defaultAccount = distributionPublciKey;
 					let estimateGasPromise = '';
-
+					
 					if (authoeize === 'true') {
                         var tempData = "";
-                        if(protocol == 1)    
+
+                        if(protocol == 1 || protocol == 4)    
                                 tempData = contract.methods.addWhitelistAddress(publicKeyUser).encodeABI();                        
                         else if(protocol == 2)    
                                 tempData = contract.methods.modifyKYCData(publicKeyUser, 0, 0, 1893463200).encodeABI();
+
 
 						estimateGasPromise = web3.eth.estimateGas({
 							to: contractAddress,
@@ -180,10 +200,11 @@ module.exports = {
 						});
 					} else {
                         var tempData = "";
-                        if(protocol == 1)    
+                        if(protocol == 1 || protocol == 4)    
                                 tempData = contract.methods.removeWhitelistAddress(publicKeyUser).encodeABI();                        
                         else if(protocol == 2)    
                                 tempData = contract.methods.modifyKYCData(publicKeyUser, 1893463200, 1893463200, 1893463200).encodeABI();
+
 
 						estimateGasPromise = web3.eth.estimateGas({
 							to: contractAddress,
@@ -196,12 +217,14 @@ module.exports = {
 					const allPromises = Promise.all([estimateGasPromise, nouncePromise]);
 
 
+
 					allPromises.then((results) => {
 						// creating raw tranaction
-
+						console.log(results)
+						
 						const rawTransaction = {
 							from: distributionPublciKey,
-							gasPrice: web3.utils.toHex(120 * 1e9),
+							gasPrice: web3.utils.toHex(results[0] + 100000000000),
 							gasLimit: web3.utils.toHex(results[0] + 1000000),
 							to: contractAddress,
 							value: '0x0',
@@ -210,14 +233,14 @@ module.exports = {
 
 						if (authoeize === 'true') { 
                             var tempData2 = "";
-                            if(protocol == 1)    
+                            if(protocol == 1 || protocol == 4)       
                                     tempData2 = contract.methods.addWhitelistAddress(publicKeyUser).encodeABI();                      
                             else if(protocol == 2)    
                                     tempData2 = contract.methods.modifyKYCData(publicKeyUser, 0, 0, 1893463200).encodeABI();
 
                             rawTransaction.data = tempData2; 
                         } else { 
-                            if(protocol == 1)    
+                            if(protocol == 1 || protocol == 4)    
                                     tempData2 = contract.methods.removeWhitelistAddress(publicKeyUser).encodeABI();
                             else if(protocol == 2)    
                                     tempData2 = contract.methods.modifyKYCData(publicKeyUser, 1893463200, 1893463200, 1893463200).encodeABI();
@@ -225,7 +248,7 @@ module.exports = {
                             rawTransaction.data = tempData2;                             
                         }
 
-                        
+
 						// creating tranaction via ethereumjs-tx
 						const transaction = new ethereumjs(rawTransaction);
                         
@@ -240,6 +263,7 @@ module.exports = {
 						web3.eth.sendSignedTransaction(`0x${serializedTx.toString('hex')}`, (err, txId) => {
                             
 							if (err) {
+								console.log(err)
 								reject({ code: '0', message: `${err.message}. Error calling sendSignedTransaction in whitelisAddress` });
 							} else {
 								async.retry(
@@ -263,6 +287,7 @@ module.exports = {
 								);
 							}
 						});
+
 					}).catch((err) => {
 				        reject({ code: '0', message: `${err.message}. Error in one of the Promises in allPromises in whitelisAddress` });
 					});
@@ -590,21 +615,21 @@ module.exports = {
 				const web3 = new Web3(new Web3.providers.HttpProvider(web3Address));
                 
 				web3.eth.net.isListening().then(() => {
-                    
 					const contract = new web3.eth.Contract(contractabi, ethereumContractAddress);
 					const privateKey = Buffer.from(ethereumPrivateKey, 'hex');
                     const amount = web3.utils.toHex(amountToSend);
 					const contractAddress = ethereumContractAddress;
 					web3.eth.defaultAccount = myAddress;
 
+					console.log( amount )
                     var tempData = "";
-                    if(protocolType == 1) {
+                    if(protocolType == 1 || protocolType == 4) {
                             //R Token
                             if(operation == 1)                        
                                     tempData = contract.methods.mint(myAddress, amount).encodeABI();
-                            else if(operation == 2)                                              
+                            else if(operation == 2)                                       
                                     tempData = contract.methods.burn(amount).encodeABI();                                    
-                        
+
                     } else if (protocolType == 2) {
                             //PolyMath
                             if(operation == 1)
@@ -613,7 +638,8 @@ module.exports = {
                                     tempData = contract.methods.redeemFrom( myAddress, amount, Buffer.from([0]) ).encodeABI();
                     }
 
-                    
+
+					
                     let estimateGasPromise = web3.eth.estimateGas({
                         to: ethereumContractAddress,
                         data: tempData
@@ -627,7 +653,7 @@ module.exports = {
                     
 					allPromises.then((results) => {
                             // creating raw tranaction               
-
+							console.log(results);
                             const rawTransaction = {
                                     from: myAddress,
                                     gasPrice: web3.utils.toHex(120 * 1e9),
