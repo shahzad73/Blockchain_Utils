@@ -745,7 +745,7 @@ if (process.argv[2] == "getGas") {
 }
 
 if (process.argv[2] == "EncryptKey") { 
-    // node EthereumUtils EncryptKey c671fbebbac110e4b0f7f25776b3585143b7a981cb16075cf2054c1a0bdfbe64 aaa /home/shahzad/KeystorD13D.txt
+    // node EthereumUtils EncryptKey 284e878525e21729040938f1e723a90f69f8ad336ce3f10e2357664f5249b915 aaa /home/shahzad/Keystor5300.txt
 
      var data = ethereum.encryptKey(process.argv[3], process.argv[4], linkToBlockchainServer); 
      fs.writeFileSync(process.argv[5], JSON.stringify(data));
@@ -915,7 +915,6 @@ if (process.argv[2] == "test") {
     });
 }
 
-
 if (process.argv[2] == "deploy") {
 	  // This will deploy ERC20 token to blockchain 
 	  //node EthereumUtils deploy
@@ -963,8 +962,6 @@ if (process.argv[2] == "deploy") {
    
 }
 
-
-
 if (process.argv[2] == "deployERC20") {
 	  // This will deploy ERC20 token to blockchain 
 	  //node EthereumUtils deployERC20
@@ -976,7 +973,7 @@ if (process.argv[2] == "deployERC20") {
 
 			  const encodedParameters = web3.eth.abi.encodeParameters(
 				[ 'address', 'uint256', 'string'],
-				['0xAD3DF0f1c421002B8Eff81288146AF9bC692d13d', '100000000000000000000000', 'ER20']
+				['0x1a8929fbE9abEc00CDfCda8907408848cBeb5300', '100000000000000000000000', 'ER20']
 			  ).slice(2);		
 
 
@@ -984,15 +981,24 @@ if (process.argv[2] == "deployERC20") {
 			// prepare the transaction:
 			var contractName = "Test Contract"
 			var rawTx = {
-				  from: "0xAD3DF0f1c421002B8Eff81288146AF9bC692d13d",
+				  from: "0x1a8929fbE9abEc00CDfCda8907408848cBeb5300",
 				  data:  ERC20Token.bytecode  + encodedParameters,
 				  gas: 2000000
 			}
 
 			
+			let estimateGasPromise = web3.eth.estimateGas({
+				data: ERC20Token.bytecode  + encodedParameters
+			});						
+			const allPromises = Promise.all([estimateGasPromise]);
+			allPromises.then((results) => {
+					console.log(results);			 //  1229935  will be returned 
+			})			
+			
+			
 			// sign and send the transaction
 			//let contractAddress
-			web3.eth.accounts.signTransaction(rawTx, 'c671fbebbac110e4b0f7f25776b3585143b7a981cb16075cf2054c1a0bdfbe64')
+			web3.eth.accounts.signTransaction(rawTx, '284e878525e21729040938f1e723a90f69f8ad336ce3f10e2357664f5249b915')
 			.then((signedTx) => {
 				  const sentTx = web3.eth.sendSignedTransaction(signedTx.raw || signedTx.rawTransaction);
 				  sentTx.on("error", err => {

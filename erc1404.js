@@ -13,8 +13,8 @@ const Tx = require('ethereumjs-tx').Transaction;
 const ERC1404Token = JSON.parse(fs.readFileSync("./data/ERC1404.json", "utf8")); 
 
 
-var contract_address = "0x15A1307729f55464589e2e98eE0F6c8c4fA2A140";
-var service_address = "0x15A1307729f55464589e2e98eE0F6c8c4fA2A140";
+var contract_address = "0x6eFCBcb30EF3C28eA987F807ad6FC3a6CFad1Bd1";
+var service_address = "0x6eFCBcb30EF3C28eA987F807ad6FC3a6CFad1Bd1";
 //var linkToBlockchainServer = "HTTP://127.0.0.1:7545";
 // 0xeA1466402fC4b0a0b4959E4cd040e79a7309B3c9
 var linkToBlockchainServer = "https://kovan.infura.io/v3/fe41724da6f24b76a782f376b2698ee8";
@@ -33,7 +33,7 @@ if (process.argv[2] == "etherBalance") {
 
 if (process.argv[2] == "whiteListInvestor") {
 
-    // node EthereumUtils whiteListInvestor aaa /home/shahzad/WorkingDocuments/data/Keystore_D13D_aaa.txt 0x1a8929fbE9abEc00CDfCda8907408848cBeb5300 true
+    // node erc1404 whiteListInvestor aaa /home/shahzad/WorkingDocuments/data/Keystore_5300_aaa.txt 0xAD3DF0f1c421002B8Eff81288146AF9bC692d13d true
 
     let data2 = decryptKeyFromFile(process.argv[4], process.argv[3]);
 	
@@ -55,23 +55,35 @@ if (process.argv[2] == "deployERC1404") {
 			
 
 		  const encodedParameters = web3.eth.abi.encodeParameters(
-			[ 'address', 'uint256', 'string'],
-			['0xAD3DF0f1c421002B8Eff81288146AF9bC692d13d', '1000000000000000000000', 'ER1404']
+			['uint256', 'string', 'string'],
+			['1000000000000000000000', 'ER1404', 'ER1404']
 		  ).slice(2);		
-
 
 			// prepare the transaction:
 			var contractName = "Test Contract"
 			var rawTx = {
-				  from: "0xAD3DF0f1c421002B8Eff81288146AF9bC692d13d",
+				  from: "0x1a8929fbE9abEc00CDfCda8907408848cBeb5300",
 				  data:  ERC1404Token.bytecode  + encodedParameters,
 				  gas: 12500000
 			}
 
-
+            
+			web3.eth.getGasPrice(function(e, r) { 
+				console.log("Current Gas price is : " + r) 
+			})				
+			
+			let estimateGasPromise = web3.eth.estimateGas({
+				data: ERC1404Token.bytecode  + encodedParameters
+			});						
+			const allPromises = Promise.all([estimateGasPromise]);
+			allPromises.then((results) => {
+					console.log(results);			 // 2224434 will be returned   
+			})
+			
+			/*
 			// sign and send the transaction
 			//let contractAddress
-			web3.eth.accounts.signTransaction(rawTx, 'c671fbebbac110e4b0f7f25776b3585143b7a981cb16075cf2054c1a0bdfbe64')
+			web3.eth.accounts.signTransaction(rawTx, '284e878525e21729040938f1e723a90f69f8ad336ce3f10e2357664f5249b915')
 			.then((signedTx) => {
 				  const sentTx = web3.eth.sendSignedTransaction(signedTx.raw || signedTx.rawTransaction);
 				  sentTx.on("error", err => {
@@ -86,14 +98,14 @@ if (process.argv[2] == "deployERC1404") {
 			  // do something when promise fails
 			  console.log(err)
 			});		
-		
+			*/
 				
 	})();   
    
 }
 
 if (process.argv[2] == "checkInvestorWhiteListed") {
-    // node erc1404 checkInvestorWhiteListed 0xAD3DF0f1c421002B8Eff81288146AF9bC692d13d
+    // node erc1404 checkInvestorWhiteListed 0x1a8929fbE9abEc00CDfCda8907408848cBeb5300
 
 	ethereum.checkIsInvestorWhitelistedInService( process.argv[3], ERC1404Token.abi, service_address, linkToBlockchainServer).then(function(data){
 		console.log(data);
@@ -103,7 +115,7 @@ if (process.argv[2] == "checkInvestorWhiteListed") {
 
 if (process.argv[2] == "whiteListInvestor") {
 
-    // node erc1404 whiteListInvestor aaa /home/shahzad/WorkingDocuments/data/Keystore_D13D_aaa.txt 0x1a8929fbE9abEc00CDfCda8907408848cBeb5300 true
+    // node erc1404 whiteListInvestor aaa /home/shahzad/WorkingDocuments/data/Keystore_5300_aaa.txt 0xAD3DF0f1c421002B8Eff81288146AF9bC692d13d true
 
     let data2 = decryptKeyFromFile(process.argv[4], process.argv[3]);
 	
@@ -117,10 +129,9 @@ if (process.argv[2] == "whiteListInvestor") {
 
 if (process.argv[2] == "create") {
 
-	// node erc1404 create aaa /home/shahzad/WorkingDocuments/data/Keystore_D13D_aaa.txt 1000000000000000000000
+	// node erc1404 create aaa /home/shahzad/WorkingDocuments/data/Keystore_5300_aaa.txt 1000000000000000000000
     
     let data2 = decryptKeyFromFile(process.argv[4], process.argv[3]);
-    console.log(data2)
 	ethereum.tokenCreateBurn(1, 4, data2.address, process.argv[5], data2.privateKey.substring(2), service_address, linkToBlockchainServer, ERC1404Token.abi).then(function(data){
 		console.log("done");
         process.exit(0);

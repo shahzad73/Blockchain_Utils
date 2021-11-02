@@ -222,6 +222,10 @@ module.exports = {
 						// creating raw tranaction
 						console.log(results)
 						
+						web3.eth.getGasPrice(function(e, r) { 
+							console.log("Current Gas price is : " + r) 
+						})								
+						
 						const rawTransaction = {
 							from: distributionPublciKey,
 							gasPrice: web3.utils.toHex(results[0] + 100000000000),
@@ -609,11 +613,15 @@ module.exports = {
 	
 	tokenCreateBurn: function(operation, protocolType, myAddress, amountToSend, ethereumPrivateKey, ethereumContractAddress, web3Address, contractabi) {
 
-       return new Promise(((resolve, reject) => {
+		return new Promise(((resolve, reject) => {
     
 			try {
 				const web3 = new Web3(new Web3.providers.HttpProvider(web3Address));
                 
+				web3.eth.getGasPrice(function(e, r) { 
+					console.log("Current Gas price is : " + r) 
+				})				
+				
 				web3.eth.net.isListening().then(() => {
 					const contract = new web3.eth.Contract(contractabi, ethereumContractAddress);
 					const privateKey = Buffer.from(ethereumPrivateKey, 'hex');
@@ -621,7 +629,6 @@ module.exports = {
 					const contractAddress = ethereumContractAddress;
 					web3.eth.defaultAccount = myAddress;
 
-					console.log( amount )
                     var tempData = "";
                     if(protocolType == 1 || protocolType == 4) {
                             //R Token
@@ -648,9 +655,9 @@ module.exports = {
 
                     const nouncePromise = web3.eth.getTransactionCount(myAddress, 'pending');
 
-                    //const allPromises = Promise.all([estimateGasPromise, nouncePromise]);
-                    const allPromises = Promise.all([nouncePromise]);
-                    
+                    const allPromises = Promise.all([estimateGasPromise, nouncePromise]);
+                    //const allPromises = Promise.all([nouncePromise]);
+                     
 					allPromises.then((results) => {
                             // creating raw tranaction               
 							console.log(results);
@@ -661,8 +668,8 @@ module.exports = {
                                     gasLimit: web3.utils.toHex(1000000),                                
                                     to: ethereumContractAddress,
                                     value: 0x0,
-                                    //nonce: web3.utils.toHex(results[1]),
-                                    nonce: web3.utils.toHex(results[0]),                                
+                                    nonce: web3.utils.toHex(results[1]),
+                                    //nonce: web3.utils.toHex(results[0]),                                
                                     data: tempData
                             };
 
@@ -703,7 +710,12 @@ module.exports = {
                                         },
                                     );
                                 }
-                            });
+                            }, (err2) => {
+									if(err2) {
+										console.log(` ${err2()} `);
+										reject(err2);
+									}
+                             });
 
 					}).catch((err) => {
 				        reject({ code: '0', message: `${err.message}. Error in one of the Promises in allPromises in 1 tokenCreateBurn` });
