@@ -960,6 +960,7 @@ module.exports = {
 	//PolyMath ERC1400 specific  info contract 
 	// ---------------------------------------------------	
 	
+	//Use this to get whitelist address of ERC1400
 	getWhitelistAddress( address, contractInfoABI, web3Address) {
 		return new Promise(((resolve, reject) => {
 			try {
@@ -1185,6 +1186,58 @@ module.exports = {
     },
 	
 	
+	
+	       
+	// ---------------------------------------------------
+	//Custom ERC1404 contract 
+	// ---------------------------------------------------		
+	getAllowedInvestors( contractInfoABI, address, web3Address) {
+
+		return new Promise(((resolve, reject) => {
+			try {
+
+				const web3 = new Web3(new Web3.providers.HttpProvider(web3Address));
+				web3.eth.net.isListening().then(() => {
+					const contract = new web3.eth.Contract(contractInfoABI, address);
+
+								contract.methods.allowedInvestors().call().then((balance) => {
+									resolve(balance);
+								}).catch((err) => {
+									reject({ code: '0', message: `${err.message}. Error calling balanceOf method in getAccountBalance` });
+								});
+
+				}).catch(() => {
+					reject({ code: '0', message: 'Ethereum network connection error in getAccountBalance11' });
+				});
+			} catch (err) {
+				reject({ code: '0', message: `${err.message}. Error occured in getAccountBalance` });
+			}
+		}));
+	},
+	
+	
+	getCurrentTotalInvestors(contractInfoABI, address, web3Address) {
+		return new Promise(((resolve, reject) => {
+			try {
+				const web3 = new Web3(new Web3.providers.HttpProvider(web3Address));
+				web3.eth.net.isListening().then(() => {
+					const contract = new web3.eth.Contract(contractInfoABI, address);
+						
+								contract.methods.currentTotalInvestors().call().then((balance) => {
+									resolve(balance);
+								}).catch((err) => {
+									reject({ code: '0', message: `${err.message}. Error calling balanceOf method in getAccountBalance` });
+								});
+
+				}).catch(() => {
+					reject({ code: '0', message: 'Ethereum network connection error in getAccountBalance11' });
+				});
+			} catch (err) {
+				reject({ code: '0', message: `${err.message}. Error occured in getAccountBalance` });
+			}
+		}));
+	},
+		
 		
 	
 	
