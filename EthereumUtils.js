@@ -745,7 +745,7 @@ if (process.argv[2] == "getGas") {
 }
 
 if (process.argv[2] == "EncryptKey") { 
-    // node EthereumUtils EncryptKey 284e878525e21729040938f1e723a90f69f8ad336ce3f10e2357664f5249b915 aaa /home/shahzad/Keystor5300.txt
+    // node EthereumUtils EncryptKey f32805a8e67ab4f0a412e62af31c36c7b5ae4f31bbeeae2eb55f2e0655a328fb aaa /home/shahzad/Keystor672E.txt
 
      var data = ethereum.encryptKey(process.argv[3], process.argv[4], linkToBlockchainServer); 
      fs.writeFileSync(process.argv[5], JSON.stringify(data));
@@ -832,7 +832,7 @@ if (process.argv[2] == "whiteListInvestor") {
 if (process.argv[2] == "sendTokens") {
 
     //node EthereumUtils sendTokens aaa /home/shahzad/WorkingDocuments/data/Keystore_D13D_aaa.txt  0x1a8929fbE9abEc00CDfCda8907408848cBeb5300 10
-    
+
     let data2 = decryptKeyFromFile(process.argv[4], process.argv[3]);
     
     ethereum.sendTokens(data2.address, process.argv[5], parseInt(process.argv[6]),  data2.privateKey.substring(2), contract_address, service_address, linkToBlockchainServer, abi_contract).then(function(data){
@@ -866,6 +866,10 @@ if (process.argv[2] == "allowance") {
 	})
 
 }
+
+
+
+
 
 
 

@@ -4,6 +4,7 @@ const axios = require("axios");
 
 const CONFIG = getConfig();
 const crypto = require ("crypto");
+const ravencore = require("ravencore-lib");
 
 
 const serverLink = "http://127.0.0.1:8766";
@@ -17,7 +18,7 @@ https://www.npmjs.com/package/ravencore-lib?activeTab=readme
 
 node ravencoin listaddressesfortag configfile=./data/ravencoinconfig.txt SHATAG
 
-node ravencoin listaddressesbyassets configfile=./data/ravencoinconfig.txt ICOCOIN
+node ravencoin listaddressesbyassets configfile=./data/ravencoinconfig.txt SHATAG
 
 node ravencoin addtagtoaddress configfile=./data/ravencoinconfig.txt SHATAG RXBurnXXXXXXXXXXXXXXXXXXXXXXWUo9FV
 
@@ -25,7 +26,7 @@ node ravencoin removetagfromaddress configfile=./data/ravencoinconfig.txt SHATAG
 
 node ravencoin getassetdata configfile=./data/ravencoinconfig.txt     this is used to get total supploy of the token
 
-node ravencoin listassetbalancesbyaddress configfile=./data/ravencoinconfig.txt mxogYG3E5Nn5pG2pRK5a53tMYbLe83Kcep
+node ravencoin listassetbalancesbyaddress configfile=./data/ravencoinconfig.txt myxd8nhb8Bh9h9syK2n2u6hKRyrSrAbxZ8
 
 check if investor has a specific tag
 node ravencoin checkaddresstag configfile=./data/ravencoinconfig.txt mrkh1G3SAZxEo5ZXoDyAWzdmVMBi9zGLnU SHATAG    
@@ -40,7 +41,9 @@ $MEGATECH  myxd8nhb8Bh9h9syK2n2u6hKRyrSrAbxZ8
 #MEGA
 
 SHACOIN    mwHNuJ1MEF4MK9K2WMQXsTvVLwZSWcBZuX   1
-$SHACOIN  mxogYG3E5Nn5pG2pRK5a53tMYbLe83Kcep  100000
+
+$SHACOIN  mxogYG3E5Nn5pG2pRK5a53tMYbLe83Kcep  100000     private key of this public key is cRH1BgNoy3MxXe5eRHC94VRXa1vs6VsuuVmyvadjXZvkFLurL8rF
+
 #SHATAG   mxTs5rZGvj2kYgZFo75E3fqpPgc4sWujiF  1
 
 ICOCOIN   mhx8NLZHeyxhHbR9Ji6FyEtKazA4MnLbKx 10000
@@ -52,6 +55,13 @@ Ravencoin_Password
 
 AssetName
 AssetTag
+
+//Retriving private key from wallet 
+1.  unlocak wallet first with     walletpassphrase "Allahis@1" 100
+2. dumpprivkey "mxogYG3E5Nn5pG2pRK5a53tMYbLe83Kcep"
+
+
+
 */
 
 
@@ -435,6 +445,70 @@ if (process.argv[2] == "encryptdecrypt") {
 
 
 
+if (process.argv[2] == "sendRawTransaction") {
+	
+			//	node ravencoin sendRawTransaction configfile=./data/ravencoinconfig.txt
+
+	
+	/*
+			var params = {
+			  'insight_url': 'https://api.testnet.ravencoin.org/api',
+			  'asset': 'SHACOIN',
+			  'amount': 100,
+			  'asset_from_addresses': 'mxogYG3E5Nn5pG2pRK5a53tMYbLe83Kcep',
+			  'rvn_from_address': 'mxogYG3E5Nn5pG2pRK5a53tMYbLe83Kcep',
+			  'private_keys': ['cRH1BgNoy3MxXe5eRHC94VRXa1vs6VsuuVmyvadjXZvkFLurL8rF', 'cRH1BgNoy3MxXe5eRHC94VRXa1vs6VsuuVmyvadjXZvkFLurL8rF'],
+			  'to_address': 'myxd8nhb8Bh9h9syK2n2u6hKRyrSrAbxZ8',
+			  'asset_change_address': 'mxogYG3E5Nn5pG2pRK5a53tMYbLe83Kcep',
+			  'rvn_change_address': 'mxogYG3E5Nn5pG2pRK5a53tMYbLe83Kcep'
+			}
+
+			var insight =  ravencore.Insight(params.insight_url)
+
+			var getAssetUtxos = function (from_address, asset) {
+			  return new Promise(function (resolve, reject) {
+				insight.addrAssetUtxo(from_address, asset, function (res) { resolve(res) })
+			  })
+			}
+
+			var getRvnUtxos = function (from_address) {
+			  return new Promise(function (resolve, reject) {
+				insight.passthroughGet('/addr/' + from_address + '/utxo', function (res) { resolve(res) })
+			  })
+			}
+
+			var createTransaction = function (utxos) {
+			  return new Promise(function (resolve, reject) {
+				t = new ravencore.Transaction()
+				  .from(utxos)
+				  .to(params.to_address, params.amount, params.asset)
+				  .change(params.rvn_change_address)
+				  .change(params.asset_change_address, params.asset)
+				  .sign(params.private_keys)
+				resolve(t)
+			  })
+			}
+
+			var transaction;
+
+			Promise.all([
+			  getAssetUtxos(params.asset_from_addresses, params.asset),
+			  getRvnUtxos(params.rvn_from_address)
+			]).then(function (results) {
+			  return _.flatten(results)
+			}).then(function (utxos) {
+			  return createTransaction(utxos)
+			}).then(function (t) {
+			  transaction = t
+			  
+			})
+			
+*/			
+}
+
+
+
+
 
 
 async function rpc(method, params) {
@@ -453,8 +527,6 @@ async function rpc(method, params) {
               method,
               params,
         };
-		  
-		console.log(data)
 		  
 
         try {

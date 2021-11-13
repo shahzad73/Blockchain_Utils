@@ -13,12 +13,11 @@ const Tx = require('ethereumjs-tx').Transaction;
 const ERC1404Token = JSON.parse(fs.readFileSync("./data/ERC1404.json", "utf8")); 
 
 
-var contract_address = "0xAe16876EC5ec04Bf452aD3EA4A5a1f63Bd76DA4B";
-var service_address = "0xAe16876EC5ec04Bf452aD3EA4A5a1f63Bd76DA4B";
-var linkToBlockchainServer = "HTTP://127.0.0.1:7545";
-// 0xeA1466402fC4b0a0b4959E4cd040e79a7309B3c9
-//var linkToBlockchainServer = "https://mainnet.infura.io/v3/fe41724da6f24b76a782f376b2698ee8";
-
+var contract_address = "0xf134d417659797c2AB607999E6671777084705f4";
+var service_address = "0xf134d417659797c2AB607999E6671777084705f4";
+//var linkToBlockchainServer = "HTTP://127.0.0.1:7545";
+var linkToBlockchainServer = "https://mainnet.infura.io/v3/fe41724da6f24b76a782f376b2698ee8";
+//var linkToBlockchainServer = "https://matic-mumbai--jsonrpc.datahub.figment.io/apikey/9737e952f56cd7bdca83d6bb4fdf1576"
 
 
 if (process.argv[2] == "etherBalance") {
@@ -31,34 +30,34 @@ if (process.argv[2] == "etherBalance") {
 
 }
 
-if (process.argv[2] == "whiteListInvestor") {
+/*if (process.argv[2] == "whiteListInvestor") {
 
     // node erc1404 whiteListInvestor aaa /home/shahzad/WorkingDocuments/data/Keystore_5300_aaa.txt 0xAD3DF0f1c421002B8Eff81288146AF9bC692d13d true
 
     let data2 = decryptKeyFromFile(process.argv[4], process.argv[3]);
-	
-	
+
     ethereum.whitelisAddress(4, data2.address, process.argv[5], process.argv[6], data2.privateKey.substring(2), contract_address, service_address, linkToBlockchainServer, ERC1404Token.abi).then(function(data){
 		console.log(data);
         process.exit(0);
 	})
 
-}
+}*/
 
 if (process.argv[2] == "deployERC1404") {
 	  // This will deploy ERC20 token to blockchain 
-	  //node erc1404 deployERC1404
+	  // node erc1404 deployERC1404
 	
 	(async () => {
-		
+
 		var web3 = new Web3(new Web3.providers.HttpProvider(linkToBlockchainServer));
-			
 
 		  const encodedParameters = web3.eth.abi.encodeParameters(
-			['uint256', 'string', 'string'],
-			['1000000000000000000000000', 'E1404', 'E1404']
-		  ).slice(2);		
+			['uint256', 'string', 'string', 'uint256'],
+			['1000000000000000000000000', 'E1404', 'E1404', 5]
+		  ).slice(2);
 
+		
+		
 			// prepare the transaction:
 			var contractName = "Test Contract"
 			var rawTx = {
@@ -68,22 +67,31 @@ if (process.argv[2] == "deployERC1404") {
 			}
 
 
-			web3.eth.getGasPrice(function(e, r) { 
-				console.log("Current Gas price is : " + r) 
-			})				
 			
+			var gasPrice = await web3.eth.getGasPrice();
+						
 			let estimateGasPromise = web3.eth.estimateGas({
 				data: ERC1404Token.bytecode  + encodedParameters
 			});						
 			const allPromises = Promise.all([estimateGasPromise]);
-			allPromises.then((results) => {
-					console.log(results);			 // 2224434 will be returned   
-			})
+			var gas = await allPromises;
+		
+			var block = await web3.eth.getBlock("latest");
+			//var gasLimit = block.gasLimit/block.transactions.length;
+
+			const etherValue = Web3.utils.fromWei(gasPrice, 'ether');
+			console.log("gasLimit: " + block.gasLimit);				
+			console.log( "Gas Estimate : " + gas )				
+			console.log( "Gas : " + gasPrice )		
+			console.log( "ETH :" + gas * etherValue );		
+			console.log( "$" + gas * etherValue * 4700 );
+
 			
-			/*
+		
+			
 			// sign and send the transaction
 			//let contractAddress
-			web3.eth.accounts.signTransaction(rawTx, '284e878525e21729040938f1e723a90f69f8ad336ce3f10e2357664f5249b915')
+			/*web3.eth.accounts.signTransaction(rawTx, '284e878525e21729040938f1e723a90f69f8ad336ce3f10e2357664f5249b915')
 			.then((signedTx) => {
 				  const sentTx = web3.eth.sendSignedTransaction(signedTx.raw || signedTx.rawTransaction);
 				  sentTx.on("error", err => {
@@ -97,17 +105,17 @@ if (process.argv[2] == "deployERC1404") {
 			}).catch((err) => {
 			  // do something when promise fails
 			  console.log(err)
-			});		
-			*/
+			});*/		
+			
 				
 	})();   
    
 }
 
 if (process.argv[2] == "checkInvestorWhiteListed") {
-    // node erc1404 checkInvestorWhiteListed 0x8192706d699390D668710BD247886e3016D4672E
+    // node erc1404 checkInvestorWhiteListed 0xAD3DF0f1c421002B8Eff81288146AF9bC692d13d
 
-	ethereum.checkIsInvestorWhitelistedInService( process.argv[3], ERC1404Token.abi, service_address, linkToBlockchainServer).then(function(data){
+	ethereum.getKYCData( process.argv[3], ERC1404Token.abi, service_address, linkToBlockchainServer).then(function(data){
 		console.log(data);
         process.exit(0);
 	})
@@ -115,7 +123,7 @@ if (process.argv[2] == "checkInvestorWhiteListed") {
 
 if (process.argv[2] == "whiteListInvestor") {
 
-    // node erc1404 whiteListInvestor aaa /home/shahzad/WorkingDocuments/data/Keystore_5300_aaa.txt 0x8192706d699390D668710BD247886e3016D4672E true
+    // node erc1404 whiteListInvestor aaa /home/shahzad/WorkingDocuments/data/Keystore_5300_aaa.txt 0xAD3DF0f1c421002B8Eff81288146AF9bC692d13d false
 
     let data2 = decryptKeyFromFile(process.argv[4], process.argv[3]);
 	
@@ -151,21 +159,82 @@ if (process.argv[2] == "burn") {
 
 }
 
+if (process.argv[2] == "stoTokenBalance") {
+	// node erc1404 stoTokenBalance 0xAD3DF0f1c421002B8Eff81288146AF9bC692d13d
 
-
-if (process.argv[2] == "getAllowedInvestors") {
-    // node erc1404 checkInvestorWhiteListed 0x8192706d699390D668710BD247886e3016D4672E
-
-	ethereum.checkIsInvestorWhitelistedInService( process.argv[3], ERC1404Token.abi, service_address, linkToBlockchainServer).then(function(data){
+	ethereum.getAccountStoBalance( process.argv[3], ERC1404Token.abi, contract_address, linkToBlockchainServer).then(function(data){
 		console.log(data);
         process.exit(0);
 	})
+
 }
+
+if (process.argv[2] == "sendTokens") {
+
+    //node erc1404 sendTokens aaa /home/shahzad/WorkingDocuments/data/Keystore_5300_aaa.txt  0xeA1466402fC4b0a0b4959E4cd040e79a7309B3c9 10000000000000000000
+
+    let data2 = decryptKeyFromFile(process.argv[4], process.argv[3]);
+    
+    ethereum.sendTokens(data2.address, process.argv[5], parseInt(process.argv[6]),  data2.privateKey.substring(2), contract_address, service_address, linkToBlockchainServer, ERC1404Token.abi).then(function(data){
+		console.log(data);
+        process.exit(0);
+	});
+
+}
+
+
+if (process.argv[2] == "approve") {
+
+    //node erc1404 approve aaa /home/shahzad/WorkingDocuments/data/Keystore_5300_aaa.txt 0x8192706d699390D668710BD247886e3016D4672E 800000000000000000000
+    
+    let data2 = decryptKeyFromFile(process.argv[4], process.argv[3]);
+    
+    ethereum.approve(data2.address, process.argv[5], parseInt(process.argv[6]),  data2.privateKey.substring(2), contract_address, service_address, linkToBlockchainServer, ERC1404Token.abi).then(function(data){
+		console.log(data);
+        process.exit(0);
+	});
+
+}
+
+if (process.argv[2] == "allowance") {
+	// node erc1404 allowance 0x1a8929fbE9abEc00CDfCda8907408848cBeb5300  0x8192706d699390D668710BD247886e3016D4672E 
+
+	ethereum.getAccountAllowance( process.argv[3], process.argv[4] , ERC1404Token.abi, contract_address, linkToBlockchainServer).then(function(data){
+		console.log(data);
+        process.exit(0);
+	})
+
+}
+
+if (process.argv[2] == "approveTransfer") {
+
+    //node erc1404 approveTransfer aaa /home/shahzad/WorkingDocuments/data/Keystore_672E_aaa.txt  0x1a8929fbE9abEc00CDfCda8907408848cBeb5300 0xeA1466402fC4b0a0b4959E4cd040e79a7309B3c9 100000000000000000000
+
+    let data2 = decryptKeyFromFile(process.argv[4], process.argv[3]);
+    
+    ethereum.approveTransfer(data2.address, process.argv[5], process.argv[6], parseInt(process.argv[7]),  data2.privateKey.substring(2), contract_address, service_address, linkToBlockchainServer, ERC1404Token.abi).then(function(data) {
+		console.log(data);
+        process.exit(0);
+	});
+
+}
+
+if (process.argv[2] == "getOwner") {
+	// node erc1404 getOwner
+
+	ethereum.getOwner( ERC1404Token.abi, contract_address, linkToBlockchainServer).then(function(data){
+		console.log(data);
+        process.exit(0);
+	})
+
+}
+
+
 
 if (process.argv[2] == "getAllowedInvestors") {
     // node erc1404 getAllowedInvestors
 
-	ethereum.getAllowedInvestors( ERC1404Token.abi, service_address, linkToBlockchainServer).then(function(data){
+	ethereum.getAllowedInvestors( ERC1404Token.abi, service_address, linkToBlockchainServer ).then(function(data){
 		console.log(data);
         process.exit(0);
 	})
@@ -180,7 +249,27 @@ if (process.argv[2] == "getCurrentTotalInvestors") {
 	})
 }
 
+if (process.argv[2] == "getWhitelistAuthorityStatus") {
+    // node erc1404 getWhitelistAuthorityStatus 0x1a8929fbE9abEc00CDfCda8907408848cBeb5300
 
+	ethereum.getWhitelistAuthorityStatus( process.argv[3],  ERC1404Token.abi,  service_address, linkToBlockchainServer ).then(function(data){
+		console.log(data);
+        process.exit(0);
+	})
+}
+
+if (process.argv[2] == "setWhitelistAuthorityStatus") {
+
+    //node erc1404 setWhitelistAuthorityStatus aaa /home/shahzad/WorkingDocuments/data/Keystore_5300_aaa.txt 0x1a8929fbE9abEc00CDfCda8907408848cBeb5300 true
+    
+    let data2 = decryptKeyFromFile(process.argv[4], process.argv[3]);
+    
+    ethereum.setWhitelistAuthorityStatus(process.argv[5], process.argv[6], data2.privateKey.substring(2), data2.address,  ERC1404Token.abi, contract_address, linkToBlockchainServer).then(function(data){
+		console.log(data);
+        process.exit(0);
+	});
+
+}
 
 
 
