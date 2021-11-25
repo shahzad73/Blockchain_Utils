@@ -776,8 +776,10 @@ if (process.argv[2] == "DecryptKey") {
 if (process.argv[2] == "etherBalance") {
 
 	// node EthereumUtils etherBalance 0x3cb6df9845af79ab7c2af9530da0b046bacb6cf9
-	ethereum.getAccountEtherBalance( process.argv[3], abi_contract, contract_address, linkToBlockchainServer).then(function(data){
-		console.log(data);
+	ethereum.getAccountEtherBalance( process.argv[3], abi_contract, contract_address, linkToBlockchainServer).then(function(data) {
+		
+		console.log(Web3.utils.fromWei(data, "ether") + " ETH").toFixed(4);
+		
         process.exit(0);
 	})
 
@@ -793,7 +795,6 @@ if (process.argv[2] == "stoTokenBalance") {
 
 }
 
-
 if (process.argv[2] == "getOwner") {
 	// node EthereumUtils getOwner
 
@@ -804,7 +805,6 @@ if (process.argv[2] == "getOwner") {
 
 }
 
-
 if (process.argv[2] == "checkInvestorWhiteListed") {
     // node EthereumUtils checkInvestorWhiteListed 0x1a8929fbE9abEc00CDfCda8907408848cBeb5300
 
@@ -813,7 +813,6 @@ if (process.argv[2] == "checkInvestorWhiteListed") {
         process.exit(0);
 	})
 }
-
 
 if (process.argv[2] == "whiteListInvestor") {
 
@@ -841,8 +840,6 @@ if (process.argv[2] == "sendTokens") {
 	});
 
 }
-
-
 
 if (process.argv[2] == "approve") {
 
@@ -1024,7 +1021,19 @@ if (process.argv[2] == "deployERC20") {
 }
 
 
+if (process.argv[2] == "deployERC20") {
+	const Web3 = require("web3")
 
+	const web3 = new Web3(new Web3.providers.HttpProvider("https://mainnet.infura.io/v3/YOUR_PROJECT_ID"))
+
+	web3.eth.getBalance("0x52bc44d5378309EE2abF1539BF71dE1b7d7bE3b5", function(err, result) {
+	  if (err) {
+		console.log(err)
+	  } else {
+		console.log(web3.utils.fromWei(result, "ether") + " ETH")
+	  }
+	})
+}
 
 
 function decryptKeyFromFile(file, password) {

@@ -12,11 +12,16 @@ const Tx = require('ethereumjs-tx').Transaction;
 
 const ERC1404Token = JSON.parse(fs.readFileSync("./data/ERC1404.json", "utf8")); 
 
+//local
+//var contract_address = "0x3F4B2e1B4Ca4B32EF29e3bf90362d30Cc45B30a5";
+//var service_address = "0x3F4B2e1B4Ca4B32EF29e3bf90362d30Cc45B30a5";
 
-var contract_address = "0xf134d417659797c2AB607999E6671777084705f4";
-var service_address = "0xf134d417659797c2AB607999E6671777084705f4";
-//var linkToBlockchainServer = "HTTP://127.0.0.1:7545";
-var linkToBlockchainServer = "https://mainnet.infura.io/v3/fe41724da6f24b76a782f376b2698ee8";
+//kovan
+var contract_address = "0xb9d373d996f66Ced963bD47Ea294513a07A6802c";
+var service_address = "0xb9d373d996f66Ced963bD47Ea294513a07A6802c";
+
+var linkToBlockchainServer = "HTTP://127.0.0.1:7545";
+//var linkToBlockchainServer = "https://mainnet.infura.io/v3/fe41724da6f24b76a782f376b2698ee8";
 //var linkToBlockchainServer = "https://matic-mumbai--jsonrpc.datahub.figment.io/apikey/9737e952f56cd7bdca83d6bb4fdf1576"
 
 
@@ -52,20 +57,17 @@ if (process.argv[2] == "deployERC1404") {
 		var web3 = new Web3(new Web3.providers.HttpProvider(linkToBlockchainServer));
 
 		  const encodedParameters = web3.eth.abi.encodeParameters(
-			['uint256', 'string', 'string', 'uint256'],
-			['1000000000000000000000000', 'E1404', 'E1404', 5]
+			['uint256', 'string', 'string', 'uint256', 'uint256', 'string', 'string', 'string'],
+			['100000000000000000000000', 'ERC04', 'ERC04', 5, 18, "Site website link", "Website link document", " website document links"]
 		  ).slice(2);
 
-		
-		
+
 			// prepare the transaction:
-			var contractName = "Test Contract"
 			var rawTx = {
 				  from: "0x1a8929fbE9abEc00CDfCda8907408848cBeb5300",
 				  data:  ERC1404Token.bytecode  + encodedParameters,
-				  gas: 12500000
+				  gas: 6721975
 			}
-
 
 			
 			var gasPrice = await web3.eth.getGasPrice();
@@ -88,10 +90,10 @@ if (process.argv[2] == "deployERC1404") {
 
 			
 		
-			
+			/*
 			// sign and send the transaction
 			//let contractAddress
-			/*web3.eth.accounts.signTransaction(rawTx, '284e878525e21729040938f1e723a90f69f8ad336ce3f10e2357664f5249b915')
+			web3.eth.accounts.signTransaction(rawTx, '284e878525e21729040938f1e723a90f69f8ad336ce3f10e2357664f5249b915')
 			.then((signedTx) => {
 				  const sentTx = web3.eth.sendSignedTransaction(signedTx.raw || signedTx.rawTransaction);
 				  sentTx.on("error", err => {
@@ -105,7 +107,7 @@ if (process.argv[2] == "deployERC1404") {
 			}).catch((err) => {
 			  // do something when promise fails
 			  console.log(err)
-			});*/		
+			});*/
 			
 				
 	})();   
@@ -113,7 +115,7 @@ if (process.argv[2] == "deployERC1404") {
 }
 
 if (process.argv[2] == "checkInvestorWhiteListed") {
-    // node erc1404 checkInvestorWhiteListed 0xAD3DF0f1c421002B8Eff81288146AF9bC692d13d
+    // node erc1404 checkInvestorWhiteListed 0x34944916338d9abf788d9f31aFAFeEaB577F732c
 
 	ethereum.getKYCData( process.argv[3], ERC1404Token.abi, service_address, linkToBlockchainServer).then(function(data){
 		console.log(data);
@@ -160,7 +162,7 @@ if (process.argv[2] == "burn") {
 }
 
 if (process.argv[2] == "stoTokenBalance") {
-	// node erc1404 stoTokenBalance 0xAD3DF0f1c421002B8Eff81288146AF9bC692d13d
+	// node erc1404 stoTokenBalance 0x1a8929fbE9abEc00CDfCda8907408848cBeb5300
 
 	ethereum.getAccountStoBalance( process.argv[3], ERC1404Token.abi, contract_address, linkToBlockchainServer).then(function(data){
 		console.log(data);
@@ -181,6 +183,7 @@ if (process.argv[2] == "sendTokens") {
 	});
 
 }
+
 
 
 if (process.argv[2] == "approve") {
@@ -258,6 +261,15 @@ if (process.argv[2] == "getWhitelistAuthorityStatus") {
 	})
 }
 
+if (process.argv[2] == "setStaticInformation") {
+    // node erc1404 setStaticInformation 1
+
+	ethereum.setStaticInformation( process.argv[3],  ERC1404Token.abi,  service_address, linkToBlockchainServer ).then(function(data){
+		console.log(data);
+        process.exit(0);
+	})
+}
+
 if (process.argv[2] == "setWhitelistAuthorityStatus") {
 
     //node erc1404 setWhitelistAuthorityStatus aaa /home/shahzad/WorkingDocuments/data/Keystore_5300_aaa.txt 0x1a8929fbE9abEc00CDfCda8907408848cBeb5300 true
@@ -270,6 +282,8 @@ if (process.argv[2] == "setWhitelistAuthorityStatus") {
 	});
 
 }
+
+
 
 
 
