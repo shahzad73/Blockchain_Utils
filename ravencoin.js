@@ -6,6 +6,8 @@ const CONFIG = getConfig();
 const crypto = require ("crypto");
 const ravencore = require("ravencore-lib");
 
+const Ravencoincore = require('ravencoin-core');
+
 
 const serverLink = "http://127.0.0.1:8766";
 //  http://127.0.0.1:8766        main net
@@ -14,26 +16,27 @@ const serverLink = "http://127.0.0.1:8766";
 npm library
 https://www.npmjs.com/package/ravencore-lib?activeTab=readme  
 
+",  "
 
+node ravencoin listaddressesbyassets configfile=./data/ravencoinconfig.txt TST005         normal
+node ravencoin listaddressesbyassets configfile=./data/ravencoinconfig.txt TST005 QUA
+node ravencoin listaddressesbyassets configfile=./data/ravencoinconfig.txt TST005 RES
 
-node ravencoin listaddressesfortag configfile=./data/ravencoinconfig.txt SHATAG
-
-node ravencoin listaddressesbyassets configfile=./data/ravencoinconfig.txt SHATAG
-
-node ravencoin addtagtoaddress configfile=./data/ravencoinconfig.txt SHATAG RXBurnXXXXXXXXXXXXXXXXXXXXXXWUo9FV
-
-node ravencoin removetagfromaddress configfile=./data/ravencoinconfig.txt SHATAG myhyhmRiKnuqgpmyAAeujWoxoTyWpZVUi7
+Tags
+node ravencoin addtagtoaddress configfile=./data/ravencoinconfig.txt TST005 myhyhmRiKnuqgpmyAAeujWoxoTyWpZVUi7
+node ravencoin removetagfromaddress configfile=./data/ravencoinconfig.txt TST005 myhyhmRiKnuqgpmyAAeujWoxoTyWpZVUi7
+node ravencoin checkaddresstag configfile=./data/ravencoinconfig.txt mhx8NLZHeyxhHbR9Ji6FyEtKazA4MnLbKx TST004    
+node ravencoin listaddressesfortag configfile=./data/ravencoinconfig.txt TST005    (addresses tags are assigned to)
 
 node ravencoin getassetdata configfile=./data/ravencoinconfig.txt     this is used to get total supploy of the token
 
-node ravencoin listassetbalancesbyaddress configfile=./data/ravencoinconfig.txt myxd8nhb8Bh9h9syK2n2u6hKRyrSrAbxZ8
-
-check if investor has a specific tag
-node ravencoin checkaddresstag configfile=./data/ravencoinconfig.txt mrkh1G3SAZxEo5ZXoDyAWzdmVMBi9zGLnU SHATAG    
+node ravencoin listassetbalancesbyaddress configfile=./data/ravencoinconfig.txt myhyhmRiKnuqgpmyAAeujWoxoTyWpZVUi7
 
 node ravencoin listtagsforaddress configfile=./data/ravencoinconfig.txt mxogYG3E5Nn5pG2pRK5a53tMYbLe83Kcep
 
-node ravencoin transferfromaddress configfile=./data/ravencoinconfig.txt mxogYG3E5Nn5pG2pRK5a53tMYbLe83Kcep myhyhmRiKnuqgpmyAAeujWoxoTyWpZVUi7 SHACOIN 30
+node ravencoin transferfromaddress configfile=./data/ravencoinconfig.txt mmrSGbraaxPVPR1gp9CxyTNqihHeniMA3G myhyhmRiKnuqgpmyAAeujWoxoTyWpZVUi7 TST003 30
+
+node ravencoin transferfromaddress configfile=./data/ravencoinconfig.txt mmrSGbraaxPVPR1gp9CxyTNqihHeniMA3G myhyhmRiKnuqgpmyAAeujWoxoTyWpZVUi7 TST005 50
 
 
 MEGATECH
@@ -47,6 +50,8 @@ $SHACOIN  mxogYG3E5Nn5pG2pRK5a53tMYbLe83Kcep  100000     private key of this pub
 #SHATAG   mxTs5rZGvj2kYgZFo75E3fqpPgc4sWujiF  1
 
 ICOCOIN   mhx8NLZHeyxhHbR9Ji6FyEtKazA4MnLbKx 10000
+
+// TST003 main asset       #TST003 qualifier        $TST003 restricted asset     mmrSGbraaxPVPR1gp9CxyTNqihHeniMA3G
  
 
 Ravencoin_ServerURL
@@ -114,9 +119,25 @@ if (process.argv[2] == "listaddressesfortag") {
 }	
 
 if (process.argv[2] == "listaddressesbyassets") {
-    //  node ravencoin listaddressesbyassets configfile=./data/ravencoinconfig.txt MEGATECH
+    //  node ravencoin listaddressesbyassets configfile=./data/ravencoinconfig.txt MEGATECH QUA
+	//  node ravencoin listaddressesbyassets configfile=./data/ravencoinconfig.txt MEGATECH RES
+	//  node ravencoin listaddressesbyassets configfile=./data/ravencoinconfig.txt MEGATECH  normal
+ 
+	
+		// use $ to get balance of restricted asset
+	    // use # to get balance of number of qualifier asset
+	    // use nothing to get balance of main asset
+	
+		var assetName = process.argv[4];	
+		if(process.argv[5] != null )	 {
+			if(process.argv[5] == "QUA" )
+					assetName = "#" + assetName;
+			if(process.argv[5] == "RES" )	
+					assetName = "$" + assetName;
+		}
 
-        rpc("listaddressesbyasset", [process.argv[4]])
+	
+        rpc("listaddressesbyasset", [assetName])
             .then(function (data) {
                 console.log(data);
           })
@@ -238,30 +259,48 @@ if (process.argv[2] == "viewmyrestrictedaddresses") {
 	*/
 }
 
-if (process.argv[2] == "addtagtoaddress") {
-    	//  node ravencoin addtagtoaddress configfile=./data/ravencoinconfig.txt MEGA myhyhmRiKnuqgpmyAAeujWoxoTyWpZVUi7
-        rpc("addtagtoaddress", ["#" + process.argv[4], process.argv[5]])
-            .then(function (data) {
-                console.log(data);
-          })
-          .catch(function (e) {
-                console.error(e.message);
-          });
+if (process.argv[2] == "addtagtoaddress") {		
+    	//  node ravencoin addtagtoaddress configfile=./data/ravencoinconfig.txt MEGA myhyhmRiKnuqgpmyAAeujWoxoTyWpZVUi7		
+	
+		rpc("walletpassphrase", ["Allahis@1", 60])			
+		.then(function () {	
+
+				rpc("addtagtoaddress", ["#" + process.argv[4], process.argv[5]])
+					.then(function (data) {
+						console.log(data);
+				  })
+				  .catch(function (e) {
+						console.error(e.message);
+				  });
+			
+		}).catch(function (e) {
+			console.log(e)
+		});							
+	
 }
 
 if (process.argv[2] == "removetagfromaddress") {
     	//  node ravencoin removetagfromaddress configfile=./data/ravencoinconfig.txt MEGA myhyhmRiKnuqgpmyAAeujWoxoTyWpZVUi7
 
-        rpc("removetagfromaddress",  ["#" + process.argv[4], process.argv[5]])
-            .then(function (data) {
-                console.log(data);
-          })
-          .catch(function (e) {
-                console.error(e.message);
-          });
+		rpc("walletpassphrase", ["Allahis@1", 60])			
+		.then(function () {	
+			
+				rpc("removetagfromaddress",  ["#" + process.argv[4], process.argv[5]])
+					.then(function (data) {
+						console.log(data);
+				  })
+				  .catch(function (e) {
+						console.error(e.message);
+				  });
+
+		}).catch(function (e) {
+			console.log(e)
+		});				
+			
 }
 
 if (process.argv[2] == "listassets") {
+		// i think it shows all of the assets
     	//  node ravencoin listassets configfile=./data/ravencoinconfig.txt
         rpc("listassets", [])
             .then(function (data) {
@@ -380,19 +419,28 @@ if (process.argv[2] == "getwalletinfo") {
 }
 
 if (process.argv[2] == "transferfromaddress") {
-    	 //  node ravencoin transferfromaddress configfile=./data/ravencoinconfig.txt mxogYG3E5Nn5pG2pRK5a53tMYbLe83Kcep RXBurnXXXXXXXXXXXXXXXXXXXXXXWUo9FV SHACOIN 20
+    	 //  node ravencoin transferfromaddress configfile=./data/ravencoinconfig.txt mxogYG3E5Nn5pG2pRK5a53tMYbLe83Kcep myhyhmRiKnuqgpmyAAeujWoxoTyWpZVUi7 TST004 20
+	
+		rpc("walletpassphrase", ["Allahis@1", 60])			
+		.then(function () {
 
-         rpc("transferfromaddress", ["$" + process.argv[6], process.argv[4], process.argv[7], process.argv[5]])
-            .then(function (data) {
+				 rpc("transferfromaddress", ["$" + process.argv[6], process.argv[4], process.argv[7], process.argv[5]])
+					.then(function (data) {
 
-                console.log(data);
-          })
-          .catch(function (e) {
-                console.error(e.message);
-          });
-		  //mvzRFJRNPY2JjTi3gY46ofskBnxC6WHpyz
+						console.log(data);
+				  })
+				  .catch(function (e) {
+						console.error(e.message);
+				  });
+
+		}).catch(function (e) {
+			console.log(e)
+		});	
+	
+			
 }
 
+// re-issue or mint new assets for investor
 if (process.argv[2] == "issueNewAssets") {
     	//  node ravencoin issueNewAssets configfile=./data/ravencoinconfig.txt mxogYG3E5Nn5pG2pRK5a53tMYbLe83Kcep SHACOIN 20
 			
@@ -443,7 +491,25 @@ if (process.argv[2] == "encryptdecrypt") {
 	
 }
 
+if (process.argv[2] == "dumpWalletAddressPrivateKey") {
+		// node ravencoin dumpWalletAddressPrivateKey configfile=./data/ravencoinconfig.txt
+		
+		rpc("walletpassphrase", ["Allahis@1", 60])			
+		.then(function () {
+			 
+				rpc("dumpprivkey", ["mhx8NLZHeyxhHbR9Ji6FyEtKazA4MnLbKx"])			
+				.then(function (data) {
 
+						console.log(data);
+
+				}).catch(function (e) {
+					console.log(e)
+				});				
+			
+		}).catch(function (e) {
+			console.log(e)
+		});	
+}
 
 if (process.argv[2] == "sendRawTransaction") {
 	
@@ -507,7 +573,162 @@ if (process.argv[2] == "sendRawTransaction") {
 }
 
 
+if (process.argv[2] == "issueAssets") {
+		// node ravencoin issueAssets configfile=./data/ravencoinconfig.txt
+	
+		rpc("walletpassphrase", ["Allahis@1", 60])			
+		.then(function () {
+				
+				// issue "asset_name" qty "( to_address )" "( change_address )" ( units ) ( reissuable ) ( has_ipfs ) "( ipfs_hash
+				rpc("issue", ["TestAsset123", 100 ])			
+				.then(function () {
 
+					console.log("Created");
+
+				}).catch(function (e) {
+					console.log(e.toString())
+				});	
+			
+			
+		}).catch(function (e) {
+			console.log(e)
+		});	
+
+}
+
+
+
+if (process.argv[2] == "revncorebalance") { 
+	
+	//node ravencoin revncorebalance  configfile=./data/ravencoinconfig.txt
+	
+	const client = new Ravencoincore({ 
+		 network: 'regtest',
+		 username: 'supermegasecret',
+		 password: 'supermegasecret'
+	});
+
+	client.getBalance().then(data => {
+		console.log(data);		
+	})
+
+}
+
+
+if (process.argv[2] == "createIssueAsset") {
+	
+		// node ravencoin createIssueAsset configfile=./data/ravencoinconfig.txt	 	
+	
+		rpc("walletpassphrase", ["Allahis@1", 600])			
+		.then(function () {
+			
+				const options = {
+					  auth: {
+							username: "supermegasecret",
+							password: "supermegasecret",
+					  },
+				};
+			
+				const serverURL = 'http://127.0.0.1:18766'
+
+				  const rpcResponse = axios.post(serverURL, {"method": 'issue', "params": ["TESTINGAB02", "1000"], "jsonrpc": "2.0"}, options);
+
+				  rpcResponse.then((re) => {
+					  		console.log(re.data.result);
+				  });
+				  rpcResponse.catch((e) => {
+							console.log(e.response.data)
+				  });	
+
+		}).catch(function (e) {
+			console.log(e)
+		});				
+	
+}
+
+
+
+// ----------------------------------------------------------------------------
+// These are steps for ravencoin assets 
+
+//1  create main asset    i thin only 1 quality is needed because restricted asset will get transferred
+if (process.argv[2] == "createIssueAsset1") {
+
+		// node ravencoin createIssueAsset1 configfile=./data/ravencoinconfig.txt
+
+		rpc("walletpassphrase", ["Allahis@1", 600])			
+		.then(function () {
+				rpc("issue", ["TST005", 1, "mmrSGbraaxPVPR1gp9CxyTNqihHeniMA3G"])			
+				.then(function () {
+
+						console.log("Done")
+
+				}).catch(function (e) {
+					console.log(e)
+				});
+
+		}).catch(function (e) {
+			console.log(e)
+		});				
+
+}
+
+//2   create qualifier      more qualifiers cannot be created and max is 10 so create as much as you can
+//issuequalifierasset  "asset_name" qty "( to_address )" "( change_address )" ( has_ipfs ) "( ipfs_hash )"
+if (process.argv[2] == "createQualifier") {
+
+		// node ravencoin createQualifier configfile=./data/ravencoinconfig.txt
+
+		rpc("walletpassphrase", ["Allahis@1", 600])			
+		.then(function () {
+			
+			
+				rpc("issuequalifierasset", ["#TST005", 10, "mmrSGbraaxPVPR1gp9CxyTNqihHeniMA3G"])			
+				.then(function () {
+
+						console.log("Done")
+
+				}).catch(function (e) {
+					console.log(e)
+				});
+
+		}).catch(function (e) {
+			console.log(e)
+		});
+
+}
+
+
+//3 assign qualifier to company address
+//node ravencoin addtagtoaddress configfile=./data/ravencoinconfig.txt TST005 mmrSGbraaxPVPR1gp9CxyTNqihHeniMA3G
+
+//3   create restricted asset
+// issuerestrictedasset "asset_name" qty "verifier" "to_address" "( change_address )" (units) ( reissuable ) ( has_ipfs ) 
+if (process.argv[2] == "createRestrictedAsset") {
+
+		// node ravencoin createRestrictedAsset configfile=./data/ravencoinconfig.txt
+
+		rpc("walletpassphrase", ["Allahis@1", 600])			
+		.then(function () {
+
+				rpc("issuerestrictedasset", ["TST005", 10000, "#TST005",  "mmrSGbraaxPVPR1gp9CxyTNqihHeniMA3G"])			
+				.then(function () {
+
+						console.log("Done")
+
+				}).catch(function (e) {
+					console.log(e)
+				});
+
+		}).catch(function (e) {
+			console.log(e)
+		});			
+
+}
+
+
+
+// ----------------------------------------------------------------------------
 
 
 
@@ -523,7 +744,6 @@ async function rpc(method, params) {
         };
         const data = {
               jsonrpc: "1.0",
-              //id: CONFIG.asset,
               method,
               params,
         };
@@ -531,26 +751,23 @@ async function rpc(method, params) {
 
         try {
 
-                  const rpcResponse = axios.post("http://127.0.0.1:18766", data, options);
+			const rpcResponse = axios.post("http://127.0.0.1:18766", data, options);
 
-                  rpcResponse.then((re) => {
-                        const result = re.data.result;
-                        resolutionFunc(result);
-                  });
-                  rpcResponse.catch((e) => {
-                        rejectionFunc(e);
-                  });
+			  rpcResponse.then((re) => {
+					const result = re.data.result;
+					resolutionFunc(result);
+			  });
+			  rpcResponse.catch((e) => {
+					rejectionFunc(e);
+			  });
 
         } catch (e) {
-              console.log("11111111111111111111")
               rejectionFunc(e);
         }
       });
       return promise;
     
 }    
-
-
 
 function getConfig() {
   let config = null;
@@ -635,7 +852,7 @@ getaddressutxos
 getassetdata "asset_name"
 getcacheinfo 
 getsnapshot "asset_name" block_height
-issue "asset_name" qty "( to_address )" "( change_address )" ( units ) ( reissuable ) ( has_ipfs ) "( ipfs_hash )"
+---- issue "asset_name" qty "( to_address )" "( change_address )" ( units ) ( reissuable ) ( has_ipfs ) "( ipfs_hash )"
 issueunique "root_name" [asset_tags] ( [ipfs_hashes] ) "( to_address )" "( change_address )"
 listaddressesbyasset "asset_name" (onlytotal) (count) (start)
 listassetbalancesbyaddress "address" (onlytotal) (count) (start)
@@ -741,8 +958,8 @@ checkglobalrestriction restricted_name
 freezeaddress asset_name address (change_address) (asset_data)
 freezerestrictedasset asset_name (change_address) (asset_data)
 getverifierstring restricted_name
-issuequalifierasset "asset_name" qty "( to_address )" "( change_address )" ( has_ipfs ) "( ipfs_hash )"
-issuerestrictedasset "asset_name" qty "verifier" "to_address" "( change_address )" (units) ( reissuable ) ( has_ipfs ) "( ipfs_hash )"
+---- issuequalifierasset "asset_name" qty "( to_address )" "( change_address )" ( has_ipfs ) "( ipfs_hash )"
+---- issuerestrictedasset "asset_name" qty "verifier" "to_address" "( change_address )" (units) ( reissuable ) ( has_ipfs ) "( ipfs_hash )"
 isvalidverifierstring verifier_string
 listaddressesfortag tag_name
 listaddressrestrictions address
@@ -750,7 +967,7 @@ listglobalrestrictions
 listtagsforaddress address
 reissuerestrictedasset "asset_name" qty to_address ( change_verifier ) ( "new_verifier" ) "( change_address )" ( new_units ) ( reissuable ) "( new_ipfs )"
 removetagfromaddress tag_name to_address (change_address) (asset_data)
-transferqualifier "qualifier_name" qty "to_address" ("change_address") ("message") (expire_time) 
+---- transferqualifier "qualifier_name" qty "to_address" ("change_address") ("message") (expire_time) 
 unfreezeaddress asset_name address (change_address) (asset_data)
 unfreezerestrictedasset asset_name (change_address) (asset_data)
 
@@ -799,12 +1016,12 @@ getunconfirmedbalance
 getwalletinfo
 importaddress "address" ( "label" rescan p2sh )
 importmulti "requests" ( "options" )
-importprivkey "privkey" ( "label" ) ( rescan )
+-----  importprivkey "privkey" ( "label" ) ( rescan )
 importprunedfunds
 importpubkey "pubkey" ( "label" rescan )
-importwallet "filename"
+----- importwallet "filename"
 keypoolrefill ( newsize )
-listaccounts ( minconf include_watchonly)
+---- listaccounts ( minconf include_watchonly)
 listaddressgroupings
 listlockunspent
 listreceivedbyaccount ( minconf include_empty include_watchonly)
@@ -825,3 +1042,15 @@ setaccount "address" "account"
 settxfee amount
 signmessage "address" "message"
 */
+
+
+
+
+// issue "asset_name" qty "( to_address )" "( change_address )" ( units ) ( reissuable ) ( has_ipfs ) "( ipfs_hash )"
+// issuequalifierasset  "asset_name" qty "( to_address )" "( change_address )" ( has_ipfs ) "( ipfs_hash )"
+// issuerestrictedasset "asset_name" qty "verifier" "to_address" "( change_address )" (units) ( reissuable ) ( has_ipfs ) 
+// transferqualifier "qualifier_name" qty "to_address" ("change_address") ("message") (expire_time)
+
+
+
+

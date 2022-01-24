@@ -8,8 +8,6 @@ const async = require('async');
 // protocol   1=R     2=PolyMath     3=Ravencoin     4=ERC1404
 		
 
-
-
 module.exports = {
 
     encryptKey: function(key, password, web3Address) {
@@ -329,18 +327,19 @@ module.exports = {
                         to: ethereumContractAddress,
                         data: contract.methods.transfer(toAddress, amount).encodeABI(),
                     });
-
 					const nouncePromise = web3.eth.getTransactionCount(myAddress, 'pending');
-
-					const allPromises = Promise.all([nouncePromise, estimateGasPromise]);
+					const blockInfo = web3.eth.getBlock("latest");
+					const gasPrice = web3.eth.getGasPrice();
+					
+					const allPromises = Promise.all([nouncePromise, estimateGasPromise, blockInfo, gasPrice]);
                     
 					allPromises.then((results) => {
-
+												
 						// creating raw tranaction
 						const rawTransaction = {
 							from: myAddress,
-							gasPrice: web3.utils.toHex(120 * 1e9),
-							gasLimit: 93399 + 1000000,
+							gasPrice: web3.utils.toHex(results[3]),
+							gasLimit: results[2].gasLimit,
 							to: ethereumContractAddress,
 							value: 0x0,
                             data: contract.methods.transfer(toAddress, amount).encodeABI(),
@@ -401,7 +400,7 @@ module.exports = {
 
 	},
 
-	
+
     forceTransfer: function(fromAddress, toAddress, amountToSend, ethereumPrivateKey, ethereumContractAddress, ethereumWhitelistAddress, web3Address, contractabi) {
         
         return new Promise(((resolve, reject) => {
@@ -499,10 +498,7 @@ module.exports = {
     
 			try {
 				const web3 = new Web3(new Web3.providers.HttpProvider(web3Address));
-                
-				web3.eth.getGasPrice(function(e, r) { 
-					console.log("Current Gas price is : " + r) 
-				})				
+                		
 				
 				web3.eth.net.isListening().then(() => {
 					const contract = new web3.eth.Contract(contractabi, ethereumContractAddress);
@@ -536,13 +532,14 @@ module.exports = {
                     
 
                     const nouncePromise = web3.eth.getTransactionCount(myAddress, 'pending');
+					const gasPrice = web3.eth.getGasPrice();
+                    const allPromises = Promise.all([estimateGasPromise, nouncePromise, gasPrice]);
 
-                    const allPromises = Promise.all([estimateGasPromise, nouncePromise]);
-                    //const allPromises = Promise.all([nouncePromise]);
                      
 					allPromises.then((results) => {
                             // creating raw tranaction               
 							console.log(results);
+						
                             const rawTransaction = {
                                     from: myAddress,
                                     gasPrice: web3.utils.toHex(120 * 1e9),
@@ -554,7 +551,11 @@ module.exports = {
                                     //nonce: web3.utils.toHex(results[0]),                                
                                     data: tempData
                             };
-
+							
+							const etherValue = Web3.utils.fromWei(results[2], 'ether');
+							console.log ( "Ether Value of Transaction : " + etherValue *  results[0] )
+						
+						
                             // creating tranaction via ethereumjs-tx
                             const transaction = new ethereumjs(rawTransaction);
 
@@ -566,7 +567,7 @@ module.exports = {
 
                             console.log( `Sending transaction to mint tokens`);
 
-                            web3.eth.sendSignedTransaction(`0x${serializedTx.toString('hex')}`, (err, txId) => {
+                            /*web3.eth.sendSignedTransaction(`0x${serializedTx.toString('hex')}`, (err, txId) => {
 
                                 if (err) {
                                     reject({ code: '0', message: `${err.message}. Error calling sendSignedTransaction in mint tokens` });
@@ -597,7 +598,7 @@ module.exports = {
 										console.log(` ${err2()} `);
 										reject(err2);
 									}
-                             });
+                             });*/
 
 					}).catch((err) => {
 				        reject({ code: '0', message: `${err.message}. Error in one of the Promises in allPromises in 1 tokenCreateBurn` });
@@ -1461,7 +1462,6 @@ module.exports = {
 
 	},
 
-	
 	setStaticInformation(info,  contractInfoABI, address, web3Address) {
 		return new Promise(((resolve, reject) => {
 			try {
