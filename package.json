@@ -28,7 +28,7 @@
     "knex": "^0.95.11",
     "libp2p": "^0.34.0",
     "mysql": "^2.16.0",
-    "node-fetch": "^2.6.1",
+    "node-fetch": "^2.6.7",
     "openpgp": "^5.0.0-2",
     "ravencoin-core": "^1.2.2",
     "ravencore-lib": "^1.0.3",
