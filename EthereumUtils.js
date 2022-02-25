@@ -865,6 +865,29 @@ if (process.argv[2] == "allowance") {
 }
 
 
+if (process.argv[2] == "getERC20Transaction") {
+		// node EthereumUtils getERC20Transaction 0xc3c7cbf3c5a938495e934eba3d37fb0ed3ed87c1d86cd5d9b5af76b48a158a65
+	
+		ethereum.getERC20TransactionDetails( process.argv[3], linkToBlockchainServer).then(function(data){
+				console.log(data);
+				process.exit(0);
+				
+		})
+}
+
+if (process.argv[2] == "getETHTransaction") {
+		// node EthereumUtils getETHTransaction 0x08b60e2035de0bfa010fb516778134383cb3a96d25786dd0a5c4d1b5241b4695
+	
+		ethereum.getTransferredETHFomTransaction( process.argv[3], linkToBlockchainServer).then(function(data){
+				console.log(data);
+				process.exit(0);
+				
+		})
+}
+
+
+
+
 
 
 
@@ -1020,7 +1043,6 @@ if (process.argv[2] == "deployERC20") {
    
 }
 
-
 if (process.argv[2] == "deployERC20") {
 	const Web3 = require("web3")
 
@@ -1035,7 +1057,6 @@ if (process.argv[2] == "deployERC20") {
 	})
 }
 
-
 function decryptKeyFromFile(file, password) {
 	let data = fs.readFileSync(file, 'utf8')
     return ethereum.decryptKey(data, password, linkToBlockchainServer);
@@ -1044,6 +1065,54 @@ function decryptKeyFromFile(file, password) {
 }
 
 
+
+if (process.argv[2] == "compileSmartContract") {
+  // node EthereumUtils compileSmartContract
+
+  const solc = require('solc');
+  const path = require('path');  
+  
+  const tokenSalePath = path.resolve(__dirname, 'data', 'contract.sol');
+  var source = fs.readFileSync(tokenSalePath, 'utf-8');
+
+  var solcInput = {
+    language: "Solidity",
+    sources: { 
+        contract: {
+            content: source
+        }
+     },
+    settings: {
+        optimizer: {
+            enabled: true
+        },
+        evmVersion: "byzantium",
+        outputSelection: {
+            "*": {
+              "": [
+                "legacyAST",
+                "ast"
+              ],
+              "*": [
+                "abi",
+                "evm.bytecode.object",
+                "evm.bytecode.sourceMap",
+                "evm.deployedBytecode.object",
+                "evm.deployedBytecode.sourceMap",
+                "evm.gasEstimates"
+              ]
+            },
+        }
+    }
+};
+
+solcInput = JSON.stringify(solcInput);
+var contractObject = solc.compile(solcInput);
+contractObject = JSON.parse(contractObject);
+
+console.log(JSON.stringify(contractObject) );
+
+}
 
 
 

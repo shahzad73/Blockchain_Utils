@@ -2,6 +2,7 @@ const Web3 = require('web3');
 const ethereumjs = require('ethereumjs-tx');
 var Accounts = require('web3-eth-accounts');
 const async = require('async');
+const abiDecoder = require('abi-decoder');
 
 //const accounts = new Accounts('ws://127.0.0.1:7545');
 
@@ -74,6 +75,60 @@ module.exports = {
     },    
 
 	
+	
+	
+	getERC20TransactionDetails (transaction, web3Address) {
+		
+        return new Promise(function(resolve, reject) {
+			
+				var web3 = new Web3(new Web3.providers.HttpProvider(web3Address));
+
+				web3.eth.getTransaction(transaction).then(function(data) {					
+
+						var decode = web3.eth.abi.decodeParameters(
+							[ { type: 'address', name: 'address' },
+								{ type: 'uint256', name: 'amount' } ],
+							
+							data.input.substring(10)
+						);
+						
+						decode.amountConverted =  parseFloat(  web3.utils.fromWei(decode.amount.toString(), 'ether') , 10  );
+						decode.from = data.from;
+						decode.smartContractAddress = data.to;
+						decode.value = data.value;
+						
+						resolve(decode);
+				});
+			
+		});
+
+	},
+	
+	
+	getTransferredETHFomTransaction (transaction, web3Address) {
+		
+        return new Promise(function(resolve, reject) {
+			
+				var web3 = new Web3(new Web3.providers.HttpProvider(web3Address));
+
+				web3.eth.getTransaction(transaction).then(function(data) {					
+						
+						//decode.amountConverted =  parseFloat(  web3.utils.fromWei(decode.amount.toString(), 'ether') , 10  );
+						//decode.from = data.from;
+						//decode.value = data.value;
+						
+						var tmp = {
+								value : parseFloat(  web3.utils.fromWei(data.value.toString(), 'ether') , 10  ),
+								to: data.to,
+								from: data.from
+						}
+					
+						resolve(tmp);
+				});
+			
+		});
+
+	},	
 	
 	
     whiteListInvestorInService: function(address, abi, contractAddress, web3Address) {

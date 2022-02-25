@@ -25,11 +25,11 @@ var service_address = "0x783b55DDf115d713c4CAf0944f42fC4eDd45387b";
 //var linkToBlockchainServer = "https://matic-mumbai--jsonrpc.datahub.figment.io/apikey/9737e952f56cd7bdca83d6bb4fdf1576"      //Polygone test
 var linkToBlockchainServer = "https://matic-mainnet--jsonrpc.datahub.figment.io/apikey/9737e952f56cd7bdca83d6bb4fdf1576"      //Polygone mainnet
 //var linkToBlockchainServer = "https://data-seed-prebsc-1-s1.binance.org:8545"      //Binanace chain testnet    not yet tested
-//var linkToBlockchainServer = "https://bsc-dataseed1.binance.org"    // Binance chain mainnet     
+var linkToBlockchainServer = "https://bsc-dataseed1.binance.org"    // Binance chain mainnet     
 
-//var dolloarValue = 4275;    // Ethereum
+//var dolloarValue = 2384;    // Ethereum
 //var dolloarValue = 2.35;       // Polygon    MATIC, the native tokens of Polygon
-var dolloarValue = 572.82;       //BNB for bianace chain
+var dolloarValue = 380;       //BNB for bianace chain
  
 
 if (process.argv[2] == "etherBalance") {
