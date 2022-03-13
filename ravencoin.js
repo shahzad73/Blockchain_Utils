@@ -616,7 +616,7 @@ if (process.argv[2] == "revncorebalance") {
 
 
 if (process.argv[2] == "createIssueAsset") {
-	
+
 		// node ravencoin createIssueAsset configfile=./data/ravencoinconfig.txt	 	
 	
 		rpc("walletpassphrase", ["Allahis@1", 600])			

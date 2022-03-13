@@ -112,11 +112,11 @@ module.exports = {
 				var web3 = new Web3(new Web3.providers.HttpProvider(web3Address));
 
 				web3.eth.getTransaction(transaction).then(function(data) {					
-						
+
 						//decode.amountConverted =  parseFloat(  web3.utils.fromWei(decode.amount.toString(), 'ether') , 10  );
 						//decode.from = data.from;
 						//decode.value = data.value;
-						
+
 						var tmp = {
 								value : parseFloat(  web3.utils.fromWei(data.value.toString(), 'ether') , 10  ),
 								to: data.to,
