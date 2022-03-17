@@ -33,6 +33,7 @@
     "openpgp": "^5.0.0-2",
     "ravencoin-core": "^1.2.2",
     "ravencore-lib": "^1.0.3",
+    "raw-transaction-decoder": "^1.0.6",
     "request": "^2.88.0",
     "solc": "^0.8.0",
     "stellar-sdk": "^9.1.0",

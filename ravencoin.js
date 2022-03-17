@@ -598,6 +598,32 @@ if (process.argv[2] == "issueAssets") {
 
 
 
+if (process.argv[2] == "getTransaction") { 
+
+	// node ravencoin getTransaction configfile=./data/ravencoinconfig.txt
+
+	rpc("getrawtransaction", ["48bb16945e238bbcecfc81401fe1d0893ee3b2ff53d554ee7b33b8b73fc74e7e"])			
+	.then(function (data) {
+
+		const txHexDecoder = require("raw-transaction-decoder");
+
+		// Transaction https://3dcstats.net/tx/d6aa85dfb4942228923fda101a250c0f57a3bb1a7bf771fb26547848eb41ab5b -> Tool/utilities to check rawTx
+		const EncodedRawTx3DCoin = data;
+		const decode = txHexDecoder.decode3dcRawTx(EncodedRawTx3DCoin);
+		console.log("Decoded Transaction : "+JSON.stringify(decode));
+	
+
+
+	}).catch(function (e) {
+		console.log(e)
+	});
+
+
+
+}
+
+
+
 if (process.argv[2] == "revncorebalance") { 
 	
 	//node ravencoin revncorebalance  configfile=./data/ravencoinconfig.txt
@@ -736,11 +762,22 @@ async function rpc(method, params) {
     
       const promise = new Promise((resolutionFunc, rejectionFunc) => {
 
+		/*const authData = {
+			username: CONFIG.rpcUsername,
+			password: CONFIG.rpcPassword,
+	    }
+		const linkToServer = "http://127.0.0.1:18766"*/
+
+
+		const authData = {
+			username: "passwordvv122345",
+			password: "passwordvv122345",
+	    }
+		const linkToServer = "http://35.195.62.196:18766"
+
+
         const options = {
-              auth: {
-                    username: CONFIG.rpcUsername,
-                    password: CONFIG.rpcPassword,
-              },
+              auth: authData,
         };
         const data = {
               jsonrpc: "1.0",
@@ -751,7 +788,7 @@ async function rpc(method, params) {
 
         try {
 
-			const rpcResponse = axios.post("http://127.0.0.1:18766", data, options);
+			const rpcResponse = axios.post(linkToServer, data, options);
 
 			  rpcResponse.then((re) => {
 					const result = re.data.result;
