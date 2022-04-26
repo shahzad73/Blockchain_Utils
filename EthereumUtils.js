@@ -997,7 +997,7 @@ if (process.argv[2] == "deployERC20") {
 
 			  const encodedParameters = web3.eth.abi.encodeParameters(
 				[ 'address', 'uint256', 'string'],
-				['0x1a8929fbE9abEc00CDfCda8907408848cBeb5300', '100000000000000000000000', 'ER20']
+				['0x1a8929fbE9abEc00CDfCda8907408848cBeb5300', '100000000000000000000000', 'tUSDC']
 			  ).slice(2);		
 
 
@@ -1043,7 +1043,7 @@ if (process.argv[2] == "deployERC20") {
    
 }
 
-if (process.argv[2] == "deployERC20") {
+if (process.argv[2] == "deployERC20sssddddfewwefwefweewfwfef") {
 	const Web3 = require("web3")
 
 	const web3 = new Web3(new Web3.providers.HttpProvider("https://mainnet.infura.io/v3/YOUR_PROJECT_ID"))

@@ -4,7 +4,7 @@ const axios = require("axios");
 
 const CONFIG = getConfig();
 const crypto = require ("crypto");
-const ravencore = require("ravencore-lib");
+//const ravencore = require("ravencore-lib");
 
 const Ravencoincore = require('ravencoin-core');
 
@@ -64,9 +64,7 @@ AssetTag
 //Retriving private key from wallet 
 1.  unlocak wallet first with     walletpassphrase "Allahis@1" 100
 2. dumpprivkey "mxogYG3E5Nn5pG2pRK5a53tMYbLe83Kcep"
-
-
-
+			
 */
 
 
@@ -100,8 +98,6 @@ if (process.argv[2] == "getaddressbalance") {
           });
     
 }
-
-
 
 // --------------- Assets 
 if (process.argv[2] == "listaddressesfortag") {
@@ -511,66 +507,7 @@ if (process.argv[2] == "dumpWalletAddressPrivateKey") {
 		});	
 }
 
-if (process.argv[2] == "sendRawTransaction") {
-	
-			//	node ravencoin sendRawTransaction configfile=./data/ravencoinconfig.txt
 
-	
-	/*
-			var params = {
-			  'insight_url': 'https://api.testnet.ravencoin.org/api',
-			  'asset': 'SHACOIN',
-			  'amount': 100,
-			  'asset_from_addresses': 'mxogYG3E5Nn5pG2pRK5a53tMYbLe83Kcep',
-			  'rvn_from_address': 'mxogYG3E5Nn5pG2pRK5a53tMYbLe83Kcep',
-			  'private_keys': ['cRH1BgNoy3MxXe5eRHC94VRXa1vs6VsuuVmyvadjXZvkFLurL8rF', 'cRH1BgNoy3MxXe5eRHC94VRXa1vs6VsuuVmyvadjXZvkFLurL8rF'],
-			  'to_address': 'myxd8nhb8Bh9h9syK2n2u6hKRyrSrAbxZ8',
-			  'asset_change_address': 'mxogYG3E5Nn5pG2pRK5a53tMYbLe83Kcep',
-			  'rvn_change_address': 'mxogYG3E5Nn5pG2pRK5a53tMYbLe83Kcep'
-			}
-
-			var insight =  ravencore.Insight(params.insight_url)
-
-			var getAssetUtxos = function (from_address, asset) {
-			  return new Promise(function (resolve, reject) {
-				insight.addrAssetUtxo(from_address, asset, function (res) { resolve(res) })
-			  })
-			}
-
-			var getRvnUtxos = function (from_address) {
-			  return new Promise(function (resolve, reject) {
-				insight.passthroughGet('/addr/' + from_address + '/utxo', function (res) { resolve(res) })
-			  })
-			}
-
-			var createTransaction = function (utxos) {
-			  return new Promise(function (resolve, reject) {
-				t = new ravencore.Transaction()
-				  .from(utxos)
-				  .to(params.to_address, params.amount, params.asset)
-				  .change(params.rvn_change_address)
-				  .change(params.asset_change_address, params.asset)
-				  .sign(params.private_keys)
-				resolve(t)
-			  })
-			}
-
-			var transaction;
-
-			Promise.all([
-			  getAssetUtxos(params.asset_from_addresses, params.asset),
-			  getRvnUtxos(params.rvn_from_address)
-			]).then(function (results) {
-			  return _.flatten(results)
-			}).then(function (utxos) {
-			  return createTransaction(utxos)
-			}).then(function (t) {
-			  transaction = t
-			  
-			})
-			
-*/			
-}
 
 
 if (process.argv[2] == "issueAssets") {
@@ -602,16 +539,28 @@ if (process.argv[2] == "getTransaction") {
 
 	// node ravencoin getTransaction configfile=./data/ravencoinconfig.txt
 
+	//   36104843fcd815bccbc599a1a4214934012eb6c80d20feab547ca03efad19ba7    this one with 5 RVN
+
 	rpc("getrawtransaction", ["48bb16945e238bbcecfc81401fe1d0893ee3b2ff53d554ee7b33b8b73fc74e7e"])			
 	.then(function (data) {
 
-		const txHexDecoder = require("raw-transaction-decoder");
+		console.log(data);
 
-		// Transaction https://3dcstats.net/tx/d6aa85dfb4942228923fda101a250c0f57a3bb1a7bf771fb26547848eb41ab5b -> Tool/utilities to check rawTx
-		const EncodedRawTx3DCoin = data;
-		const decode = txHexDecoder.decode3dcRawTx(EncodedRawTx3DCoin);
-		console.log("Decoded Transaction : "+JSON.stringify(decode));
-	
+
+		let RavencoinZMQDecoder = require('ravencoin-zmq-decoder');
+		let ravencoinZmqDecoder =  new RavencoinZMQDecoder("testnet");
+
+
+		let decoded = ravencoinZmqDecoder.decodeTransaction(data);
+
+		//console.log( JSON.stringify( ravencoinZmqDecoder.decodeTransaction(data) ) );
+
+		decoded.outputs.forEach(obj=>{
+			console.log(obj.value);
+			obj.scriptPubKey.addresses.forEach(obj2=> {
+				console.log(obj2);
+			})
+		})
 
 
 	}).catch(function (e) {
@@ -784,7 +733,6 @@ async function rpc(method, params) {
               method,
               params,
         };
-		  
 
         try {
 
