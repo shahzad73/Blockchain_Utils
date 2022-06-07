@@ -3,7 +3,7 @@ import { LocalSigningManager } from '@polymathnetwork/local-signing-manager';
 import { Asset } from '@polymathnetwork/polymesh-sdk/api/entities/Asset';
 import { Account, TickerReservation } from '@polymathnetwork/polymesh-sdk/internal';
 
-import { AuthorizationRequest, ClaimType, ConditionTarget, ConditionType, CountryCode, Identity, ModuleName, PermissionType, ScopeType, TransactionQueue } from '@polymathnetwork/polymesh-sdk/types';
+import { AuthorizationRequest, ClaimType, ConditionTarget, ConditionType, CountryCode, Identity, KnownAssetType, ModuleName, PermissionType, ScopeType, TransactionQueue } from '@polymathnetwork/polymesh-sdk/types';
 import { Compliance } from '@polymathnetwork/polymesh-sdk/api/entities/Asset/Compliance';
 import { Requirements } from '@polymathnetwork/polymesh-sdk/api/entities/Asset/Compliance/Requirements';
 import { SecurityToken } from '@polymathnetwork/polymesh-sdk/polkadot';
@@ -40,6 +40,8 @@ else if(args[0] == "addAttestationProvider" )
     addAttestationProvider();
 else if(args[0] == "issueTokensToDistributor" )    
     issueTokensToDistributor();
+
+
 
 
 // npx ts-node src/polymesh.ts test
@@ -184,7 +186,7 @@ else if(args[0] == "issueTokensToDistributor" )
   async function registerTicker() {
       let api: Polymesh = await getConnection(mnemonicString);
 
-      const ticker = "DIGISHARE2";
+      const ticker = "DIGISHARE3";
       const reservationQ = await api.assets.reserveTicker({
         ticker
       });
@@ -194,6 +196,19 @@ else if(args[0] == "issueTokensToDistributor" )
       const { expiryDate, owner } = await reservation.details();
       console.log('Ticker reserved!');
       console.log(`Details:\n- Owner: ${owner?.did}\n- Expiry Date: ${expiryDate}\n`);
+
+      const creationQ = await reservation.createAsset({
+        name: 'DIGISHARE3',
+        isDivisible: true,
+        assetType: KnownAssetType.EquityCommon,
+        initialSupply: new BigNumber(3000),
+        requireInvestorUniqueness: false,
+      });
+    
+      console.log('Creating Asset...\n');
+      const asset = await creationQ.run();
+            
+      console.log("Token has been reserved . . . . .");
 
       await api.disconnect();
   }
@@ -246,7 +261,6 @@ else if(args[0] == "issueTokensToDistributor" )
     console.log("Asset TICKER - " + asset.ticker)
 
 
-
     let temp1 = await asset.exists();
     console.log( "Asset Exists : " + temp1 );
 
@@ -258,7 +272,7 @@ else if(args[0] == "issueTokensToDistributor" )
 
     let temp44 = await asset.investorCount();
     console.log(  "Investor count - " + temp44  );
-
+    
     console.log( "Asset DID - " +  asset.did  );
     //console.log(  asset.documents  );
     //console.log(  asset.permissions );
