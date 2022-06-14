@@ -79,7 +79,7 @@ else if(args[0] == "issueTokensToDistributor" )
     const pacc = await identity.getPrimaryAccount();
     console.log(  "Primary Account : " +  pacc.account.address   )
 
-    console.log("DIGI balance of this account - " + await identity.getAssetBalance({"ticker": "DIGI"}));
+    console.log("DIGI balance of this account - " + await identity.getAssetBalance({"ticker": "DIGIAPITST1"}));
 
     // get all secondary accounts 
     var accounts = await identity.getSecondaryAccounts();
@@ -207,7 +207,7 @@ else if(args[0] == "issueTokensToDistributor" )
     
       console.log('Creating Asset...\n');
       const asset = await creationQ.run();
-            
+
       console.log("Token has been reserved . . . . .");
 
       await api.disconnect();
@@ -257,7 +257,7 @@ else if(args[0] == "issueTokensToDistributor" )
     const identity = (await api.getSigningIdentity())!;
     console.log("signing identity of API - " + identity.did)
 
-    let asset: Asset = await api.assets.getAsset({"ticker": "DIGI"});
+    let asset: Asset = await api.assets.getAsset({"ticker": "DIGIAPITST1"});
     console.log("Asset TICKER - " + asset.ticker)
 
 
@@ -461,3 +461,5 @@ else if(args[0] == "issueTokensToDistributor" )
 
     return api;
   }
+
+  
