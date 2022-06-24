@@ -8,6 +8,7 @@ import { Compliance } from '@polymathnetwork/polymesh-sdk/api/entities/Asset/Com
 import { Requirements } from '@polymathnetwork/polymesh-sdk/api/entities/Asset/Compliance/Requirements';
 import { SecurityToken } from '@polymathnetwork/polymesh-sdk/polkadot';
 import { Identify } from 'libp2p/src/identify/message';
+import { ClaimData } from '@polymathnetwork/polymesh-sdk/types';
 
 
 const mnemonicString = "riot arm extra another way tumble clump between city pottery chronic lumber";
@@ -33,15 +34,30 @@ else if(args[0] == "setAssetRestrictions" )
 else if(args[0] == "getAccountInfo" )
     getAccountInfo()    
 else if(args[0] == "transferSharesToAnohterAccountRequest" )
-    transferSharesToAnohterAccountRequest()    
+    transferOwnershipToAnohterAccountRequest()    
 else if(args[0] == "getAccountInviteToAcceptToken" )    
     getAccountInviteToAcceptToken();
 else if(args[0] == "addAttestationProvider" )    
     addAttestationProvider();
 else if(args[0] == "issueTokensToDistributor" )    
     issueTokensToDistributor();
+else if(args[0] == "setUserKYCandOtherClaims" )    
+    setUserKYCandOtherClaims();
+else if(args[0] == "getClaimsData" )    
+    getClaimsData();
+else if(args[0] == "redeemTokensToDistributor" )    
+    redeemTokensToDistributor();
+else if(args[0] == "getAssetComplianceRules" )    
+    getAssetComplianceRules();
+else if(args[0] == "getIdentitiesWithClaims" )    
+    getIdentitiesWithClaims();
+else if(args[0] == "cantransferassetbetweenidentities" )    
+    cantransferassetbetweenidentities();
 
 
+    
+    
+    
 
 
 // npx ts-node src/polymesh.ts test
@@ -103,8 +119,12 @@ else if(args[0] == "issueTokensToDistributor" )
     await api.disconnect();
   }
 
-  // npx ts-node src/polymesh.ts transferSharesToAnohterAccountRequest
-  async function transferSharesToAnohterAccountRequest() {
+
+
+
+
+  // npx ts-node src/polymesh.ts transferOwnershipToAnohterAccountRequest
+  async function transferOwnershipToAnohterAccountRequest() {
       let api: Polymesh = await getConnection(mnemonicString);
 
       let asset: Asset = await api.assets.getAsset({"ticker": "DIGI"});
@@ -135,12 +155,11 @@ else if(args[0] == "issueTokensToDistributor" )
     await api.disconnect(); 
   }
 
-
   // npx ts-node src/polymesh.ts addAttestationProvider
   async function addAttestationProvider() {
       let api: Polymesh = await getConnection(mnemonicString);
 
-      let asset: Asset = await api.assets.getAsset({"ticker": "DIGI"});
+      let asset: Asset = await api.assets.getAsset({"ticker": "POLYMESH21"});
       console.log("Asset TICKER - " + asset.ticker)
     
       console.log("........................");
@@ -162,12 +181,11 @@ else if(args[0] == "issueTokensToDistributor" )
       await api.disconnect();       
   }
 
-
   // npx ts-node src/polymesh.ts issueTokensToDistributor
   async function issueTokensToDistributor() {
       let api: Polymesh = await getConnection(mnemonicString);
 
-      let asset: Asset = await api.assets.getAsset({"ticker": "DIGI"});
+      let asset: Asset = await api.assets.getAsset({"ticker": "POLYMESH21"});
       console.log("Asset TICKER - " + asset.ticker)
 
       const record = await asset.issuance.issue({amount: new BigNumber(2000)}); 
@@ -177,6 +195,33 @@ else if(args[0] == "issueTokensToDistributor" )
       console.log("Error " + record.error);
 
       await api.disconnect();       
+  }
+
+  // npx ts-node src/polymesh.ts redeemTokensToDistributor
+  async function redeemTokensToDistributor() {
+    let api: Polymesh = await getConnection(mnemonicString);
+
+    let asset: Asset = await api.assets.getAsset({"ticker": "POLYMESH21"});
+    console.log("Asset TICKER - " + asset.ticker)
+
+    const record = await asset.redeem({amount: new BigNumber(2000)}); 
+    await record.run();
+    console.log("Redeemed . . . . ")
+    console.log("Status " + record.status);     //  should be success 
+    console.log("Error " + record.error);
+
+    await api.disconnect();       
+  }
+
+  // npx ts-node src/polymesh.ts cantransferassetbetweenidentities  
+  async function cantransferassetbetweenidentities() {
+      let api: Polymesh = await getConnection(mnemonicString);
+      
+      let asset: Asset = await api.assets.getAsset({"ticker": "POLYMESH21"});
+
+      const data = await asset.settlements.canTransfer({to:"0x4d241b9bc81837e1dc6e92562d14cfd86da1fe995a57623d9c69a2e75bca0272", amount: new BigNumber("100".toString()) })
+
+      console.log(data);
   }
 
 
@@ -257,7 +302,7 @@ else if(args[0] == "issueTokensToDistributor" )
     const identity = (await api.getSigningIdentity())!;
     console.log("signing identity of API - " + identity.did)
 
-    let asset: Asset = await api.assets.getAsset({"ticker": "DIGIAPITST1"});
+    let asset: Asset = await api.assets.getAsset({"ticker": "POLYMESH21"});
     console.log("Asset TICKER - " + asset.ticker)
 
 
@@ -298,13 +343,14 @@ else if(args[0] == "issueTokensToDistributor" )
     
     
     
-    
-    console.log(  ".... TICKET......"  ); 
-    let temp2: TickerReservation = await api.assets.getTickerReservation({"ticker": "DIGISHARE2"}) ;
-    let temp12 = await temp2.details();
-    console.log("TICKER OWNER - " + temp12.owner?.did  );
-    console.log("TICKET STATUS - " + temp12.status );
-    console.log("Ticker Expiry date - " + temp12.expiryDate)
+    /*
+      console.log(  ".... TICKET......"  ); 
+      let temp2: TickerReservation = await api.assets.getTickerReservation({"ticker": "DIGISHARE2"}) ;
+      let temp12 = await temp2.details();
+      console.log("TICKER OWNER - " + temp12.owner?.did  );
+      console.log("TICKET STATUS - " + temp12.status );
+      console.log("Ticker Expiry date - " + temp12.expiryDate)
+    */
 
 
 
@@ -312,9 +358,17 @@ else if(args[0] == "issueTokensToDistributor" )
 
 
 
+    const assHolds = await asset.assetHolders.get()
+    console.log("All Asset Holders. . . . ")
+    assHolds.data.forEach(element => {
+       console.log( element.identity.did + " " + element.balance );
+    });
 
-    //const assHolds = asset.assetHolders;
-    //console.log(assHolds);
+
+    const comp2 = asset.compliance;
+    //console.log("compliance")
+    //console.log(comp2);
+
 
     //let temp3: boolean = await api.assets.isTickerAvailable({"ticker": "DIGISHARE2"}) ;
     //console.log( temp3 );
@@ -358,7 +412,7 @@ else if(args[0] == "issueTokensToDistributor" )
   async function setAssetRestrictions() {
     let api: Polymesh = await getConnection(mnemonicString);
 
-    let token: Asset = await api.assets.getAsset({"ticker": "DIGI"});
+    let token: Asset = await api.assets.getAsset({"ticker": "POLYMESH21"});
 
     const acmeCompliance: Compliance = token.compliance;
     const acmeRequirements: Requirements = acmeCompliance.requirements;
@@ -385,10 +439,10 @@ else if(args[0] == "issueTokensToDistributor" )
               },
               {
                   "target": ConditionTarget.Receiver,
-                  "type": ConditionType.IsAbsent,
+                  "type": ConditionType.IsPresent,
                   "claim": {
                       "type": ClaimType.Jurisdiction,
-                      "code": CountryCode.Li,
+                      "code": CountryCode.Pk,
                       "scope": {
                           "type": ScopeType.Ticker,
                           "value": token.ticker
@@ -435,10 +489,195 @@ else if(args[0] == "issueTokensToDistributor" )
 
     await api.disconnect();
 
+  }
+
+  // npx ts-node src/polymesh.ts getAssetComplianceRules    
+  async function getAssetComplianceRules() {
+    let api: Polymesh = await getConnection(mnemonicString);
+
+    let token: Asset = await api.assets.getAsset({"ticker": "POLYMESH21"});
+
+    const comp = await token.compliance.requirements.get();
+
+    console.log( "Default defaultTrustedClaimIssuers" )
+    comp.defaultTrustedClaimIssuers.forEach((obj) => {
+        console.log( obj.identity.did );
+    }) 
+
+    console.log("");
+    console.log( "Requirements" );
+    comp.requirements.forEach((requirement)=> {
+
+        /*"requirements": [
+        [
+            {
+                "target": ConditionTarget.Receiver,
+                "type": ConditionType.IsPresent,
+                "claim": {
+                    "type": ClaimType.KnowYourCustomer,
+                    "scope": {
+                        "type": ScopeType.Ticker,
+                        "value": token.ticker
+                    }
+                },
+                "trustedClaimIssuers": [{
+                    "identity": acme.did,
+                    "trustedFor": [ClaimType.KnowYourCustomer]
+                }]
+            },
+          ]*/
+        requirement.conditions.forEach((condition) => {
+            console.log("---------------------------------------");
+            console.log(  condition.target + " " + condition.type   );
+            condition.trustedClaimIssuers?.forEach((claimissuer)=> {
+                console.log("Trust Issuer for this condition : " + claimissuer.identity.did);
+                console.log("Conditions")
+                claimissuer.trustedFor?.forEach((trust)=> {
+                    console.log(" - " + trust.toString())
+                })
+            })
+        })
+    })
+
+    await api.disconnect();
+  }
+
+  // npx ts-node src/polymesh.ts setUserKYCandOtherClaims
+  async function setUserKYCandOtherClaims() {
+
+      let api: Polymesh = await getConnection(mnemonicString);
+
+      const nextYear: Date = new Date();
+      nextYear.setFullYear(nextYear.getFullYear() + 1);
+      const claimQueue: TransactionQueue<void> = await api.claims.addClaims({
+          "claims": [
+              {
+                  "claim": {
+                      "type": ClaimType.Jurisdiction,
+                      "code": CountryCode.Us,
+                      "scope": {
+                          "type": ScopeType.Ticker,
+                          "value": "POLYMESH21"
+                      }
+                  },
+                  "expiry": nextYear,
+                  "target": "0x4d241b9bc81837e1dc6e92562d14cfd86da1fe995a57623d9c69a2e75bca0272"
+              },
+              {
+                "claim": {
+                    "type": ClaimType.Jurisdiction,
+                    "code": CountryCode.Pk,
+                    "scope": {
+                        "type": ScopeType.Ticker,
+                        "value": "POLYMESH21"
+                    }
+                },
+                "expiry": nextYear,
+                "target": "0x4d241b9bc81837e1dc6e92562d14cfd86da1fe995a57623d9c69a2e75bca0272"
+              }              
+          ]
+      });
+
+      /*const claimQueue: TransactionQueue<void> = await api.claims.addClaims({
+        "claims": [
+            {
+                "claim": {
+                    "type": ClaimType.KnowYourCustomer,
+                    "scope": {
+                        "type": ScopeType.Ticker,
+                        "value": "POLYMESH21"
+                    }
+                },
+                "expiry": nextYear,
+                "target": "0x4d241b9bc81837e1dc6e92562d14cfd86da1fe995a57623d9c69a2e75bca0272"
+            }
+        ]
+      });*/
+
+      await claimQueue.run();
+
+      await api.disconnect();
+  }
+
+  // npx ts-node src/polymesh.ts getClaimsData
+  async function getClaimsData() {
+    let api: Polymesh = await getConnection(mnemonicString);
+
+    const cddClaims = await api.claims.getCddClaims();
+
+    console.log('List of CDD claims for the signing Identity:\n');
+    cddClaims.forEach((claim, i) => {
+      renderClaim(claim, i + 1);
+    });
+  
+    const investorUniquenessClaims = await api.claims.getInvestorUniquenessClaims();
+  
+    console.log('List of InvestorUniqueness claims for the signing Identity:\n');
+    investorUniquenessClaims.forEach((claim, i) => {
+      renderClaim(claim, i + 1);
+    });
+
+
+    const targetingClaims = await api.claims.getTargetingClaims(
+      { "target": "0x4d241b9bc81837e1dc6e92562d14cfd86da1fe995a57623d9c69a2e75bca0272",
+        "scope": {
+          "type": ScopeType.Ticker,
+          "value": "POLYMESH21"
+        }   
+      }
+    );
+    console.log(`List of claims targeting to ${"0x4d241b9bc81837e1dc6e92562d14cfd86da1fe995a57623d9c69a2e75bca0272"}\n`);
+    targetingClaims.data.forEach(({ identity, claims }) => {
+      console.log(`Identity: ${identity.did}`);
+      claims.forEach((claim, i) => renderClaim(claim, i + 1));
+    });
+  
+
+    const issuedClaims = await api.claims.getIssuedClaims (
+    { "target": "0x4d241b9bc81837e1dc6e92562d14cfd86da1fe995a57623d9c69a2e75bca0272"  
+    });
+    console.log(`List of issued targeting to ${"0x4d241b9bc81837e1dc6e92562d14cfd86da1fe995a57623d9c69a2e75bca0272"}\n`);
+    console.log( issuedClaims );
+
+
+    await api.disconnect();
+  }
+
+  // npx ts-node src/polymesh.ts getIdentitiesWithClaims
+  // to found out claims attached with a speciifc asset
+  // not working
+  async function getIdentitiesWithClaims() {
+    let api: Polymesh = await getConnection(mnemonicString);
+
+    const data = await api.claims.getIdentitiesWithClaims({
+      scope: {
+        type: ScopeType.Ticker,
+        value: 'POLYMESH21'
+      }
+    });
+
+
+    data.data.forEach((obj)=> {
+        console.log( obj.identity.did );
+
+        obj.claims.forEach((obj2)=> {
+            console.log( obj2.claim.type.toString() + "  " + obj2.target )
+        })
+    })
 }
 
 
 
+  const renderClaim = ({ target, issuer, issuedAt, expiry, claim }: ClaimData, pos: number): void => {
+    console.log(`Claim #${pos} ${issuedAt ? `issued at ${issuedAt}` : ``}`);
+    console.log(`Target: ${target.did}`);
+    console.log(`Issuer: ${issuer.did}`);
+    if (expiry) {
+      console.log(`Expiry date: ${expiry}`);
+    }
+    console.log(`Claim: ${claim.type}`);
+    console.log('\n');
+  };
 
 
 
@@ -462,4 +701,7 @@ else if(args[0] == "issueTokensToDistributor" )
     return api;
   }
 
-  
+
+
+
+
