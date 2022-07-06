@@ -1,7 +1,7 @@
 import { BigNumber, Polymesh } from '@polymathnetwork/polymesh-sdk';
 import { LocalSigningManager } from '@polymathnetwork/local-signing-manager';
 import { Asset } from '@polymathnetwork/polymesh-sdk/api/entities/Asset';
-import { Account, TickerReservation } from '@polymathnetwork/polymesh-sdk/internal';
+import { Account, TickerReservation, toggleFreezeOffering } from '@polymathnetwork/polymesh-sdk/internal';
 
 import { AuthorizationRequest, ClaimType, ConditionTarget, ConditionType, CountryCode, Identity, KnownAssetType, ModuleName, PermissionType, ScopeType, TransactionQueue } from '@polymathnetwork/polymesh-sdk/types';
 import { Compliance } from '@polymathnetwork/polymesh-sdk/api/entities/Asset/Compliance';
@@ -53,7 +53,14 @@ else if(args[0] == "getIdentitiesWithClaims" )
     getIdentitiesWithClaims();
 else if(args[0] == "cantransferassetbetweenidentities" )    
     cantransferassetbetweenidentities();
+else if(args[0] == "checkAttestationProviderStatus" )    
+    checkAttestationProviderStatus();
+else if(args[0] == "removeAttestationProviderStatus" )    
+    removeAttestationProviderStatus();
+else if(args[0] == "removeAssetRestrictions" )    
+    removeAssetRestrictions();
 
+    
 
     
     
@@ -155,23 +162,42 @@ else if(args[0] == "cantransferassetbetweenidentities" )
     await api.disconnect(); 
   }
 
+
+
+
   // npx ts-node src/polymesh.ts addAttestationProvider
   async function addAttestationProvider() {
       let api: Polymesh = await getConnection(mnemonicString);
 
       let asset: Asset = await api.assets.getAsset({"ticker": "POLYMESH21"});
       console.log("Asset TICKER - " + asset.ticker)
-    
-      console.log("........................");
+
+      // you can use this method to check if a identiify has required autorizations   
+      //asset.compliance.trustedClaimIssuers.add.checkAuthorization
+
       const addClaimIssuerQueue = await asset.compliance.trustedClaimIssuers.add(
         {
             claimIssuers: [{
               identity: `0xfd38c10a0ed8c81212698d02afcb0abfc9c9a80b57619682e9feb6706f71daa5`,
+
               /**
                * a null value means that the issuer is trusted for all claim types
                * Otherwise, you could specify a list of claim types 
-              */ 
-              trustedFor: null
+               or it could be one of these
+                Accredited = 'Accredited',
+                Affiliate = 'Affiliate',
+                BuyLockup = 'BuyLockup',
+                SellLockup = 'SellLockup',
+                CustomerDueDiligence = 'CustomerDueDiligence',
+                KnowYourCustomer = 'KnowYourCustomer',
+                Jurisdiction = 'Jurisdiction',
+                Exempted = 'Exempted',
+                Blocked = 'Blocked',
+                InvestorUniqueness = 'InvestorUniqueness',
+                NoData = 'NoData',
+                InvestorUniquenessV2 = 'InvestorUniquenessV2',                
+              */              
+              trustedFor: [ClaimType.KnowYourCustomer, ClaimType.Jurisdiction]
             }]
         }
       );
@@ -180,6 +206,46 @@ else if(args[0] == "cantransferassetbetweenidentities" )
 
       await api.disconnect();       
   }
+  // not working as expected      npx ts-node src/polymesh.ts checkAttestationProviderStatus
+  async function checkAttestationProviderStatus() {
+    let api: Polymesh = await getConnection(mnemonicString);
+
+    let asset: Asset = await api.assets.getAsset({"ticker": "POLYMESH21"});
+    console.log("Asset TICKER - " + asset.ticker)
+
+    const data = await asset.compliance.trustedClaimIssuers.add.checkAuthorization({
+      claimIssuers: [{
+        identity: `0xfd38c10a0ed8c81212698d02afcb0abfc9c9a80b57619682e9feb6706f71daa1`,             
+        trustedFor: [ClaimType.KnowYourCustomer]
+      }]
+    });
+
+    console.log( data )
+
+    await api.disconnect();       
+
+  }
+  //npx ts-node src/polymesh.ts removeAttestationProviderStatus
+  async function removeAttestationProviderStatus() {
+    let api: Polymesh = await getConnection(mnemonicString);
+
+    let asset: Asset = await api.assets.getAsset({"ticker": "POLYMESH21"});
+    console.log("Asset TICKER - " + asset.ticker)
+
+    const addClaimIssuerQueue = await asset.compliance.trustedClaimIssuers.remove(
+      {
+          claimIssuers: [
+            `0xfd38c10a0ed8c81212698d02afcb0abfc9c9a80b57619682e9feb6706f71daa5`
+          ]
+      }
+    );
+    console.log("Sending cpmplianace remove transaction to system");
+    const updatedAsset = await addClaimIssuerQueue.run();    
+
+    await api.disconnect(); 
+  }
+
+
 
   // npx ts-node src/polymesh.ts issueTokensToDistributor
   async function issueTokensToDistributor() {
@@ -217,11 +283,13 @@ else if(args[0] == "cantransferassetbetweenidentities" )
   async function cantransferassetbetweenidentities() {
       let api: Polymesh = await getConnection(mnemonicString);
       
-      let asset: Asset = await api.assets.getAsset({"ticker": "POLYMESH21"});
+      let asset: Asset = await api.assets.getAsset({"ticker": "POLYMESH22"});
 
-      const data = await asset.settlements.canTransfer({to:"0x4d241b9bc81837e1dc6e92562d14cfd86da1fe995a57623d9c69a2e75bca0272", amount: new BigNumber("100".toString()) })
+      const data = await asset.settlements.canTransfer({to:"0x4d241b9bc81837e1dc6e92562d14cfd86da1fe995a57623d9c69a2e75bca0272", amount: new BigNumber("1".toString()) })
 
       console.log(data);
+
+      api.disconnect();
   }
 
 
@@ -247,7 +315,7 @@ else if(args[0] == "cantransferassetbetweenidentities" )
         isDivisible: true,
         assetType: KnownAssetType.EquityCommon,
         initialSupply: new BigNumber(3000),
-        requireInvestorUniqueness: false,
+        requireInvestorUniqueness: false        
       });
     
       console.log('Creating Asset...\n');
@@ -412,7 +480,7 @@ else if(args[0] == "cantransferassetbetweenidentities" )
   async function setAssetRestrictions() {
     let api: Polymesh = await getConnection(mnemonicString);
 
-    let token: Asset = await api.assets.getAsset({"ticker": "POLYMESH21"});
+    let token: Asset = await api.assets.getAsset({"ticker": "POLYMESH22"});
 
     const acmeCompliance: Compliance = token.compliance;
     const acmeRequirements: Requirements = acmeCompliance.requirements;
@@ -453,14 +521,37 @@ else if(args[0] == "cantransferassetbetweenidentities" )
                       "trustedFor": [ClaimType.Jurisdiction]
                   }]
               }
+
           ]
       ]
     })
     const updatedToken: Asset = await que.run();
 
+    await api.disconnect();
+  }
+
+
+  // npx ts-node src/polymesh.ts removeAssetRestrictions
+  async function removeAssetRestrictions() {
+    let api: Polymesh = await getConnection(mnemonicString);
+
+    let token: Asset = await api.assets.getAsset({"ticker": "POLYMESH21"});
+
+    const acmeCompliance: Compliance = token.compliance;
+    const acmeRequirements: Requirements = acmeCompliance.requirements;
+    const acme = (await api.getSigningIdentity())!;
+
+
+    //const que = await acmeRequirements.remove(BigNumber(1))
+    //const updatedToken: Asset = await que.run();
 
     await api.disconnect();
   }
+
+
+
+
+
 
   // npx ts-node src/polymesh.ts transferAssetOwnership  
   async function transferAssetOwnership() {
@@ -491,6 +582,7 @@ else if(args[0] == "cantransferassetbetweenidentities" )
 
   }
 
+  // ----------  for jurisdictions you need to find out what are the country 
   // npx ts-node src/polymesh.ts getAssetComplianceRules    
   async function getAssetComplianceRules() {
     let api: Polymesh = await getConnection(mnemonicString);
@@ -507,7 +599,6 @@ else if(args[0] == "cantransferassetbetweenidentities" )
     console.log("");
     console.log( "Requirements" );
     comp.requirements.forEach((requirement)=> {
-
         /*"requirements": [
         [
             {
@@ -526,14 +617,18 @@ else if(args[0] == "cantransferassetbetweenidentities" )
                 }]
             },
           ]*/
-        requirement.conditions.forEach((condition) => {
+
+        console.log(requirement.id);
+
+        requirement.conditions.forEach((condition) => {            
             console.log("---------------------------------------");
             console.log(  condition.target + " " + condition.type   );
             condition.trustedClaimIssuers?.forEach((claimissuer)=> {
                 console.log("Trust Issuer for this condition : " + claimissuer.identity.did);
                 console.log("Conditions")
-                claimissuer.trustedFor?.forEach((trust)=> {
+                claimissuer.trustedFor?.forEach((trust: ClaimType)=> {
                     console.log(" - " + trust.toString())
+                    console.log(trust.valueOf)
                 })
             })
         })
@@ -554,10 +649,10 @@ else if(args[0] == "cantransferassetbetweenidentities" )
               {
                   "claim": {
                       "type": ClaimType.Jurisdiction,
-                      "code": CountryCode.Us,
+                      "code": CountryCode.Pk,
                       "scope": {
                           "type": ScopeType.Ticker,
-                          "value": "POLYMESH21"
+                          "value": "POLYMESH22"
                       }
                   },
                   "expiry": nextYear,
@@ -569,7 +664,7 @@ else if(args[0] == "cantransferassetbetweenidentities" )
                     "code": CountryCode.Pk,
                     "scope": {
                         "type": ScopeType.Ticker,
-                        "value": "POLYMESH21"
+                        "value": "POLYMESH22"
                     }
                 },
                 "expiry": nextYear,
@@ -622,7 +717,7 @@ else if(args[0] == "cantransferassetbetweenidentities" )
       { "target": "0x4d241b9bc81837e1dc6e92562d14cfd86da1fe995a57623d9c69a2e75bca0272",
         "scope": {
           "type": ScopeType.Ticker,
-          "value": "POLYMESH21"
+          "value": "POLYMESH22"
         }   
       }
     );
@@ -705,3 +800,14 @@ else if(args[0] == "cantransferassetbetweenidentities" )
 
 
 
+/*
+  Asset
+    freeze
+    isFreeze
+    unfreeze
+    transferOwnership
+
+    properties of asset      did, ticker, uuid, 
+
+
+*/
