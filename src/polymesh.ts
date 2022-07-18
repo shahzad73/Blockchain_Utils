@@ -3,12 +3,13 @@ import { LocalSigningManager } from '@polymathnetwork/local-signing-manager';
 import { Asset } from '@polymathnetwork/polymesh-sdk/api/entities/Asset';
 import { Account, TickerReservation, toggleFreezeOffering } from '@polymathnetwork/polymesh-sdk/internal';
 
-import { AuthorizationRequest, ClaimType, ConditionTarget, ConditionType, CountryCode, Identity, KnownAssetType, ModuleName, PermissionType, ScopeType, TransactionQueue } from '@polymathnetwork/polymesh-sdk/types';
+import { AuthorizationRequest, ClaimType, ConditionTarget, ConditionType, CountryCode, Identity, KnownAssetType, ModuleName, PermissionType, ScopeType, SecurityIdentifierType, TransactionQueue } from '@polymathnetwork/polymesh-sdk/types';
 import { Compliance } from '@polymathnetwork/polymesh-sdk/api/entities/Asset/Compliance';
 import { Requirements } from '@polymathnetwork/polymesh-sdk/api/entities/Asset/Compliance/Requirements';
 import { SecurityToken } from '@polymathnetwork/polymesh-sdk/polkadot';
 import { Identify } from 'libp2p/src/identify/message';
 import { ClaimData } from '@polymathnetwork/polymesh-sdk/types';
+import { prepareReclaimDividendDistributionFunds } from '@polymathnetwork/polymesh-sdk/api/procedures/reclaimDividendDistributionFunds';
 
 
 const mnemonicString = "riot arm extra another way tumble clump between city pottery chronic lumber";
@@ -41,7 +42,7 @@ else if(args[0] == "addAttestationProvider" )
     addAttestationProvider();
 else if(args[0] == "issueTokensToDistributor" )    
     issueTokensToDistributor();
-else if(args[0] == "setUserKYCandOtherClaims" )    
+else if(args[0] == "setUserKYCandOtherClaims" )
     setUserKYCandOtherClaims();
 else if(args[0] == "getClaimsData" )    
     getClaimsData();
@@ -317,11 +318,15 @@ else if(args[0] == "removeAssetRestrictions" )
         initialSupply: new BigNumber(3000),
         requireInvestorUniqueness: false        
       });
-    
+      
       console.log('Creating Asset...\n');
       const asset = await creationQ.run();
 
       console.log("Token has been reserved . . . . .");
+
+
+
+
 
       await api.disconnect();
   }
@@ -480,7 +485,7 @@ else if(args[0] == "removeAssetRestrictions" )
   async function setAssetRestrictions() {
     let api: Polymesh = await getConnection(mnemonicString);
 
-    let token: Asset = await api.assets.getAsset({"ticker": "POLYMESH22"});
+    let token: Asset = await api.assets.getAsset({"ticker": "POLYMESH21"});
 
     const acmeCompliance: Compliance = token.compliance;
     const acmeRequirements: Requirements = acmeCompliance.requirements;
@@ -504,7 +509,7 @@ else if(args[0] == "removeAssetRestrictions" )
                       "identity": acme.did,
                       "trustedFor": [ClaimType.KnowYourCustomer]
                   }]
-              },
+              },             
               {
                   "target": ConditionTarget.Receiver,
                   "type": ConditionType.IsPresent,
@@ -528,58 +533,6 @@ else if(args[0] == "removeAssetRestrictions" )
     const updatedToken: Asset = await que.run();
 
     await api.disconnect();
-  }
-
-
-  // npx ts-node src/polymesh.ts removeAssetRestrictions
-  async function removeAssetRestrictions() {
-    let api: Polymesh = await getConnection(mnemonicString);
-
-    let token: Asset = await api.assets.getAsset({"ticker": "POLYMESH21"});
-
-    const acmeCompliance: Compliance = token.compliance;
-    const acmeRequirements: Requirements = acmeCompliance.requirements;
-    const acme = (await api.getSigningIdentity())!;
-
-
-    //const que = await acmeRequirements.remove(BigNumber(1))
-    //const updatedToken: Asset = await que.run();
-
-    await api.disconnect();
-  }
-
-
-
-
-
-
-  // npx ts-node src/polymesh.ts transferAssetOwnership  
-  async function transferAssetOwnership() {
-
-    let api: Polymesh = await getConnection(mnemonicString);
-
-
-    const identity = (await api.getSigningIdentity())!;
-    console.log("signing identity of API - " + identity.did)
-
-    // 
-    // await identity.authorizations.getReceived()
-
-
-    let asset: Asset = await api.assets.getAsset({"ticker": "DIGI"});
-    console.log("Asset TICKER - " + asset.ticker)
-
-    // Teansferring Asset ownership
-    console.log("sending ownership request");
-
-
-    const data1 = await asset.transferOwnership({"target": "0x4d241b9bc81837e1dc6e92562d14cfd86da1fe995a57623d9c69a2e75bca0272"})
-    data1.run();
-    console.log(data1.status)
-
-
-    await api.disconnect();
-
   }
 
   // ----------  for jurisdictions you need to find out what are the country 
@@ -637,6 +590,65 @@ else if(args[0] == "removeAssetRestrictions" )
     await api.disconnect();
   }
 
+
+
+
+
+  // npx ts-node src/polymesh.ts removeAssetRestrictions
+  async function removeAssetRestrictions() {
+    let api: Polymesh = await getConnection(mnemonicString);
+
+    let token: Asset = await api.assets.getAsset({"ticker": "POLYMESH21"});
+
+    const acmeCompliance: Compliance = token.compliance;
+    const acmeRequirements: Requirements = acmeCompliance.requirements;
+    const acme = (await api.getSigningIdentity())!;
+
+
+    //const que = await acmeRequirements.remove(BigNumber(1))
+    //const updatedToken: Asset = await que.run();
+
+    await api.disconnect();
+  }
+
+
+
+
+
+
+  // npx ts-node src/polymesh.ts transferAssetOwnership  
+  async function transferAssetOwnership() {
+
+    let api: Polymesh = await getConnection(mnemonicString);
+
+
+    const identity = (await api.getSigningIdentity())!;
+    console.log("signing identity of API - " + identity.did)
+
+    // 
+    // await identity.authorizations.getReceived()
+
+
+    let asset: Asset = await api.assets.getAsset({"ticker": "DIGI"});
+    console.log("Asset TICKER - " + asset.ticker)
+
+    // Teansferring Asset ownership
+    console.log("sending ownership request");
+
+
+    const data1 = await asset.transferOwnership({"target": "0x4d241b9bc81837e1dc6e92562d14cfd86da1fe995a57623d9c69a2e75bca0272"})
+    data1.run();
+    console.log(data1.status)
+
+
+    await api.disconnect();
+
+  }
+
+
+
+
+
   // npx ts-node src/polymesh.ts setUserKYCandOtherClaims
   async function setUserKYCandOtherClaims() {
 
@@ -693,6 +705,10 @@ else if(args[0] == "removeAssetRestrictions" )
 
       await api.disconnect();
   }
+
+
+
+
 
   // npx ts-node src/polymesh.ts getClaimsData
   async function getClaimsData() {
@@ -760,6 +776,9 @@ else if(args[0] == "removeAssetRestrictions" )
         })
     })
 }
+
+
+
 
 
 
