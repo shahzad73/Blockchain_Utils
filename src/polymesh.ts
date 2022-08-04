@@ -1,20 +1,42 @@
 import { BigNumber, Polymesh } from '@polymathnetwork/polymesh-sdk';
 import { LocalSigningManager } from '@polymathnetwork/local-signing-manager';
 import { Asset } from '@polymathnetwork/polymesh-sdk/api/entities/Asset';
-import { Account, TickerReservation, toggleFreezeOffering } from '@polymathnetwork/polymesh-sdk/internal';
+import { Account, Portfolio, TickerReservation, toggleFreezeOffering } from '@polymathnetwork/polymesh-sdk/internal';
 
-import { AuthorizationRequest, ClaimType, ConditionTarget, ConditionType, CountryCode, Identity, KnownAssetType, ModuleName, PermissionType, ScopeType, SecurityIdentifierType, TransactionQueue } from '@polymathnetwork/polymesh-sdk/types';
+import { AuthorizationRequest, Leg, ClaimType, ConditionTarget, ConditionType, CountryCode, DistributionWithDetails, GroupedInstructions, Identity, Instruction, InstructionAffirmation, KnownAssetType, ModuleName, Offering, OfferingWithDetails, PermissionType, ScopeType, SecurityIdentifierType, TransactionQueue, Venue, VenueType, ResultSet, InstructionDetails, NumberedPortfolio, DefaultPortfolio, PortfolioBalance } from '@polymathnetwork/polymesh-sdk/types';
 import { Compliance } from '@polymathnetwork/polymesh-sdk/api/entities/Asset/Compliance';
 import { Requirements } from '@polymathnetwork/polymesh-sdk/api/entities/Asset/Compliance/Requirements';
-import { SecurityToken } from '@polymathnetwork/polymesh-sdk/polkadot';
 import { Identify } from 'libp2p/src/identify/message';
 import { ClaimData } from '@polymathnetwork/polymesh-sdk/types';
 import { prepareReclaimDividendDistributionFunds } from '@polymathnetwork/polymesh-sdk/api/procedures/reclaimDividendDistributionFunds';
-
+import { createCreateVenueResolver } from '@polymathnetwork/polymesh-sdk/api/procedures/createVenue';
+import { Distributions } from '@polymathnetwork/polymesh-sdk/api/entities/Asset/CorporateActions/Distributions';
+import { AccountManagement } from '@polymathnetwork/polymesh-sdk/AccountManagement';
 
 const mnemonicString = "riot arm extra another way tumble clump between city pottery chronic lumber";
+const mnemonicString2 = "run swarm rotate impact knife ice steel hip enough envelope pigeon recycle";
+
+// 0x4d241b9bc81837e1dc6e92562d14cfd86da1fe995a57623d9c69a2e75bca0272  waqas
+// 0xfd38c10a0ed8c81212698d02afcb0abfc9c9a80b57619682e9feb6706f71daa5  shahzad
+// 0x7f4252259c0baf9b0af41f2b4040768ed6160f1a1f61b8f2202f60c120e390d1  exchange
 
 // did    Identity ID of the Asset (used for Claims)
+/*
+  use this to get identities
+  const target = await api.identities.getIdentity({
+    did: '0x1906c0a0f58364d3f71c4e94e1361af9810666445564840c96f9f1a965cf6045',
+  });
+*/
+
+
+/*
+    Venue for the investor     this is of other venur type
+    TestingOtherVenueForInvestor     503
+
+    Venfor for the admin        this is distribution type venue
+    468
+*/
+
 
 var args = process.argv.slice(2);
 
@@ -60,12 +82,28 @@ else if(args[0] == "removeAttestationProviderStatus" )
     removeAttestationProviderStatus();
 else if(args[0] == "removeAssetRestrictions" )    
     removeAssetRestrictions();
-
-    
-
-    
-    
-    
+else if(args[0] == "createVenue" )    
+    createVenue();
+else if(args[0] == "transferShares" )    
+    transferShares();
+else if(args[0] == "getPendingDistriction" )    
+    getPendingDistriction();
+else if(args[0] == "createPortfolio" )    
+    createPortfolio();
+else if(args[0] == "getPortfolio" )    
+    getPortfolio();
+else if(args[0] == "transferBalanceToPortfolio" )    
+    transferBalanceToPortfolio();
+else if(args[0] == "getTokenBalancesOfAccount" )    
+    getTokenBalancesOfAccount();
+else if(args[0] == "transferSharesTwoLegSwap" )    
+    transferSharesTwoLegSwap();
+else if(args[0] == "affirmInstruction" )    
+    affirmInstruction();
+else if(args[0] == "rescheduleInstruction" )    
+    rescheduleInstruction();
+else if(args[0] == "rejectInstruction" )    
+    rejectInstruction();
 
 
 // npx ts-node src/polymesh.ts test
@@ -103,7 +141,7 @@ else if(args[0] == "removeAssetRestrictions" )
     const pacc = await identity.getPrimaryAccount();
     console.log(  "Primary Account : " +  pacc.account.address   )
 
-    console.log("DIGI balance of this account - " + await identity.getAssetBalance({"ticker": "DIGIAPITST1"}));
+    console.log("POLYMESH21 balance of this account - " + await identity.getAssetBalance({"ticker": "POLYMESH21"}));
 
     // get all secondary accounts 
     var accounts = await identity.getSecondaryAccounts();
@@ -127,6 +165,426 @@ else if(args[0] == "removeAssetRestrictions" )
     await api.disconnect();
   }
 
+  // ---------------------------------------------------------
+  // chekc total and portfolio balances
+  // npx ts-node src/polymesh.ts getTokenBalancesOfAccount
+  async function getTokenBalancesOfAccount() {
+    let api: Polymesh = await getConnection(mnemonicString);
+
+    const idds = (await api.getSigningIdentity())!;
+
+    console.log("POLYMESH21 balance of this account - " + await idds.getAssetBalance({"ticker": "POLYMESH21"}));
+
+    const defaultPortfolio = await idds?.portfolios.getPortfolio();
+
+    const bb = await defaultPortfolio?.getAssetBalances({"assets": ["POLYMESH21"]});
+    console.log("Default Portfolio Data")
+    bb?.forEach((obj: PortfolioBalance)=> {
+      console.log( obj.asset.ticker + " " + obj.total );
+    })
+
+    console.log("")    
+    console.log("Cold Portfolio Data")    
+    const coldStore = await  idds?.portfolios.getPortfolio({
+      "portfolioId": new BigNumber(new BigNumber(2))
+    });
+
+    var balance = await coldStore?.getAssetBalances();
+    balance?.forEach((obj: PortfolioBalance)=> {
+      console.log( obj.asset.ticker + " " + obj.total );
+    })
+
+
+    
+  }
+
+
+
+  // npx ts-node src/polymesh.ts createVenue
+  async function createVenue() {
+      console.log('Connecting to the node...\n\n');
+      let api: Polymesh = await getConnection(mnemonicString2);
+
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+      const identity = (await api.getSigningIdentity())!;
+      console.log(`Connected! Signing Identity ID: ${identity.did}`);
+
+      const venueQ = await api.settlements.createVenue({
+        description: 'TestingOtherVenueForInvestor',
+        type: VenueType.Distribution
+      });
+
+      console.log('Creating venue...');
+      const venue = await venueQ.run();
+      console.log("ID of the venue is : " + venue.id);
+      const { type, owner, description } = await venue.details();
+      console.log('Venue created!');
+      console.log(`Details:\n- Owner: ${owner?.did}\n- Type: ${type}\n- Description. ${description}`);
+
+      await api.disconnect();
+  }
+
+
+
+  // npx ts-node src/polymesh.ts transferShares
+  async function transferShares() {
+
+    console.log('Connecting to the node...\n\n');
+    let api: Polymesh = await getConnection(mnemonicString);
+  
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    const identity = (await api.getSigningIdentity())!;
+
+
+    const vens = await identity.getVenues();
+    vens.forEach(async (obj) => {        
+        const dets = await obj.details();
+        console.log( obj.id + " " + dets.description )
+    })
+
+
+    const venue: Venue = await api.settlements.getVenue({ id: new BigNumber(468) });    
+
+    // admin venue 468
+    // investor's venur  503
+
+              console.log("Now going to send transaction");
+        
+              // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+              const bob = await api.identities.getIdentity({ did: "0x4d241b9bc81837e1dc6e92562d14cfd86da1fe995a57623d9c69a2e75bca0272" });
+        
+              //const destinationPortfolio = await bob.portfolios.getPortfolio({ portfolioId: new BigNumber(1) });
+        
+              const instructionQ = await venue.addInstruction({
+                legs: [
+                  {
+                    from: "0xfd38c10a0ed8c81212698d02afcb0abfc9c9a80b57619682e9feb6706f71daa5", // passing the Identity (or did) means the default portfolio will be used
+                    to: "0x4d241b9bc81837e1dc6e92562d14cfd86da1fe995a57623d9c69a2e75bca0272", // or you can pass a Portfolio
+                    amount: new BigNumber(30),
+                    asset: 'POLYMESH21',
+                  },
+                ],
+                //endBlock: new BigNumber(10000000),
+                tradeDate: new Date('12/25/2023'),
+              });
+
+              console.log('Creating Instruction...\n');
+              const instruction = await instructionQ.run();
+        
+              /* Pending Instructions can be fetched */
+              // const pendingInstructions = await venue.getPendingInstructions();
+
+              const details = await instruction.details();
+              console.log(`Instruction Created! Creation Date: ${details.createdAt}  Status:${details.status}   instruction ID: ${instruction.id}  `);
+
+              const affirmations = await instruction.getAffirmations();
+
+              console.log("");
+              console.log("Afirmations .......");
+              affirmations.data.forEach((obj: InstructionAffirmation) => {
+                  console.log(  obj.identity.did + " " + obj.status  );
+              });
+
+              console.log("");
+              console.log("Legs Data .........");
+              const legs = await instruction.getLegs();
+              legs.data.forEach((obj2) => {
+                  console.log("asset:" + obj2.asset.ticker + " amount" + obj2.amount + " from:" + obj2.from.owner.did + " to:" + obj2.to.owner.did );
+              });
+
+              console.log("statuses.......");
+              const isPenidng = await instruction.isPending();
+              const isExe = await instruction.isExecuted();
+              const status = await instruction.getStatus();
+              console.log("Pending:" + isPenidng + "  isExeucted:" + isExe + " Status:" + status.status);
+        
+              /*const authorizeQ = await instruction.affirm();
+        
+              await authorizeQ.run();*/
+        
+              /* Instructions can be unauthorized (will be withdrawn) or rejected */
+              /* 
+                const unauthorizeQ = await instruction.unauthorize();
+                await unauthorizeQ.run();
+                
+                const rejectQ = await instruction.reject();
+                await rejectQ.run();
+              */
+
+
+        await api.disconnect();
+  }
+  // npx ts-node src/polymesh.ts transferSharesTwoLegSwap
+  async function transferSharesTwoLegSwap() {
+
+    console.log('Connecting to the node...\n\n');
+    let api: Polymesh = await getConnection(mnemonicString);
+  
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    const identity = await api.getSigningIdentity();
+
+    const venue: Venue = await api.settlements.getVenue({ id: new BigNumber(468) });  
+    console.log("venue ID is " + venue.id);
+
+              console.log("Now going to send transaction");
+        
+              // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+              const bob = await api.identities.getIdentity({ did: "0x4d241b9bc81837e1dc6e92562d14cfd86da1fe995a57623d9c69a2e75bca0272" });
+        
+              //const destinationPortfolio = await bob.portfolios.getPortfolio({ portfolioId: new BigNumber(1) });
+
+              const instructionQ = await venue.addInstruction({
+                legs: [
+                  {
+                    from: "0xfd38c10a0ed8c81212698d02afcb0abfc9c9a80b57619682e9feb6706f71daa5", // passing the Identity (or did) means the default portfolio will be used
+                    to: "0x4d241b9bc81837e1dc6e92562d14cfd86da1fe995a57623d9c69a2e75bca0272", // or you can pass a Portfolio
+                    amount: new BigNumber(900),
+                    asset: 'POLYMESH21',
+                  },
+                  {
+                    to: "0xfd38c10a0ed8c81212698d02afcb0abfc9c9a80b57619682e9feb6706f71daa5", // passing the Identity (or did) means the default portfolio will be used
+                    from: "0x4d241b9bc81837e1dc6e92562d14cfd86da1fe995a57623d9c69a2e75bca0272", // or you can pass a Portfolio
+                    amount: new BigNumber(50),
+                    asset: 'POLYMESH22',
+                  },                  
+                ],
+                //endBlock: new BigNumber(10000000),
+                tradeDate: new Date('12/25/2023'),
+              });
+
+              console.log('Creating Instruction...\n');
+              const instruction = await instructionQ.run();
+        
+              /* Pending Instructions can be fetched */
+              // const pendingInstructions = await venue.getPendingInstructions();
+
+              const details = await instruction.details();
+              console.log(`Instruction Created! Creation Date: ${details.createdAt}  Status:${details.status}   instruction ID: ${instruction.id}  `);
+
+              const affirmations = await instruction.getAffirmations();
+
+              console.log("");
+              console.log("Afirmations .......");
+              affirmations.data.forEach((obj: InstructionAffirmation) => {
+                  console.log(  obj.identity.did + " " + obj.status  );
+              });
+
+              console.log("");
+              console.log("Legs Data .........");
+              const legs = await instruction.getLegs();
+              legs.data.forEach((obj2) => {
+                  console.log("asset:" + obj2.asset.ticker + " amount" + obj2.amount + " from:" + obj2.from.owner.did + " to:" + obj2.to.owner.did );
+              });
+
+              console.log("statuses.......");
+              const isPenidng = await instruction.isPending();
+              const isExe = await instruction.isExecuted();
+              const status = await instruction.getStatus();
+              console.log("Pending:" + isPenidng + "  isExeucted:" + isExe + " Status:" + status.status);
+        
+              /*const authorizeQ = await instruction.affirm();
+        
+              await authorizeQ.run();*/
+        
+              /* Instructions can be unauthorized (will be withdrawn) or rejected */
+              /* 
+                const unauthorizeQ = await instruction.unauthorize();
+                await unauthorizeQ.run();
+                
+                const rejectQ = await instruction.reject();
+                await rejectQ.run();
+              */
+
+
+    await api.disconnect();
+  }
+  // npx ts-node src/polymesh.ts getPendingDistriction
+  async function getPendingDistriction() {
+    console.log('Connecting to the node...\n\n');
+    let api: Polymesh = await getConnection(mnemonicString);
+
+    const venue: Venue = await api.settlements.getVenue({ id: new BigNumber(468) });    
+    console.log(venue.id);
+
+    const instructions = await venue.getInstructions();
+    const pendingInstructions: Instruction[] = instructions.pending;    
+
+    const targetInstruction = pendingInstructions.find((instruction: Instruction) => {
+        return instruction.id.isEqualTo(new BigNumber(815));
+    });
+    const det = await targetInstruction?.details()
+
+    console.log("instruction venue id is " + det?.venue.id)
+
+    const affirmations =  await targetInstruction?.getAffirmations();
+    console.log("");
+    console.log("Afirmations .......");
+    affirmations?.data.forEach((obj: InstructionAffirmation) => {
+        console.log( obj.identity.did + " " + obj.status + " "  );
+    });
+
+
+    const stat = await targetInstruction?.isExecuted()
+    console.log("is Executed : " + stat);
+
+    const stat2 = await targetInstruction?.isPending()
+    console.log("is Pending : " + stat2);
+    
+
+
+    const legs = await targetInstruction?.getLegs();
+    console.log("Leg Count - " + legs?.count);
+    legs?.data.forEach((obj)=> {
+        console.log(obj.amount + " " + obj.asset.ticker + " " + obj.from.owner.did + " " + obj.to.owner.did);
+    })
+
+    await api.disconnect();    
+    
+  }
+  // npx ts-node src/polymesh.ts affirmInstruction
+  async function affirmInstruction() {
+    console.log('Connecting to the node...\n\n');
+    let api: Polymesh = await getConnection(mnemonicString2);
+
+    const venue: Venue = await api.settlements.getVenue({ id: new BigNumber(468) });    
+    console.log( "venue id is "+ venue.id );
+
+    const instructions = await venue.getInstructions();
+    const pendingInstructions: Instruction[] = instructions.pending;    
+
+    const targetInstruction = pendingInstructions.find((instruction: Instruction) => {
+      return instruction.id.isEqualTo(new BigNumber(802));
+    });
+
+    console.log("affirming the instruction");
+    const acceptQueue = await targetInstruction?.affirm();
+    await acceptQueue?.run();
+    
+    //console.log("Re-scheduling the instruction");
+    //await targetInstruction?.reschedule();
+
+    await api.disconnect();   
+  }
+  // npx ts-node src/polymesh.ts rescheduleInstruction  
+  async function rescheduleInstruction() {
+    console.log('Connecting to the node...\n\n');
+    let api: Polymesh = await getConnection("run swarm rotate impact knife ice steel hip enough envelope pigeon recycle");
+
+    const venue: Venue = await api.settlements.getVenue({ id: new BigNumber(468) });    
+
+
+    const instructions = await venue.getInstructions();
+    const pendingInstructions: Instruction[] = instructions.pending;    
+
+    // 738
+    const targetInstruction = pendingInstructions.find((instruction: Instruction) => {
+      return instruction.id.isEqualTo(new BigNumber(767));
+    });
+    
+    console.log("Re-scheduling the instruction");
+    await targetInstruction?.reschedule();
+
+    await api.disconnect();   
+  }
+ // npx ts-node src/polymesh.ts rejectInstruction  
+  async function rejectInstruction() {
+    console.log('Connecting to the node for rejection...\n\n');
+    let api: Polymesh = await getConnection(mnemonicString);
+
+    const venue: Venue = await api.settlements.getVenue({ id: new BigNumber(468) });    
+
+    const instructions = await venue.getInstructions();
+    const pendingInstructions: Instruction[] = instructions.pending;    
+
+    const targetInstruction = pendingInstructions.find((instruction: Instruction) => {
+      return instruction.id.isEqualTo(new BigNumber(822));
+    });
+    console.log( "Instruction ID is " + targetInstruction?.id )
+    console.log(  await targetInstruction?.getStatus()  );
+
+    
+    console.log("rejecting the instruction");
+    const insi = await targetInstruction?.reject();
+    await insi?.run();
+
+    await api.disconnect();   
+  }
+
+
+
+
+  // --------------- Portfolio -------------------------
+  // npx ts-node src/polymesh.ts createPortfolio
+  async function createPortfolio() {
+    console.log('Connecting to the node...\n\n');
+    let api: Polymesh = await getConnection("riot arm extra another way tumble clump between city pottery chronic lumber");
+
+    const coldPortfolio: TransactionQueue<NumberedPortfolio> = await api.identities.createPortfolio({
+      "name": "Cold Storage"
+    });
+    const coldFolio: NumberedPortfolio = await coldPortfolio.run();
+
+    console.log( coldFolio.id.toString() );
+
+    await api.disconnect();    
+  }
+  // npx ts-node src/polymesh.ts getPortfolio  
+  async function getPortfolio() {
+    console.log('Connecting to the node...\n\n');
+    let api: Polymesh = await getConnection(mnemonicString);
+
+    const idds =  await api.getSigningIdentity();
+    
+    const coldStore = await  idds?.portfolios.getPortfolio({
+      "portfolioId": new BigNumber(new BigNumber(2))
+    });
+
+    var balance = await coldStore?.getAssetBalances();
+    balance?.forEach((obj)=> {
+      console.log( obj.asset.ticker + " " + obj.total.toString() + " " )      
+    })  
+
+    await api.disconnect();    
+  }
+  // npx ts-node src/polymesh.ts transferBalanceToPortfolio  
+  async function transferBalanceToPortfolio() {
+    let api: Polymesh = await getConnection("riot arm extra another way tumble clump between city pottery chronic lumber");
+
+    const idds =  await api.getSigningIdentity();
+
+    console.log(idds?.did);
+
+    const defaultPortfolio = await idds?.portfolios.getPortfolio();
+
+    const bb = await defaultPortfolio?.getAssetBalances({"assets": ["POLYMESH21"]});
+    bb?.forEach((obj: PortfolioBalance)=> {
+      console.log( obj.asset.ticker + " " + obj.total );
+    })
+
+    const coldStore = await  idds?.portfolios.getPortfolio({
+      "portfolioId": new BigNumber(new BigNumber(2))
+    });
+
+    console.log("Moving funds to cold storage");
+    const moveQueue = await defaultPortfolio?.moveFunds({
+      "items": [
+          {
+              "asset": "POLYMESH21",
+              "amount": new BigNumber("500")
+          }
+      ],
+      "to": coldStore
+    });
+    await moveQueue?.run();
+
+    var balance = await coldStore?.getAssetBalances();
+    balance?.forEach((obj: PortfolioBalance)=> {
+      console.log( obj.asset.ticker + " " + obj.total );
+    })
+    
+    await api.disconnect(); 
+
+  }
 
 
 
@@ -282,13 +740,24 @@ else if(args[0] == "removeAssetRestrictions" )
 
   // npx ts-node src/polymesh.ts cantransferassetbetweenidentities  
   async function cantransferassetbetweenidentities() {
+      // 0x4d241b9bc81837e1dc6e92562d14cfd86da1fe995a57623d9c69a2e75bca0272  waqas
+      // 0xfd38c10a0ed8c81212698d02afcb0abfc9c9a80b57619682e9feb6706f71daa5  shahzad
+      // 0x7f4252259c0baf9b0af41f2b4040768ed6160f1a1f61b8f2202f60c120e390d1  exchange    
+
       let api: Polymesh = await getConnection(mnemonicString);
       
-      let asset: Asset = await api.assets.getAsset({"ticker": "POLYMESH22"});
+      let asset: Asset = await api.assets.getAsset({"ticker": "POLYMESH21"});
 
       const data = await asset.settlements.canTransfer({to:"0x4d241b9bc81837e1dc6e92562d14cfd86da1fe995a57623d9c69a2e75bca0272", amount: new BigNumber("1".toString()) })
 
       console.log(data);
+      console.log( data.result )
+      data.compliance.requirements.forEach((obj)=>{
+          console.log(  obj.id  + " " + obj.complies ) 
+          obj.conditions.forEach((obj2)=> {
+              console.log(obj2.complies + " " + obj2.condition.target + " " + obj2.condition.type );
+          })
+      })
 
       api.disconnect();
   }
@@ -664,30 +1133,13 @@ else if(args[0] == "removeAssetRestrictions" )
                       "code": CountryCode.Pk,
                       "scope": {
                           "type": ScopeType.Ticker,
-                          "value": "POLYMESH22"
+                          "value": "POLYMESH21"
                       }
                   },
                   "expiry": nextYear,
                   "target": "0x4d241b9bc81837e1dc6e92562d14cfd86da1fe995a57623d9c69a2e75bca0272"
               },
               {
-                "claim": {
-                    "type": ClaimType.Jurisdiction,
-                    "code": CountryCode.Pk,
-                    "scope": {
-                        "type": ScopeType.Ticker,
-                        "value": "POLYMESH22"
-                    }
-                },
-                "expiry": nextYear,
-                "target": "0x4d241b9bc81837e1dc6e92562d14cfd86da1fe995a57623d9c69a2e75bca0272"
-              }              
-          ]
-      });
-
-      /*const claimQueue: TransactionQueue<void> = await api.claims.addClaims({
-        "claims": [
-            {
                 "claim": {
                     "type": ClaimType.KnowYourCustomer,
                     "scope": {
@@ -697,6 +1149,22 @@ else if(args[0] == "removeAssetRestrictions" )
                 },
                 "expiry": nextYear,
                 "target": "0x4d241b9bc81837e1dc6e92562d14cfd86da1fe995a57623d9c69a2e75bca0272"
+            }             
+          ]
+      }); 
+
+      /*const claimQueue: TransactionQueue<void> = await api.claims.addClaims({
+        "claims": [
+            {
+                "claim": {
+                    "type": ClaimType.KnowYourCustomer,
+                    "scope": {
+                        "type": ScopeType.Ticker,
+                        "value": "POLYMESH22"
+                    }
+                },
+                "expiry": nextYear,
+                "target": "0xfd38c10a0ed8c81212698d02afcb0abfc9c9a80b57619682e9feb6706f71daa5"
             }
         ]
       });*/

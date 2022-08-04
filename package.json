@@ -17,6 +17,7 @@
   "author": "Shahzad Aslam",
   "license": "Private",
   "dependencies": {
+    "@polkadot/api": "^5.1.1",
     "@polymathnetwork/local-signing-manager": "^1.0.5",
     "@polymathnetwork/polymesh-sdk": "^14.0.0",
     "@tangany/waas": "^1.3.1",
@@ -52,3 +53,5 @@
     "typescript": "^4.6.4"
   }
 }
+
+
