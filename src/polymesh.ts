@@ -1,17 +1,17 @@
-import { BigNumber, Polymesh } from '@polymathnetwork/polymesh-sdk';
-import { LocalSigningManager } from '@polymathnetwork/local-signing-manager';
-import { Asset } from '@polymathnetwork/polymesh-sdk/api/entities/Asset';
+import { BigNumber, Polymesh } from '@polymeshassociation/polymesh-sdk';
+import { LocalSigningManager } from '@polymeshassociation/local-signing-manager';
+import { Asset } from @polymeshassociation/polymesh-sdk/api/entities/Asset';
 import { Account, Portfolio, TickerReservation, toggleFreezeOffering } from '@polymathnetwork/polymesh-sdk/internal';
 
 import { AuthorizationRequest, Leg, ClaimType, ConditionTarget, ConditionType, CountryCode, DistributionWithDetails, GroupedInstructions, Identity, Instruction, InstructionAffirmation, KnownAssetType, ModuleName, Offering, OfferingWithDetails, PermissionType, ScopeType, SecurityIdentifierType, TransactionQueue, Venue, VenueType, ResultSet, InstructionDetails, NumberedPortfolio, DefaultPortfolio, PortfolioBalance } from '@polymathnetwork/polymesh-sdk/types';
-import { Compliance } from '@polymathnetwork/polymesh-sdk/api/entities/Asset/Compliance';
-import { Requirements } from '@polymathnetwork/polymesh-sdk/api/entities/Asset/Compliance/Requirements';
-import { Identify } from 'libp2p/src/identify/message';
-import { ClaimData } from '@polymathnetwork/polymesh-sdk/types';
-import { prepareReclaimDividendDistributionFunds } from '@polymathnetwork/polymesh-sdk/api/procedures/reclaimDividendDistributionFunds';
-import { createCreateVenueResolver } from '@polymathnetwork/polymesh-sdk/api/procedures/createVenue';
-import { Distributions } from '@polymathnetwork/polymesh-sdk/api/entities/Asset/CorporateActions/Distributions';
-import { AccountManagement } from '@polymathnetwork/polymesh-sdk/AccountManagement';
+import { Compliance } from '@polymeshassociation/polymesh-sdk/api/entities/Asset/Compliance';
+import { Requirements } from '@polymeshassociation/polymesh-sdk/api/entities/Asset/Compliance/Requirements';
+//import { Identify } from 'libp2p/src/identify/message';
+import { ClaimData } from '@polymeshassociation/polymesh-sdk/types';
+import { prepareReclaimDividendDistributionFunds } from '@polymeshassociation/polymesh-sdk/api/procedures/reclaimDividendDistributionFunds';
+import { createCreateVenueResolver } from '@polymeshassociation/polymesh-sdk/api/procedures/createVenue';
+import { Distributions } from '@polymeshassociation/polymesh-sdk/api/entities/Asset/CorporateActions/Distributions';
+import { AccountManagement } from '@polymeshassociation/polymesh-sdk/AccountManagement';
 
 const mnemonicString = "riot arm extra another way tumble clump between city pottery chronic lumber";
 const mnemonicString2 = "run swarm rotate impact knife ice steel hip enough envelope pigeon recycle";
@@ -556,16 +556,17 @@ else if(args[0] == "rejectInstruction" )
 
     const defaultPortfolio = await idds?.portfolios.getPortfolio();
 
-    const bb = await defaultPortfolio?.getAssetBalances({"assets": ["POLYMESH21"]});
+    const bb = await defaultPortfolio?.getAssetBalances({"assets": ["POLYMESH51"]});
+    console.log( bb?.length )
     bb?.forEach((obj: PortfolioBalance)=> {
-      console.log( obj.asset.ticker + " " + obj.total );
+      console.log( "--" + obj.asset.ticker + " " + obj.total );
     })
 
     const coldStore = await  idds?.portfolios.getPortfolio({
       "portfolioId": new BigNumber(new BigNumber(2))
     });
 
-    console.log("Moving funds to cold storage");
+    /*console.log("Moving funds to cold storage");
     const moveQueue = await defaultPortfolio?.moveFunds({
       "items": [
           {
@@ -575,7 +576,7 @@ else if(args[0] == "rejectInstruction" )
       ],
       "to": coldStore
     });
-    await moveQueue?.run();
+    await moveQueue?.run();*/
 
     var balance = await coldStore?.getAssetBalances();
     balance?.forEach((obj: PortfolioBalance)=> {

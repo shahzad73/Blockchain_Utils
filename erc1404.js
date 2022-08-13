@@ -1,7 +1,9 @@
 'use strict'  
 const Web3 = require('web3');
 var dotenv =  require('dotenv')
-dotenv.load({path: __dirname + '/config.txt'});
+console.log(__dirname)
+dotenv.config({path: __dirname + '/config.txt'});
+
 
 const async = require('async');
 const mysql = require("./modules/mysql");
