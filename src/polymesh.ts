@@ -7,7 +7,7 @@ import { AuthorizationRequest, Leg, ClaimType, ConditionTarget, ConditionType, C
 import { Compliance } from '@polymeshassociation/polymesh-sdk/api/entities/Asset/Compliance';
 import { Requirements } from '@polymeshassociation/polymesh-sdk/api/entities/Asset/Compliance/Requirements';
 //import { Identify } from 'libp2p/src/identify/message';
-import { ClaimData } from '@polymeshassociation/polymesh-sdk/types';
+import { ClaimData, InstructionStatus } from '@polymeshassociation/polymesh-sdk/types';
 import { prepareReclaimDividendDistributionFunds } from '@polymeshassociation/polymesh-sdk/api/procedures/reclaimDividendDistributionFunds';
 import { createCreateVenueResolver } from '@polymeshassociation/polymesh-sdk/api/procedures/createVenue';
 import { Distributions } from '@polymeshassociation/polymesh-sdk/api/entities/Asset/CorporateActions/Distributions';
@@ -269,7 +269,7 @@ else if(args[0] == "rejectInstruction" )
               });
 
               console.log('Creating Instruction...\n');
-              const instruction = await instructionQ.run();
+              const instruction = await instructionQ.run()
         
               /* Pending Instructions can be fetched */
               // const pendingInstructions = await venue.getPendingInstructions();
