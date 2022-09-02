@@ -35,8 +35,6 @@
     "openpgp": "^5.4.0",
     "ravencoin-core": "^1.2.2",
     "ravencoin-zmq-decoder": "^1.0.2",
-    "ravencore-lib": "^1.0.3",
-    "raw-transaction-decoder": "^1.0.6",
     "request": "^2.88.0",
     "solc": "^0.8.16",
     "stellar-sdk": "^10.1.2",

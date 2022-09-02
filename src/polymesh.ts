@@ -1,17 +1,32 @@
 import { BigNumber, Polymesh } from '@polymeshassociation/polymesh-sdk';
 import { LocalSigningManager } from '@polymeshassociation/local-signing-manager';
-import { Asset } from @polymeshassociation/polymesh-sdk/api/entities/Asset';
-import { Account, Portfolio, TickerReservation, toggleFreezeOffering } from '@polymathnetwork/polymesh-sdk/internal';
 
-import { AuthorizationRequest, Leg, ClaimType, ConditionTarget, ConditionType, CountryCode, DistributionWithDetails, GroupedInstructions, Identity, Instruction, InstructionAffirmation, KnownAssetType, ModuleName, Offering, OfferingWithDetails, PermissionType, ScopeType, SecurityIdentifierType, TransactionQueue, Venue, VenueType, ResultSet, InstructionDetails, NumberedPortfolio, DefaultPortfolio, PortfolioBalance } from '@polymathnetwork/polymesh-sdk/types';
-import { Compliance } from '@polymeshassociation/polymesh-sdk/api/entities/Asset/Compliance';
-import { Requirements } from '@polymeshassociation/polymesh-sdk/api/entities/Asset/Compliance/Requirements';
 //import { Identify } from 'libp2p/src/identify/message';
-import { ClaimData, InstructionStatus } from '@polymeshassociation/polymesh-sdk/types';
+import { Account, AuthorizationRequest, ClaimData, CountryCode, Instruction, InstructionStatus } from '@polymeshassociation/polymesh-sdk/types';
 import { prepareReclaimDividendDistributionFunds } from '@polymeshassociation/polymesh-sdk/api/procedures/reclaimDividendDistributionFunds';
 import { createCreateVenueResolver } from '@polymeshassociation/polymesh-sdk/api/procedures/createVenue';
 import { Distributions } from '@polymeshassociation/polymesh-sdk/api/entities/Asset/CorporateActions/Distributions';
-import { AccountManagement } from '@polymeshassociation/polymesh-sdk/AccountManagement';
+
+
+import { Asset } from "@polymeshassociation/polymesh-sdk/api/entities/Asset";
+import {
+  KnownAssetType,
+  TransactionQueue,
+  ClaimType,
+  ConditionTarget,
+  ConditionType,
+  ScopeType,
+  Venue,
+  VenueType,
+  PortfolioBalance,
+  NumberedPortfolio,
+  InstructionAffirmation,
+} from "@polymeshassociation/polymesh-sdk/types";
+import { Compliance } from "@polymeshassociation/polymesh-sdk/api/entities/Asset/Compliance";
+import { Requirements } from "@polymeshassociation/polymesh-sdk/api/entities/Asset/Compliance/Requirements";
+
+
+
 
 const mnemonicString = "riot arm extra another way tumble clump between city pottery chronic lumber";
 const mnemonicString2 = "run swarm rotate impact knife ice steel hip enough envelope pigeon recycle";
@@ -133,7 +148,7 @@ else if(args[0] == "rejectInstruction" )
     // Attestations are attached with this account
     console.log(" Polymesh account: What is/are your username(s)? Polymesh 'decentralised ID' (DID) - ")
     console.log( identity.did );
-    console.log("JSON - " + identity.toJson())     //same as above
+    console.log("JSON - " + identity.did)     //same as above
 
     console.log("");
 
@@ -145,9 +160,9 @@ else if(args[0] == "rejectInstruction" )
 
     // get all secondary accounts 
     var accounts = await identity.getSecondaryAccounts();
-    accounts.forEach(obj=> {
+    /*accounts.forEach(obj=> {
       console.log( obj.account.address );
-    })
+    })*/
 
 
     // This is how you can decided if a public key has any account associated with it or not
@@ -410,7 +425,7 @@ else if(args[0] == "rejectInstruction" )
     const pendingInstructions: Instruction[] = instructions.pending;    
 
     const targetInstruction = pendingInstructions.find((instruction: Instruction) => {
-        return instruction.id.isEqualTo(new BigNumber(815));
+        return instruction.id.isEqualTo(new BigNumber(940));
     });
     const det = await targetInstruction?.details()
 
@@ -434,7 +449,7 @@ else if(args[0] == "rejectInstruction" )
 
     const legs = await targetInstruction?.getLegs();
     console.log("Leg Count - " + legs?.count);
-    legs?.data.forEach((obj)=> {
+    legs?.data.forEach((obj: any)=> {
         console.log(obj.amount + " " + obj.asset.ticker + " " + obj.from.owner.did + " " + obj.to.owner.did);
     })
 
@@ -453,7 +468,7 @@ else if(args[0] == "rejectInstruction" )
     const pendingInstructions: Instruction[] = instructions.pending;    
 
     const targetInstruction = pendingInstructions.find((instruction: Instruction) => {
-      return instruction.id.isEqualTo(new BigNumber(802));
+      return instruction.id.isEqualTo(new BigNumber(943));
     });
 
     console.log("affirming the instruction");
@@ -825,7 +840,7 @@ else if(args[0] == "rejectInstruction" )
     console.log(balance.total);
 
     let accounts = await api.accountManagement.getSigningAccounts();
-    console.log(  "Signing Accout - " + accounts[0].toJson()   );
+    //console.log(  "Signing Accout - " + (await accounts[0].getIdentity().did )   );
 
     console.log("IsFrozen ---")
     console.log(    await accounts[0].isFrozen()   );    
