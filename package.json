@@ -17,8 +17,7 @@
   "author": "Shahzad Aslam",
   "license": "Private",
   "dependencies": {
-    "@polymeshassociation/local-signing-manager": "^1.1.0",
-    "@polymeshassociation/polymesh-sdk": "^15.0.0",
+    "@polymeshassociation/local-signing-manager": "^1.2.0",
     "@tangany/waas": "^1.5.0",
     "abi-decoder": "^2.4.0",
     "async": "^3.2.4",
@@ -40,10 +39,11 @@
     "stellar-sdk": "^10.1.2",
     "unirest": "^0.6.0",
     "utf8": "^3.0.0",
-    "web3": "^0.20.7"
+    "web3": "^1.8.0"
   },
   "devDependencies": {
     "@tsconfig/node16": "^1.0.3",
+    "@types/web3": "^1.2.2",
     "mocha": "^10.0.0",
     "should": "^13.2.3",
     "ts-node": "^10.9.1",

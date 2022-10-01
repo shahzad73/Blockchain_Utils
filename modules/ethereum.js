@@ -1,6 +1,6 @@
 const Web3 = require('web3');
 const ethereumjs = require('ethereumjs-tx');
-var Accounts = require('web3-eth-accounts');
+//var Accounts = require('web3-eth-accounts');
 const async = require('async');
 const abiDecoder = require('abi-decoder');
 

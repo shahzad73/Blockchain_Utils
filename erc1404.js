@@ -4,13 +4,13 @@ var dotenv =  require('dotenv')
 console.log(__dirname)
 dotenv.config({path: __dirname + '/config.txt'});
 
-
 const async = require('async');
-const mysql = require("./modules/mysql");
+//const mysql = require("./modules/mysql");
 const ethereum = require("./modules/ethereum");
 const fs = require('fs');
 
-const Tx = require('ethereumjs-tx').Transaction;
+
+//const Tx = require('ethereumjs-tx').Transaction;
 
 const ERC1404Token = JSON.parse(fs.readFileSync("./data/ERC1404.json", "utf8")); 
 
@@ -64,7 +64,9 @@ if (process.argv[2] == "deployERC1404") {
 	
 	(async () => {
 
-		var web3 = new Web3(new Web3.providers.HttpProvider(linkToBlockchainServer));
+		var web3 = new Web3.providers.HttpProvider(linkToBlockchainServer);
+
+		
 
 		  const encodedParameters = web3.eth.abi.encodeParameters(
 			['uint256', 'string', 'string', 'uint256', 'uint256', 'string', 'string', 'string'],
