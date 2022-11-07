@@ -5,6 +5,18 @@ const {
     mnemonicValidate,
     naclKeypairFromSeed
   } = require('@polkadot/util-crypto');
+  import { ApiPromise, WsProvider } from '@polkadot/api';
+
+  const {
+    naclDecrypt,
+    naclEncrypt,
+    randomAsU8a
+  } = require('@polkadot/util-crypto');
+  const {
+    stringToU8a,
+    u8aToString
+  } = require('@polkadot/util');
+
 
 var args = process.argv.slice(2);
 
@@ -28,7 +40,41 @@ async function test(): Promise<void> {
   // Create valid Substrate-compatible seed from mnemonic
   const seedAlice = mnemonicToMiniSecret(mnemonicAlice);
 
-  // Generate new public/secret keypair for Alice from the supplied seed
-  const { publicKey, secretKey } = naclKeypairFromSeed(seedAlice);
+  const wsProvider = new WsProvider('wss://rpc.polkadot.io');
+  const api = await ApiPromise.create({ provider: wsProvider });
+  console.log(api.genesisHash.toHex());
+
+  const bbb = api.rpc.eth.blockNumber();
+  console.log(bbb);
+
+  // Retrieve the chain & node information information via rpc calls
+  const [chain, nodeName, nodeVersion] = await Promise.all([
+    api.rpc.system.chain(),
+    api.rpc.system.name(),
+    api.rpc.system.version()
+  ]);
+
+
+  const secret = randomAsU8a();
+  const messagePreEncryption = stringToU8a('super secret message');
+
+  // Encrypt the message
+  const { encrypted, nonce } = naclEncrypt(messagePreEncryption, secret);
+
+  // Show contents of the encrypted message
+  console.log(`Encrypted message: ${JSON.stringify(encrypted, null, 2)}`);
+
+  // Decrypt the message
+  const messageDecrypted = naclDecrypt(encrypted, nonce, secret);
+
+  // Convert each Uint8Array to a string for comparison
+  const isMatch = u8aToString(messagePreEncryption) === u8aToString(messageDecrypted);
+
+  // Verify that the decrypted message matches the original message
+  console.log(`Does the decrypted message match the original message? ${isMatch}`);
+
+
+  console.log(`You are connected to chain ${chain} using ${nodeName} v${nodeVersion}`);
+
 }
 

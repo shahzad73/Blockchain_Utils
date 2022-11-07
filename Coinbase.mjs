@@ -1,12 +1,117 @@
 'use strict'  
 
-var Client = require('coinbase').Client;
+//var Client = require("coinbase").Client;
+import fetch from 'node-fetch';
 
-var client = new Client({   
-    'apiKey': 'sOPNvFCx3q7WO30K',                         
-    'apiSecret': 'UBiXSufO81bUwlbrdq8lDIanQruZFoDe',
-    'strictSSL': false
+
+/*
+const url = 'https://api.prime.coinbase.com/v1/portfolios';
+const options = {
+  method: 'GET',
+  headers: {
+    accept: 'application/json',
+    'X-CB-ACCESS-KEY': 'ZdlFsitVWo4=IS4UU08Gq4TMJOFj5QL6mXiGEF+QpJy03PMANJXDYss=',
+    'X-CB-ACCESS-PASSPHRASE': '5Rb5KFBCGLQ=PT5+nIbmlPPwcHcciV/E5A==7',
+    'X-CB-ACCESS-SIGNATURE': '',
+    'X-CB-ACCESS-TIMESTAMP': '1667585222'
+  }
+};
+
+
+fetch(url, options)
+  .then(res => res.json())
+  .then(json => {
+      console.log("............")
+      console.log(json)
+  })
+  .catch(err => {
+      console.log("............");
+      console.error('error:' + err)
+  });
+*/
+
+
+
+import https from 'https';
+import CryptoJS from 'crypto-js';
+
+
+
+const SIGNING_KEY = "/NqFL5Fk4qM=uDxzGU57Od6vOhVKEIfsuVbnpc/MnBrvmNu0o6oY/hxsnpiD5A3HnzOJcP9IZ/hCYjdFXSsltcGAL28jdc+2FQ==";
+const ACCESS_KEY = "ZdlFsitVWo4=hQciKIegZCERuIqF+fTsTwZW0WQKNAXF9Qt3C5yqChs=";
+const PASSPHRASE = "5Rb5KFBCGLQ=rujyr2wOZMlctY/67GKaUQ=="
+const REST_METHODS = {
+    GET: 'GET',
+    POST: 'POST',
+    PUT: 'PUT',
+    DELETE: 'DELETE',
+};
+
+
+const PROD_URL = 'api.prime.coinbase.com';
+// The path of the API endpoint being called                    
+let requestPath = `/v1/portfolios}`;
+// The method of the request: GET, POST, PUT, DELETE, etc
+let method = REST_METHODS.GET;
+// Request signatures require a current UNIX timestamp in seconds that is
+// embedded in the signed payload to verify against server clock.
+const currentTimeInSecs = Math.floor(Date.now() / 1000);
+// Body will be JSON (POST) or empty string (GET)
+const body = '';
+// Function to generate a signature using CryptoJS
+function sign(str, secret) {
+    const hash = CryptoJS.HmacSHA256(str, secret);
+    return hash.toString(CryptoJS.enc.Base64);
+}
+// Function to build the payload required to sign
+function buildPayload(ts, method, requestPath, body) {
+    return `${ts}${method}${requestPath}${body}`;
+}
+// Build the string we want to sign using information defined above
+const strToSign = buildPayload(currentTimeInSecs, method, requestPath, body);
+// Sign it!
+const sig = sign(strToSign, SIGNING_KEY);
+// Use Postman's scripting objects to append the header values
+const headers = new Map();
+headers.set('X-CB-ACCESS-KEY', ACCESS_KEY);
+headers.set('X-CB-ACCESS-PASSPHRASE', PASSPHRASE);
+headers.set('X-CB-ACCESS-SIGNATURE', sig);
+headers.set('X-CB-ACCESS-TIMESTAMP', currentTimeInSecs);
+headers.set('Content-Type', 'application/json');
+const requestOptions = {
+    hostname: PROD_URL,
+    path: requestPath,
+    method: REST_METHODS.GET,
+    headers: Object.fromEntries(headers),
+};
+https.get(requestOptions, res => {
+    let data = [];
+    console.log('Status Code:', res.statusCode);
+    res.on('data', chunk => {
+        data.push(chunk);
+    });
+    res.on('end', () => {
+        console.log('Response ended: ');
+        const parsedResponse = Buffer.concat(data).toString();
+        console.log(parsedResponse);
+    });
+}).on('error', err => {
+    console.log('Error: ', err.message);
 });
+
+
+
+
+
+
+/*var client = new Client({   
+    'apiKey': 'C4q5uoU0KAmSytBt',                         
+    'apiSecret': 'kBEs9olucHpc4RwDy3xugATffWTSy7uE',
+    'strictSSL': false
+});*/
+
+
+// https://api.coinbase.com/v2/accounts/:account_id/addresses
 
 
 /*client.getAccounts({}, function(err, accounts) {
@@ -74,7 +179,7 @@ b8d95608-af81-50e0-8e62-1bac8c356cbc   BTC Wallet    wallet    BTC
 });*/
 
 // get account details
-/*client.getAccount("b8d95608-af81-50e0-8e62-1bac8c356cbc", function(err, account) {
+/*client.getAccount("453b87a0-2f10-58eb-b08e-9310d9d7c22f", function(err, account) {
   console.log(account);
 });*/
 
@@ -92,7 +197,7 @@ b8d95608-af81-50e0-8e62-1bac8c356cbc   BTC Wallet    wallet    BTC
 });*/
 
 //Request Money
-client.getAccount('b8d95608-af81-50e0-8e62-1bac8c356cbc', function(err, account) {
+/*client.getAccount('b8d95608-af81-50e0-8e62-1bac8c356cbc', function(err, account) {
 
     if (err) 
         console.log(err);
@@ -113,7 +218,7 @@ client.getAccount('b8d95608-af81-50e0-8e62-1bac8c356cbc', function(err, account)
 
     } 
 
-});
+});*/
 
 /*client.getExchangeRates({'currency': 'BTC'}, function(err, rates) {
   console.log(rates);
@@ -123,7 +228,7 @@ client.getAccount('b8d95608-af81-50e0-8e62-1bac8c356cbc', function(err, account)
   console.log(currencies);
 });*/
 
-/*client.getAccount('b8d95608-af81-50e0-8e62-1bac8c356cbc', function(err, account) {
+/*client.getAccount('453b87a0-2f10-58eb-b08e-9310d9d7c22f', function(err, account) {
       if(err)
           console.log(err)
       else {
@@ -132,6 +237,12 @@ client.getAccount('b8d95608-af81-50e0-8e62-1bac8c356cbc', function(err, account)
             });
       }
 });*/
+
+
+/*client.getPaymentMethods(function(err, pms) {
+  console.log(pms);
+});*/
+
 
 /*client.getAccount('ddb35f48-12bf-5c45-ad47-8ac8007394dc', function(err, account) {
     if(err) {

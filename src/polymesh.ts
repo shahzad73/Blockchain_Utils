@@ -329,7 +329,7 @@ else if(args[0] == "rejectInstruction" )
 
         await api.disconnect();
   }
-  // npx ts-node src/polymesh.ts transferSharesTwoLegSwap
+  // 1. npx ts-node src/polymesh.ts transferSharesTwoLegSwap
   async function transferSharesTwoLegSwap() {
 
     console.log('Connecting to the node...\n\n');
@@ -353,14 +353,14 @@ else if(args[0] == "rejectInstruction" )
                   {
                     from: "0xfd38c10a0ed8c81212698d02afcb0abfc9c9a80b57619682e9feb6706f71daa5", // passing the Identity (or did) means the default portfolio will be used
                     to: "0x4d241b9bc81837e1dc6e92562d14cfd86da1fe995a57623d9c69a2e75bca0272", // or you can pass a Portfolio
-                    amount: new BigNumber(900),
-                    asset: 'POLYMESH21',
+                    amount: new BigNumber(500),
+                    asset: 'POLYMESH57',
                   },
                   {
                     to: "0xfd38c10a0ed8c81212698d02afcb0abfc9c9a80b57619682e9feb6706f71daa5", // passing the Identity (or did) means the default portfolio will be used
                     from: "0x4d241b9bc81837e1dc6e92562d14cfd86da1fe995a57623d9c69a2e75bca0272", // or you can pass a Portfolio
-                    amount: new BigNumber(50),
-                    asset: 'POLYMESH22',
+                    amount: new BigNumber(100),
+                    asset: 'USDC',
                   },                  
                 ],
                 //endBlock: new BigNumber(10000000),
@@ -425,8 +425,16 @@ else if(args[0] == "rejectInstruction" )
     const pendingInstructions: Instruction[] = instructions.pending;    
 
     const targetInstruction = pendingInstructions.find((instruction: Instruction) => {
-        return instruction.id.isEqualTo(new BigNumber(940));
+        return instruction.id.isEqualTo(new BigNumber(2828));
     });
+
+    if(targetInstruction == undefined) {
+       console.log("could not found instruction   so it will get NANs")
+    } else {
+      console.log('HURRAY found it')
+    }
+
+
     const det = await targetInstruction?.details()
 
     console.log("instruction venue id is " + det?.venue.id)
@@ -456,7 +464,7 @@ else if(args[0] == "rejectInstruction" )
     await api.disconnect();    
     
   }
-  // npx ts-node src/polymesh.ts affirmInstruction
+  // 2. npx ts-node src/polymesh.ts affirmInstruction
   async function affirmInstruction() {
     console.log('Connecting to the node...\n\n');
     let api: Polymesh = await getConnection(mnemonicString2);
@@ -468,7 +476,7 @@ else if(args[0] == "rejectInstruction" )
     const pendingInstructions: Instruction[] = instructions.pending;    
 
     const targetInstruction = pendingInstructions.find((instruction: Instruction) => {
-      return instruction.id.isEqualTo(new BigNumber(943));
+      return instruction.id.isEqualTo(new BigNumber(2796));
     });
 
     console.log("affirming the instruction");
@@ -512,7 +520,7 @@ else if(args[0] == "rejectInstruction" )
     const pendingInstructions: Instruction[] = instructions.pending;    
 
     const targetInstruction = pendingInstructions.find((instruction: Instruction) => {
-      return instruction.id.isEqualTo(new BigNumber(822));
+      return instruction.id.isEqualTo(new BigNumber(2796));
     });
     console.log( "Instruction ID is " + targetInstruction?.id )
     console.log(  await targetInstruction?.getStatus()  );
