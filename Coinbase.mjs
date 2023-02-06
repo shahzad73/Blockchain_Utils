@@ -35,11 +35,9 @@ fetch(url, options)
 import https from 'https';
 import CryptoJS from 'crypto-js';
 
-
-
-const SIGNING_KEY = "/NqFL5Fk4qM=uDxzGU57Od6vOhVKEIfsuVbnpc/MnBrvmNu0o6oY/hxsnpiD5A3HnzOJcP9IZ/hCYjdFXSsltcGAL28jdc+2FQ==";
-const ACCESS_KEY = "ZdlFsitVWo4=hQciKIegZCERuIqF+fTsTwZW0WQKNAXF9Qt3C5yqChs=";
-const PASSPHRASE = "5Rb5KFBCGLQ=rujyr2wOZMlctY/67GKaUQ=="
+const SIGNING_KEY = "/NqFL5Fk4qM=wiEixOsVDTjgEnWGjOobKWcDzA80ZyTnjuJK2kIc/t4BwXbFRzMYHuLvYZAKEjS9FyP/jQqnQX+F3jaSzhjSkw==";
+const ACCESS_KEY = "ZdlFsitVWo4=enVtGHgP5x2gz3hPtFaIz+4a1rm7OSactqv1m1xrnAs=";
+const PASSPHRASE = "5Rb5KFBCGLQ=dWdAesBSp8wiiM7yCwVXmw=="
 const REST_METHODS = {
     GET: 'GET',
     POST: 'POST',
@@ -48,30 +46,48 @@ const REST_METHODS = {
 };
 
 
+// portfolios id  28980275-647f-4770-8ce1-fe2cac97d351
+// name  Default Portfolio
+// entity_id  c6b97a2d-92f0-4fa4-a198-c007cbd4e249
+// organization_id  efb68d67-02f6-4e80-83bf-65aa610146ce
+
+
 const PROD_URL = 'api.prime.coinbase.com';
-// The path of the API endpoint being called                    
-let requestPath = `/v1/portfolios}`;
-// The method of the request: GET, POST, PUT, DELETE, etc
+
+//let requestPath = `/v1/portfolios`;  //get all portfolios
+//let requestPath = `/v1/portfolios/28980275-647f-4770-8ce1-fe2cac97d351`;   //get single portfolio with id
+//let requestPath = `/v1/portfolios/28980275-647f-4770-8ce1-fe2cac97d351/wallets`;  //get wallets in portfolios
+//let requestPath = `/v1/entities/c6b97a2d-92f0-4fa4-a198-c007cbd4e249/assets`;   //get assets in a entity
+
+// let requestPath = `/v1/entities/c6b97a2d-92f0-4fa4-a198-c007cbd4e249/users`;   //get users in a entity
+// {"users":[{"id":"040133cd-0edb-5d1e-a2ae-57bdf8a5af70","name":"Eric Lord","email":"eric@investorcosmos.com","entity_id":"","role":"ADMIN"}],"pagination":{"next_cursor":"","sort_direction":"DESC","has_next":false}}
+
+//let requestPath = `/v1/portfolios/28980275-647f-4770-8ce1-fe2cac97d351/users`;  //get users in portfolios
+//{"users":[{"id":"040133cd-0edb-5d1e-a2ae-57bdf8a5af70","name":"Eric Lord","email":"eric@investorcosmos.com","portfolio_id":"28980275-647f-4770-8ce1-fe2cac97d351","entity_id":"c6b97a2d-92f0-4fa4-a198-c007cbd4e249","role":"ADMIN"}],"pagination":{"next_cursor":"","sort_direction":"DESC","has_next":false}}
+
+let requestPath = `/v1/portfolios/28980275-647f-4770-8ce1-fe2cac97d351/address_book`;  //get address book in portfolios
+
+
+
 let method = REST_METHODS.GET;
-// Request signatures require a current UNIX timestamp in seconds that is
-// embedded in the signed payload to verify against server clock.
+
 const currentTimeInSecs = Math.floor(Date.now() / 1000);
-// Body will be JSON (POST) or empty string (GET)
+
 const body = '';
-// Function to generate a signature using CryptoJS
+
 function sign(str, secret) {
     const hash = CryptoJS.HmacSHA256(str, secret);
     return hash.toString(CryptoJS.enc.Base64);
 }
-// Function to build the payload required to sign
+
 function buildPayload(ts, method, requestPath, body) {
     return `${ts}${method}${requestPath}${body}`;
 }
-// Build the string we want to sign using information defined above
+
 const strToSign = buildPayload(currentTimeInSecs, method, requestPath, body);
-// Sign it!
+
 const sig = sign(strToSign, SIGNING_KEY);
-// Use Postman's scripting objects to append the header values
+
 const headers = new Map();
 headers.set('X-CB-ACCESS-KEY', ACCESS_KEY);
 headers.set('X-CB-ACCESS-PASSPHRASE', PASSPHRASE);
