@@ -734,7 +734,6 @@ var linkToBlockchainServer = "https://kovan.infura.io/v3/fe41724da6f24b76a782f37
 
 
 
-
 if (process.argv[2] == "getGas") {
     // node EthereumUtils getGas
     

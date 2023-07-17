@@ -11,7 +11,6 @@ import { Distributions } from '@polymeshassociation/polymesh-sdk/api/entities/As
 import { Asset } from "@polymeshassociation/polymesh-sdk/api/entities/Asset";
 import {
   KnownAssetType,
-  TransactionQueue,
   ClaimType,
   ConditionTarget,
   ConditionType,
@@ -30,6 +29,7 @@ import { Requirements } from "@polymeshassociation/polymesh-sdk/api/entities/Ass
 
 const mnemonicString = "riot arm extra another way tumble clump between city pottery chronic lumber";
 const mnemonicString2 = "run swarm rotate impact knife ice steel hip enough envelope pigeon recycle";
+const mnemonicString3 = "monkey orchard pear salon walnut genre obscure fuel van slim night flock";
 
 // 0x4d241b9bc81837e1dc6e92562d14cfd86da1fe995a57623d9c69a2e75bca0272  waqas
 // 0xfd38c10a0ed8c81212698d02afcb0abfc9c9a80b57619682e9feb6706f71daa5  shahzad
@@ -167,15 +167,15 @@ else if(args[0] == "rejectInstruction" )
 
     // This is how you can decided if a public key has any account associated with it or not
     // An account means that account has gone through CDD.  This is my account Shahzad that has already gone through CDD
-    const bobKeyInfo: Account = api.accountManagement.getAccount({
+    const bobKeyInfo = api.accountManagement.getAccount({
       "address": "5H9J6wqHfJr1G4BULZZYvZo5NCq9MpzHKRmawztrUBc1XHis"
     });
-    const shahzad = await bobKeyInfo.getIdentity();
+    /*const shahzad = await bobKeyInfo.getIdentity();
     if(shahzad === null) {
        console.log(" No Account Exists ");
     } else {
       console.log(" Account Exists with DID" +  shahzad.did  );       
-    }
+    }*/
 
     await api.disconnect();
   }
@@ -418,14 +418,14 @@ else if(args[0] == "rejectInstruction" )
     console.log('Connecting to the node...\n\n');
     let api: Polymesh = await getConnection(mnemonicString);
 
-    const venue: Venue = await api.settlements.getVenue({ id: new BigNumber(468) });    
+    const venue: Venue = await api.settlements.getVenue({ id: new BigNumber(1368) });    
     console.log(venue.id);
 
     const instructions = await venue.getInstructions();
     const pendingInstructions: Instruction[] = instructions.pending;    
 
     const targetInstruction = pendingInstructions.find((instruction: Instruction) => {
-        return instruction.id.isEqualTo(new BigNumber(2828));
+        return instruction.id.isEqualTo(new BigNumber(4675));
     });
 
     if(targetInstruction == undefined) {
@@ -467,16 +467,16 @@ else if(args[0] == "rejectInstruction" )
   // 2. npx ts-node src/polymesh.ts affirmInstruction
   async function affirmInstruction() {
     console.log('Connecting to the node...\n\n');
-    let api: Polymesh = await getConnection(mnemonicString2);
+    let api: Polymesh = await getConnection(mnemonicString3);
 
-    const venue: Venue = await api.settlements.getVenue({ id: new BigNumber(468) });    
+    const venue: Venue = await api.settlements.getVenue({ id: new BigNumber(1368) });    
     console.log( "venue id is "+ venue.id );
 
     const instructions = await venue.getInstructions();
     const pendingInstructions: Instruction[] = instructions.pending;    
 
     const targetInstruction = pendingInstructions.find((instruction: Instruction) => {
-      return instruction.id.isEqualTo(new BigNumber(2796));
+      return instruction.id.isEqualTo(new BigNumber(4675));
     });
 
     console.log("affirming the instruction");
@@ -542,7 +542,7 @@ else if(args[0] == "rejectInstruction" )
     console.log('Connecting to the node...\n\n');
     let api: Polymesh = await getConnection("riot arm extra another way tumble clump between city pottery chronic lumber");
 
-    const coldPortfolio: TransactionQueue<NumberedPortfolio> = await api.identities.createPortfolio({
+    const coldPortfolio = await api.identities.createPortfolio({
       "name": "Cold Storage"
     });
     const coldFolio: NumberedPortfolio = await coldPortfolio.run();
@@ -809,7 +809,6 @@ else if(args[0] == "rejectInstruction" )
         isDivisible: true,
         assetType: KnownAssetType.EquityCommon,
         initialSupply: new BigNumber(3000),
-        requireInvestorUniqueness: false        
       });
       
       console.log('Creating Asset...\n');
@@ -827,12 +826,12 @@ else if(args[0] == "rejectInstruction" )
   async function  getTickerInfo() {
     let api: Polymesh = await getConnection(mnemonicString);
 
-    const asset = await api.assets.getTickerReservation({"ticker": "DIGISHARE2"});
+    const asset = await api.assets.getTickerReservation({"ticker": "USDC"});
     const { expiryDate, owner } = await asset.details();
     console.log('Ticker reserved!');
     console.log(`Details:\n- Owner: ${owner?.did}\n- Expiry Date: ${expiryDate}\n`);
 
-    const owner2: Account = api.accountManagement.getAccount({"address": "5H9J6wqHfJr1G4BULZZYvZo5NCq9MpzHKRmawztrUBc1XHis"})
+    const owner2 = api.accountManagement.getAccount({"address": "5H9J6wqHfJr1G4BULZZYvZo5NCq9MpzHKRmawztrUBc1XHis"})
     //console.log(owner2.);
 
     await api.disconnect();
@@ -868,7 +867,7 @@ else if(args[0] == "rejectInstruction" )
     const identity = (await api.getSigningIdentity())!;
     console.log("signing identity of API - " + identity.did)
 
-    let asset: Asset = await api.assets.getAsset({"ticker": "POLYMESH21"});
+    let asset: Asset = await api.assets.getAsset({"ticker": "USDC"});
     console.log("Asset TICKER - " + asset.ticker)
 
 
@@ -1149,7 +1148,7 @@ else if(args[0] == "rejectInstruction" )
 
       const nextYear: Date = new Date();
       nextYear.setFullYear(nextYear.getFullYear() + 1);
-      const claimQueue: TransactionQueue<void> = await api.claims.addClaims({
+      const claimQueue = await api.claims.addClaims({
           "claims": [
               {
                   "claim": {
