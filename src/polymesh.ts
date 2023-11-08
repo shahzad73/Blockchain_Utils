@@ -2,7 +2,7 @@ import { BigNumber, Polymesh } from '@polymeshassociation/polymesh-sdk';
 import { LocalSigningManager } from '@polymeshassociation/local-signing-manager';
 
 //import { Identify } from 'libp2p/src/identify/message';
-import { Account, AuthorizationRequest, ClaimData, CountryCode, Instruction, InstructionStatus } from '@polymeshassociation/polymesh-sdk/types';
+import { Account, AuthorizationRequest, Checkpoint, ClaimData, CountryCode, DistributionWithDetails, DividendDistribution, Instruction, InstructionStatus, TargetTreatment } from '@polymeshassociation/polymesh-sdk/types';
 import { prepareReclaimDividendDistributionFunds } from '@polymeshassociation/polymesh-sdk/api/procedures/reclaimDividendDistributionFunds';
 import { createCreateVenueResolver } from '@polymeshassociation/polymesh-sdk/api/procedures/createVenue';
 import { Distributions } from '@polymeshassociation/polymesh-sdk/api/entities/Asset/CorporateActions/Distributions';
@@ -24,6 +24,7 @@ import {
 import { Compliance } from "@polymeshassociation/polymesh-sdk/api/entities/Asset/Compliance";
 import { Requirements } from "@polymeshassociation/polymesh-sdk/api/entities/Asset/Compliance/Requirements";
 
+//import { TargetTreatment } from '@polymathnetwork/polymesh-sdk/types';
 
 
 
@@ -119,6 +120,27 @@ else if(args[0] == "rescheduleInstruction" )
     rescheduleInstruction();
 else if(args[0] == "rejectInstruction" )    
     rejectInstruction();
+
+// Dividend Related
+if(args[0] == "setupDividends" )    
+    setupDividends();
+else if(args[0] == "getDividends" )    
+    getDividends()
+else if(args[0] == "deleteSingleDividends" )    
+    deleteSingleDividends()
+else if(args[0] == "getSingleDividends" )    
+    getSingleDividends()
+else if(args[0] == "getReceiverDividendDistribution" )    
+    getReceiverDividendDistribution()  
+else if(args[0] == "claimDividendDistribution" )    
+    claimDividendDistribution()  
+else if(args[0] == "payDividendDistribution" )    
+    payDividendDistribution()  
+
+
+
+       
+      
 
 
 // npx ts-node src/polymesh.ts test
@@ -1203,7 +1225,7 @@ else if(args[0] == "rejectInstruction" )
 
   // npx ts-node src/polymesh.ts getClaimsData
   async function getClaimsData() {
-    let api: Polymesh = await getConnection(mnemonicString);
+   /* let api: Polymesh = await getConnection(mnemonicString);
 
     const cddClaims = await api.claims.getCddClaims();
 
@@ -1242,7 +1264,7 @@ else if(args[0] == "rejectInstruction" )
     console.log( issuedClaims );
 
 
-    await api.disconnect();
+    await api.disconnect(); */
   }
 
   // npx ts-node src/polymesh.ts getIdentitiesWithClaims
@@ -1270,10 +1292,251 @@ else if(args[0] == "rejectInstruction" )
 
 
 
+// npx ts-node src/polymesh.ts setupDividends
+async function setupDividends() {
+
+  /*
+      eric
+      0x4d241b9bc81837e1dc6e92562d14cfd86da1fe995a57623d9c69a2e75bca0272    2000
+      
+      shahzad
+      0xfd38c10a0ed8c81212698d02afcb0abfc9c9a80b57619682e9feb6706f71daa5    1000
+      
+      ASSET01   
+      COIN01
+  
+      Issuer - Hassan Saddiqi                   
+      monkey orchard pear salon walnut genre obscure fuel van slim night flock    
+  */  
+  
+      let api: Polymesh = await getConnection(mnemonicString3);
+  
+      const identity = (await api.getSigningIdentity())!;
+      console.log(`Connected! Signing Identity ID: ${identity.did}`);
+    
+      const ticker = "ASSET01";
+  
+      const asset = await api.assets.getAsset({ ticker });
+      console.log(`Asset found! Current asset name is: ${(await asset.details()).name}`);
+  
+  
+    /*const checkpointQueue = await asset.checkpoints.create();
+    const checkpoint: Checkpoint = await checkpointQueue.run();
+    const preDividendCheckpointId: string = checkpoint.id.toString(10);
+    console.log( "Checkpoint id : " + preDividendCheckpointId )*/
+  
+    const preDividendCheckpoint: Checkpoint = await asset.checkpoints.getOne({
+      id: new BigNumber("5"),
+    });    
+  
+  const distributions: Distributions = asset.corporateActions.distributions;
+  const dividendActionQueue = await distributions.configureDividendDistribution({
+      "description": "Test distribution",
+      "declarationDate": new Date('10/26/2023'), // Here declared now, but can be any date.
+      "checkpoint": preDividendCheckpoint, // Good thing we created it. If not, it would create it automatically.
+      "paymentDate": new Date(new Date().getTime() + 1000 * 60), // Or whichever point at which ACME holders can claim their dividend.
+      //"originPortfolio": acmeCAFolio, // Another well prepared item.
+      "currency": "COIN02",
+      "maxAmount": new BigNumber("6000"), // This determines what will be locked.
+      "perShare": new BigNumber("0.2"), // Unlike with the Token Studio, you have to calculate it here.
+      "expiryDate": new Date('12/26/2024'), // Sufficiently far in the future that holders have time to claim.
+      "targets": {
+          identities: ["0x7cc1b91e216b3ea3192fa9b5f6a49f7fd51f5873e16c607100ad5e40db643765"], // Nobody is excluded, i.e. everyone can claim a dividend.
+          treatment: TargetTreatment.Exclude
+      },
+      "taxWithholdings": [], // Let's keep it simple.
+  });
+  const dividendAction: DividendDistribution = await dividendActionQueue.run();
+  const dividendActionId: string = dividendAction.id.toString(10);    
+  
+  console.log("Dividend created with ID " + dividendActionId)
+  
+  
+    // fetch distribution details (whether funds have been reclaimed and the amount of remaining funds)
+    const { remainingFunds, fundsReclaimed } = await dividendAction.details();
+    console.log(`Reclaimed: ${fundsReclaimed}. Remaining funds: ${remainingFunds.toFormat()}`);
+  
+    console.log("Getting partcipents now ....")
+    // get all participants, their owed amount and whether they have been paid or not (this is SLOW)
+    const participants = await dividendAction.getParticipants();
+    participants.forEach(({ identity: { did }, amount, paid }) => {
+      console.log(`DID ${did} is owed ${amount.toFormat()}. Paid: ${paid}`);
+    });
+  
+  }
+  
+// npx ts-node src/polymesh.ts getDividends
+async function getDividends() {
+
+  let api: Polymesh = await getConnection(mnemonicString3);
+
+  const identity = (await api.getSigningIdentity())!;
+  console.log(`Connected! Signing Identity ID: ${identity.did}`);
+
+  const ticker = "ASSET01";
+
+  const asset = await api.assets.getAsset({ ticker });
+  console.log(`Asset found! Current asset name is: ${(await asset.details()).name}`);
+
+  //const originPortfolio = await identity.portfolios.getPortfolio({ portfolioId: new BigNumber(0) });
 
 
 
-  const renderClaim = ({ target, issuer, issuedAt, expiry, claim }: ClaimData, pos: number): void => {
+    console.log("going to create dividends");
+    // this creates a Corporate Action under the hood and then uses it to create the Dividend Distribution
+    const objects = await asset.corporateActions.distributions.get()
+
+
+    objects.forEach(obj => {
+        console.log(obj.distribution.id.toString())
+    })
+
+
+}
+
+// npx ts-node src/polymesh.ts getSingleDividends          get single didvidend details from blockchain
+async function getSingleDividends() {
+
+  let api: Polymesh = await getConnection(mnemonicString3);
+
+  const identity = (await api.getSigningIdentity())!;
+  console.log(`Connected! Signing Identity ID: ${identity.did}`);
+
+  const ticker = "ASSET01";
+
+  const asset = await api.assets.getAsset({ ticker });
+  console.log(`Asset found! Current asset name is: ${(await asset.details()).name}`);
+
+  //const originPortfolio = await identity.portfolios.getPortfolio({ portfolioId: new BigNumber(0) });
+
+
+
+    console.log("going to create dividends");
+    // this creates a Corporate Action under the hood and then uses it to create the Dividend Distribution
+    const object = await asset.corporateActions.distributions.getOne({id: new BigNumber(9)});
+
+    console.log(object);
+
+    console.log("Getting partcipents now ....")
+    // get all participants, their owed amount and whether they have been paid or not (this is SLOW)
+    const participants = await object.distribution.getParticipants();
+    participants.forEach(({ identity: { did }, amount, paid }) => {
+      console.log(`DID ${did} is owed ${amount.toFormat()}. Paid: ${paid}`);
+    });
+
+
+}
+
+// npx ts-node src/polymesh.ts deleteSingleDividends
+async function deleteSingleDividends() {
+
+  let api: Polymesh = await getConnection(mnemonicString3);
+
+  const identity = (await api.getSigningIdentity())!;
+  console.log(`Connected! Signing Identity ID: ${identity.did}`);
+
+  const ticker = "ASSET01";
+
+  const asset = await api.assets.getAsset({ ticker });
+  console.log(`Asset found! Current asset name is: ${(await asset.details()).name}`);
+
+
+    console.log("going to delete dividends");
+    // this creates a Corporate Action under the hood and then uses it to create the Dividend Distribution
+    const object = await asset.corporateActions.distributions.getOne({id: new BigNumber(0)});
+
+    const reclaimQ = await object.distribution.reclaimFunds();
+    await reclaimQ.run();     
+
+    console.log("Funds reclaimed");
+}
+
+// npx ts-node src/polymesh.ts getReceiverDividendDistribution
+async function getReceiverDividendDistribution() {
+
+  let api: Polymesh = await getConnection(mnemonicString2);
+
+
+  const acmeAsset: Asset = await api.assets.getAsset({
+    ticker: 'ASSET01',
+  });
+  const acmeDividendWithDetails: DistributionWithDetails =
+    await acmeAsset.corporateActions.distributions.getOne({
+      id: new BigNumber("1"),
+    });
+
+
+  console.log( acmeDividendWithDetails );
+
+  const acmeDividend: DividendDistribution = acmeDividendWithDetails.distribution;
+  const claimQueue = await acmeDividend.claim(); // From the context of Alice, which is why we used apiAlice
+  await claimQueue.run();  
+
+  console.log("Claim filled");
+}
+
+// npx ts-node src/polymesh.ts claimDividendDistribution
+async function claimDividendDistribution() {
+  let api: Polymesh = await getConnection(mnemonicString3);
+
+  const identity = (await api.getSigningIdentity())!;
+  console.log(`Connected! Signing Identity ID: ${identity.did}`);
+
+  const ticker = "ASSET01";
+
+  const asset = await api.assets.getAsset({ ticker });
+  console.log(`Asset found! Current asset name is: ${(await asset.details()).name}`);
+
+  //const originPortfolio = await identity.portfolios.getPortfolio({ portfolioId: new BigNumber(0) });
+
+
+
+    console.log("going to create dividends");
+    // this creates a Corporate Action under the hood and then uses it to create the Dividend Distribution
+    const object = await asset.corporateActions.distributions.getOne({id: new BigNumber(6)});
+
+    console.log(object.distribution.id.toString());
+
+    const tmp = await object.distribution.claim();
+    await tmp.run();
+
+    console.log("Claim is called")
+}
+
+// npx ts-node src/polymesh.ts payDividendDistribution
+async function payDividendDistribution() {
+  let api: Polymesh = await getConnection(mnemonicString3);
+
+  const identity = (await api.getSigningIdentity())!;
+  console.log(`Connected! Signing Identity ID: ${identity.did}`);
+
+  const ticker = "ASSET01";
+
+  const asset = await api.assets.getAsset({ ticker });
+  console.log(`Asset found! Current asset name is: ${(await asset.details()).name}`);
+
+  //const originPortfolio = await identity.portfolios.getPortfolio({ portfolioId: new BigNumber(0) });
+
+
+
+    console.log("going to get dividends");
+    // this creates a Corporate Action under the hood and then uses it to create the Dividend Distribution
+    const object = await asset.corporateActions.distributions.getOne({id: new BigNumber(8)});
+
+    console.log(object.distribution.id.toString(10));
+
+    const tmp = await object.distribution.pay({ targets: ["0xfd38c10a0ed8c81212698d02afcb0abfc9c9a80b57619682e9feb6706f71daa5", "0x4d241b9bc81837e1dc6e92562d14cfd86da1fe995a57623d9c69a2e75bca0272"]});
+    await tmp.run();
+    console.log("Pay is called")
+}
+
+
+
+
+
+
+
+const renderClaim = ({ target, issuer, issuedAt, expiry, claim }: ClaimData, pos: number): void => {
     console.log(`Claim #${pos} ${issuedAt ? `issued at ${issuedAt}` : ``}`);
     console.log(`Target: ${target.did}`);
     console.log(`Issuer: ${issuer.did}`);
@@ -1282,7 +1545,7 @@ else if(args[0] == "rejectInstruction" )
     }
     console.log(`Claim: ${claim.type}`);
     console.log('\n');
-  };
+};
 
 
 
@@ -1294,12 +1557,14 @@ else if(args[0] == "rejectInstruction" )
 
     let api: Polymesh = await Polymesh.connect({
       nodeUrl: "wss://testnet-rpc.polymesh.live",
-      middleware: {
-        link: "testnet-graphql.polymesh.live",
+      middlewareV2: {
+        link: "https://testnet-graphqlnative.polymath.network",
         key: "nBdcFXMFXLawqrh4STJG69IlVCp1Psve4qq0wfpe"
       },
       signingManager: localSigningManager,
     });
+
+
 
     console.log("connected");
 
@@ -1311,13 +1576,32 @@ else if(args[0] == "rejectInstruction" )
 
 
 /*
-  Asset
-    freeze
-    isFreeze
-    unfreeze
-    transferOwnership
+Dividend Distribution 
 
-    properties of asset      did, ticker, uuid, 
+PolymeshDividend
+id
+title
+description
+details
+declarationDate
+checkpointID
+paymentDate
+currency
+maxAmount
+perShare
+expiryDate
 
 
+PolymeshDividendCheckpoint
+id
+polymeshDividendID
+investorID
+pulicKey
+Amount
+isPaid
+
+
+Listing screen
+New Dividend 
+Dividend Details with partcipents and if they are paid or not 
 */

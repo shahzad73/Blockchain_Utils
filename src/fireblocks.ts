@@ -27,8 +27,9 @@ const ERC20ABI = require("./erc20ABI.json");
 var args = process.argv.slice(2);
 
 const baseUrl = "https://sandbox-api.fireblocks.io";
-const apiSecret = fs.readFileSync(path.resolve("./src/FireBlocks_Secret.key"), "utf8");
-const fireblocks = new FireblocksSDK(apiSecret, "b2569cf1-bc7c-408d-80f4-ddb1b30d9294", baseUrl);
+const apiSecret2 = fs.readFileSync(path.resolve("./src/FireBlocks_Secret.key"), "utf8");
+console.log(apiSecret2);
+const fireblocks = new FireblocksSDK(apiSecret2, "b2569cf1-bc7c-408d-80f4-ddb1b30d9294", baseUrl);
 
 
 
@@ -195,7 +196,12 @@ async function getAccountsList() {
 
     const vaultAccounts = await fireblocks.getVaultAccountsWithPageInfo([]);
 
-    console.log( JSON.stringify( vaultAccounts) );
+    //console.log( JSON.stringify( vaultAccounts) );
+
+	vaultAccounts.accounts.forEach((obj: any) => {
+		console.log(obj.id);
+		console.log(obj.name);		
+	})
 
     /*
     {
@@ -539,7 +545,7 @@ async function executeERC20TransactionWithFireBlocksProvider() {
 
 	const eip1193Provider = new FireblocksWeb3Provider({
 		apiBaseUrl: baseUrl, // If using a sandbox workspace
-		privateKey: apiSecret,
+		privateKey: apiSecret2,
 		apiKey: "b2569cf1-bc7c-408d-80f4-ddb1b30d9294",
 		vaultAccountIds: 1,
 		chainId: ChainId.SEPOLIA
@@ -577,12 +583,14 @@ async function getPolyMeshConnectionObject() {
 		accounts: [{ mnemonic: "riot arm extra another way tumble clump between city pottery chronic lumber" }],
 	});*/
 
+
 	const signingManager = await FireblocksSigningManager.create({
 		apiKey: 'b2569cf1-bc7c-408d-80f4-ddb1b30d9294',	
 		url: 'https://sandbox-api.fireblocks.io',
-		secretPath: './src/FireBlocks_Secret.key',
+		//secretPath: './src/FireBlocks_Secret.key',
+		secret: apiSecret2,
 		// third parameter is  the Fireblocks vault    0=Default and so on
-		derivationPaths: [[44, 595, 1, 0, 0]],  
+		derivationPaths: [[44, 595, 1, 0, 0]]
 	});
 
 
@@ -594,6 +602,7 @@ async function getPolyMeshConnectionObject() {
         },
         signingManager: signingManager,
     });
+
 
 	return { 
 		api,
@@ -656,7 +665,8 @@ async function executePolymeshOperation() {
 }
 
 // npx ts-node src/fireblocks.ts registerPolyMeshTicker
-const ticker: string = "TKTEST00002"
+//const ticker: string = "TKTEST00002"
+const ticker: string = "TSTTOC03";
 async function registerPolyMeshTicker() {
 
 	const conectionObj = await getPolyMeshConnectionObject();
@@ -1078,3 +1088,17 @@ async function transferPolymeshShares() {
 }
 
 
+
+/*
+
+DB settings 
+params table settigs 
+
+platform admin  
+FireBlocks settings page with settings to manage Vaults there 
+
+in case of polymesh on token studio the dropdown from the list should show 
+
+
+
+*/

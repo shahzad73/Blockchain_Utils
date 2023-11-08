@@ -19,13 +19,13 @@ const ERC1404Token = JSON.parse(fs.readFileSync("./data/ERC1404.json", "utf8"));
 //var service_address = "0x3F4B2e1B4Ca4B32EF29e3bf90362d30Cc45B30a5";
 
 //kovan
-var contract_address = "0x783b55DDf115d713c4CAf0944f42fC4eDd45387b";
-var service_address = "0x783b55DDf115d713c4CAf0944f42fC4eDd45387b";
+var contract_address = "0xAC2251a906C5A86ed48EeBD9bE665D59C2314c46";
+var service_address = "0xAC2251a906C5A86ed48EeBD9bE665D59C2314c46";
 
-//var linkToBlockchainServer = "HTTP://127.0.0.1:7545";
-var linkToBlockchainServer = "https://mainnet.infura.io/v3/fe41724da6f24b76a782f376b2698ee8";
+var linkToBlockchainServer = "https://eth-sepolia.g.alchemy.com/v2/5yiTa2hWRefUdIki3OGt4buh8wyW4MJc";
+//var linkToBlockchainServer = "https://mainnet.infura.io/v3/fe41724da6f24b76a782f376b2698ee8";
 //var linkToBlockchainServer = "https://matic-mumbai--jsonrpc.datahub.figment.io/apikey/9737e952f56cd7bdca83d6bb4fdf1576"      //Polygone test
-// var linkToBlockchainServer = "https://matic-mainnet--jsonrpc.datahub.figment.io/apikey/9737e952f56cd7bdca83d6bb4fdf1576"      //Polygone mainnet
+//var linkToBlockchainServer = "https://matic-mainnet--jsonrpc.datahub.figment.io/apikey/9737e952f56cd7bdca83d6bb4fdf1576"      //Polygone mainnet
 //var linkToBlockchainServer = "https://data-seed-prebsc-1-s1.binance.org:8545"      //Binanace chain testnet    not yet tested
 //var linkToBlockchainServer = "https://bsc-dataseed1.binance.org"    // Binance chain mainnet     
 
@@ -140,9 +140,10 @@ if (process.argv[2] == "checkInvestorWhiteListed") {
 
 if (process.argv[2] == "whiteListInvestor") {
 
-    // node erc1404 whiteListInvestor aaa /home/shahzad/WorkingDocuments/data/Keystore_5300_aaa.txt 0xAD3DF0f1c421002B8Eff81288146AF9bC692d13d true
+    // node erc1404 whiteListInvestor aaa /home/shahzad/WorkingDocuments/data/Keystore_5300_aaa.txt 0x5A22dc69aFe095Ca86450864954536Ed67F3832F true
 
     let data2 = decryptKeyFromFile(process.argv[4], process.argv[3]);
+	console.log(data2)
 	
     ethereum.whitelisAddress(4, data2.address, process.argv[5], process.argv[6], data2.privateKey.substring(2), contract_address, service_address, linkToBlockchainServer, ERC1404Token.abi).then(function(data){
 		console.log(data);
@@ -203,7 +204,7 @@ if (process.argv[2] == "sendTokens") {
 
 if (process.argv[2] == "approve") {
 
-    //node erc1404 approve aaa /home/shahzad/WorkingDocuments/data/Keystore_5300_aaa.txt 0x8192706d699390D668710BD247886e3016D4672E 800000000000000000000
+    //node erc1404 approve aaa ~/WorkingDocuments/data/Keystore_D13D_aaa.txt 0x5A22dc69aFe095Ca86450864954536Ed67F3832F 800000000000000000000
     
     let data2 = decryptKeyFromFile(process.argv[4], process.argv[3]);
     

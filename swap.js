@@ -4,21 +4,21 @@ var Accounts = require('web3-eth-accounts');
 const async = require('async');
 const fs = require('fs');
 const ethereum = require("./modules/ethereum");
-
+const solc = require('solc');
 
 const contractabi = [{"anonymous":false,"inputs":[{"indexed":false,"internalType":"address","name":"originator","type":"address"},{"indexed":false,"internalType":"uint256","name":"swapNumber","type":"uint256"}],"name":"Closed","type":"event"},{"anonymous":false,"inputs":[{"indexed":false,"internalType":"address","name":"originator","type":"address"},{"indexed":false,"internalType":"uint256","name":"swapNumber","type":"uint256"}],"name":"Expired","type":"event"},{"anonymous":false,"inputs":[{"indexed":false,"internalType":"address","name":"originator","type":"address"},{"indexed":false,"internalType":"uint256","name":"swapNumber","type":"uint256"}],"name":"Opened","type":"event"},{"inputs":[{"internalType":"address","name":"originator","type":"address"},{"internalType":"uint256","name":"swapNumber","type":"uint256"}],"name":"close","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"address","name":"originator","type":"address"},{"internalType":"uint256","name":"swapNumber","type":"uint256"}],"name":"expire","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"address","name":"originator","type":"address"},{"internalType":"uint256","name":"swapNumber","type":"uint256"}],"name":"getSwapData","outputs":[{"components":[{"internalType":"address","name":"executor","type":"address"},{"internalType":"address","name":"openingToken","type":"address"},{"internalType":"uint256","name":"tokensToOpen","type":"uint256"},{"internalType":"address","name":"closingToken","type":"address"},{"internalType":"uint256","name":"tokensToClose","type":"uint256"},{"internalType":"uint256","name":"expiry","type":"uint256"}],"internalType":"struct ERC20TokenSwapper.Swap","name":"","type":"tuple"},{"internalType":"uint256","name":"swapState","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"uint256","name":"swapNumber","type":"uint256"},{"internalType":"address","name":"_executor","type":"address"},{"internalType":"address","name":"_openingToken","type":"address"},{"internalType":"uint256","name":"_tokensToOpen","type":"uint256"},{"internalType":"address","name":"_closingToken","type":"address"},{"internalType":"uint256","name":"_tokensToClose","type":"uint256"},{"internalType":"uint256","name":"_expiry","type":"uint256"}],"name":"open","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"nonpayable","type":"function"}];
 
 
-var contract_address = "0x3cb6df9845af79ab7c2af9530da0b046bacb6cf9";
-var web3Address = "https://kovan.infura.io/v3/fe41724da6f24b76a782f376b2698ee8";
+var contract_address = "0x5A22dc69aFe095Ca86450864954536Ed67F3832F";
+var web3Address = "https://eth-sepolia.g.alchemy.com/v2/5yiTa2hWRefUdIki3OGt4buh8wyW4MJc";
 
 
 if (process.argv[2] == "open") {
     
-        //node swap open a ~/WorkingDocuments/Ethereum_localkey.txt uint256 swapNumber, address _executor, address _openingToken, uint256 _tokensToOpen, address _closingToken, uint256 _tokensToClose, uint256 _expiry) external returns(bool     
+        //node swap open aaa ~/WorkingDocuments/Ethereum_localkey.txt uint256 swapNumber, address _executor, address _openingToken, uint256 _tokensToOpen, address _closingToken, uint256 _tokensToClose, uint256 _expiry) external returns(bool     
 
-        //node swap open a ~/WorkingDocuments/Ethereum_localkey.txt 5665 0xcD063145Fcd75aca7C2c3CaD2675B4328dbd8f83 0x7Cf01fbAd42d2FEa2b0D697aa7Ee022801cD2154 50 0xF2A6143Bf60885d2044a744943d09ca1C05EF66F 250 1644733968
-    
+        // node swap open aaa ~/WorkingDocuments/data/Keystore_5300_aaa.txt 103 0xAD3DF0f1c421002B8Eff81288146AF9bC692d13d 0x26f94edb6351dce3d0df11f455606d36dad4db29 100000000000000000000 0xAC2251a906C5A86ed48EeBD9bE665D59C2314c46 200000000000000000000 1701534629
+
         // function open(uint256 swapNumber, address _executor, address _openingToken, uint256 _tokensToOpen, address _closingToken, uint256 _tokensToClose, uint256 _expiry) external returns(bool) {
 
         // 5   uint256 swapNumber 
@@ -132,7 +132,7 @@ if (process.argv[2] == "expire") {
     
             //function expire(address originator, uint256 swapNumber) external returns(bool)
     
-            //node swap expire a ~/WorkingDocuments/Ethereum_localkey.txt 0xeA1466402fC4b0a0b4959E4cd040e79a7309B3c9  1234  
+            //node swap expire aaa ~/WorkingDocuments/data/Keystore_5300_aaa.txt 0xeA1466402fC4b0a0b4959E4cd040e79a7309B3c9  1234  
     
     
             let data2 = decryptKeyFromFile(process.argv[4], process.argv[3]);
@@ -231,10 +231,10 @@ if (process.argv[2] == "expire") {
 }
 
 if (process.argv[2] == "close") {
-    
+
             //close(address originator, uint256 swapNumber) external returns(bool) {
     
-            //node swap close a ~/WorkingDocuments/Ethereum_localkey2.txt 0xeA1466402fC4b0a0b4959E4cd040e79a7309B3c9 5665
+            //node swap close aaa ~/WorkingDocuments/data/Keystore_D13D_aaa.txt 0x1a8929fbE9abEc00CDfCda8907408848cBeb5300 102
 
             let data2 = decryptKeyFromFile(process.argv[4], process.argv[3]);
     
@@ -262,7 +262,7 @@ if (process.argv[2] == "close") {
 					const nouncePromise = web3.eth.getTransactionCount(data2.address, 'pending');
 
 					const allPromises = Promise.all([nouncePromise, estimateGasPromise]);
-                    
+
 					allPromises.then((results) => {
 
 						// creating raw tranaction
@@ -331,7 +331,25 @@ if (process.argv[2] == "close") {
     
 }
 
+if (process.argv[2] == "getInfo") {
 
+    //node swap getInfo 0x1a8929fbE9abEc00CDfCda8907408848cBeb5300 103
+
+    const web3 = new Web3(new Web3.providers.HttpProvider(web3Address));
+
+    web3.eth.net.isListening().then(() => {
+        const contract = new web3.eth.Contract(contractabi, contract_address);
+        contract.methods.getSwapData(process.argv[3], process.argv[4]).call().then((data) => {
+            console.log(data);
+        }).catch((err) => {
+            reject({ code: '0', message: `${err.message}. Error calling balanceOf method in getAccountBalance` });
+        });
+
+    }).catch(() => {
+        reject({ code: '0', message: 'Ethereum network connection error in getAccountBalance' });
+    });    
+
+}
 
 function decryptKeyFromFile(file, password) {
 	let data = fs.readFileSync(file, 'utf8')
@@ -339,12 +357,6 @@ function decryptKeyFromFile(file, password) {
     
     //return    {"privateKey": "", "address": ""}
 }
-
-
-
-
-
-
 
 
 

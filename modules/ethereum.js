@@ -221,14 +221,14 @@ module.exports = {
 
 		// authorize = true   add user to whitelist
 		// authorize = false  remove user from whitelist
-
+		console.log(web3Address);
 
 		return new Promise(((resolve, reject) => {
 			try {
 				const web3 = new Web3(new Web3.providers.HttpProvider(web3Address));
                 
 				web3.eth.net.isListening().then(() => {
-					
+
 					const contract = new web3.eth.Contract(whitelistAbi, ethereumWhitelistAddress);
 					const privateKey = Buffer.from(ethereumPrivateKey, 'hex');
 					const contractAddress = ethereumWhitelistAddress;
@@ -310,7 +310,7 @@ module.exports = {
 
 						// creating tranaction via ethereumjs-tx
 						const transaction = new ethereumjs(rawTransaction);
-                        
+
 						// signing transaction with private key
 						transaction.sign(privateKey);
                         
@@ -320,7 +320,7 @@ module.exports = {
 						console.log(`whitelisAddress transaction  address-${publicKeyUser}  authorize-${authoeize} Sending transaction`);
 
 						web3.eth.sendSignedTransaction(`0x${serializedTx.toString('hex')}`, (err, txId) => {
-                            
+
 							if (err) {
 								console.log(err)
 								reject({ code: '0', message: `${err.message}. Error calling sendSignedTransaction in whitelisAddress` });
@@ -913,7 +913,7 @@ module.exports = {
 
                     estimateGasPromise = web3.eth.estimateGas({
                         to: ethereumContractAddress,
-                        data: contract.methods.setWhitelistAuthorityStatus(toAddress, amount).encodeABI(),
+                        data: contract.methods.approve(toAddress, amount).encodeABI(),
                     });
 
 					const nouncePromise = web3.eth.getTransactionCount(myAddress, 'pending');
