@@ -951,7 +951,7 @@ if (process.argv[2] == "deploy") {
 				[ 'address', 'uint256', 'string'],
 				['0x5b31fC93a7a120D467651BF2aD15b0940E0Fcbd5', '100000000000000000000000', 'MyContractName2']
 			  ).slice(2);		
-		
+
 		
 			// prepare the transaction:
 			var contractName = "Test Contract"

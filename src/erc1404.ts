@@ -16,13 +16,13 @@ var contract_address = "0x783b55DDf115d713c4CAf0944f42fC4eDd45387b";
 var service_address = "0x783b55DDf115d713c4CAf0944f42fC4eDd45387b";
 
 //var linkToBlockchainServer = "HTTP://127.0.0.1:7545";
-var linkToBlockchainServer = "https://sepolia.infura.io/v3/fe41724da6f24b76a782f376b2698ee8";
+//var linkToBlockchainServer = "https://sepolia.infura.io/v3/fe41724da6f24b76a782f376b2698ee8";
 //var linkToBlockchainServer = "https://matic-mumbai--jsonrpc.datahub.figment.io/apikey/9737e952f56cd7bdca83d6bb4fdf1576"      //Polygone test
 //var linkToBlockchainServer = "https://polygon-mainnet.g.alchemy.com/v2/-ILqUOGwJjUcoX39sWWft7QsW9SGiDzx"      //Polygone mainnet
 //var linkToBlockchainServer = "https://data-seed-prebsc-1-s1.binance.org:8545"      //Binanace chain testnet    not yet tested
 //var linkToBlockchainServer = "https://bsc-dataseed1.binance.org"    // Binance chain mainnet     
 //var linkToBlockchainServer = "https://test-rpc.libex.ai"    // Libex testnet     
-//var linkToBlockchainServer = "https://mainnet.infura.io/v3/fe41724da6f24b76a782f376b2698ee8";
+var linkToBlockchainServer = "https://mainnet.infura.io/v3/fe41724da6f24b76a782f376b2698ee8";
 //var dolloarValue = 2000;    // Ethereum
 
 var dolloarValue = 1861;       // mainnet 
@@ -201,7 +201,7 @@ async function deployERC20() {
 
       console.log(gas);
 
-
+/*
         // sign and send the transaction
         //let contractAddress
         web3.eth.accounts.signTransaction(rawTx, '284e878525e21729040938f1e723a90f69f8ad336ce3f10e2357664f5249b915')
@@ -221,6 +221,7 @@ async function deployERC20() {
             // do something when promise fails
             console.log(err)
         });
+*/
 
 }
 

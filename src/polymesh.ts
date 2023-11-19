@@ -1318,13 +1318,13 @@ async function setupDividends() {
   
       const asset = await api.assets.getAsset({ ticker });
       console.log(`Asset found! Current asset name is: ${(await asset.details()).name}`);
+
   
-  
-    /*const checkpointQueue = await asset.checkpoints.create();
+    const checkpointQueue = await asset.checkpoints.create();
     const checkpoint: Checkpoint = await checkpointQueue.run();
     const preDividendCheckpointId: string = checkpoint.id.toString(10);
-    console.log( "Checkpoint id : " + preDividendCheckpointId )*/
-  
+    console.log( "Checkpoint id : " + preDividendCheckpointId )
+
     const preDividendCheckpoint: Checkpoint = await asset.checkpoints.getOne({
       id: new BigNumber("5"),
     });    
