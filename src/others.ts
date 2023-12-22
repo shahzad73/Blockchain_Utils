@@ -50,3 +50,12 @@ if(args[0] == "retry" ) {
     });
         
 }
+
+// npx ts-node src/others.ts stringToHex
+if(args[0] == "stringToHex" ) {
+
+
+    console.log(paddedHex);
+    console.log(paddedBuffer.toString())
+}
+

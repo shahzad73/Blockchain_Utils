@@ -19,9 +19,10 @@ const ERC1404Token = JSON.parse(fs.readFileSync("./data/ERC1404.json", "utf8"));
 //var service_address = "0x3F4B2e1B4Ca4B32EF29e3bf90362d30Cc45B30a5";
 
 //kovan
-var contract_address = "0xAC2251a906C5A86ed48EeBD9bE665D59C2314c46";
-var service_address = "0xAC2251a906C5A86ed48EeBD9bE665D59C2314c46";
+var contract_address = "0x0F294ea9202f42e5cd78B1F4Bb0E4429f6e0b224";
+var service_address = "0x0F294ea9202f42e5cd78B1F4Bb0E4429f6e0b224";
 
+//var linkToBlockchainServer = "https://sepolia.base.org";
 var linkToBlockchainServer = "https://eth-sepolia.g.alchemy.com/v2/5yiTa2hWRefUdIki3OGt4buh8wyW4MJc";
 //var linkToBlockchainServer = "https://mainnet.infura.io/v3/fe41724da6f24b76a782f376b2698ee8";
 //var linkToBlockchainServer = "https://matic-mumbai--jsonrpc.datahub.figment.io/apikey/9737e952f56cd7bdca83d6bb4fdf1576"      //Polygone test

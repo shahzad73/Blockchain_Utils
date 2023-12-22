@@ -1213,8 +1213,9 @@ module.exports = {
     getKYCData: function(address, abi, contractAddress, web3Address) {
 		return new Promise(((resolve, reject) => {
 			try {
+console.log( web3Address )
 				const web3 = new Web3(new Web3.providers.HttpProvider(web3Address));
-
+console.log("hhhhhhhhhhhhhhhh")
 				web3.eth.net.isListening().then(() => {
 					const contract = new web3.eth.Contract(abi, contractAddress);
 

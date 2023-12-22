@@ -5,7 +5,6 @@ import { LocalSigningManager } from '@polymeshassociation/local-signing-manager'
 import { Account, AuthorizationRequest, Checkpoint, ClaimData, CountryCode, DistributionWithDetails, DividendDistribution, Instruction, InstructionStatus, TargetTreatment } from '@polymeshassociation/polymesh-sdk/types';
 import { prepareReclaimDividendDistributionFunds } from '@polymeshassociation/polymesh-sdk/api/procedures/reclaimDividendDistributionFunds';
 import { createCreateVenueResolver } from '@polymeshassociation/polymesh-sdk/api/procedures/createVenue';
-import { Distributions } from '@polymeshassociation/polymesh-sdk/api/entities/Asset/CorporateActions/Distributions';
 
 
 import { Asset } from "@polymeshassociation/polymesh-sdk/api/entities/Asset";
@@ -21,16 +20,18 @@ import {
   NumberedPortfolio,
   InstructionAffirmation,
 } from "@polymeshassociation/polymesh-sdk/types";
-import { Compliance } from "@polymeshassociation/polymesh-sdk/api/entities/Asset/Compliance";
-import { Requirements } from "@polymeshassociation/polymesh-sdk/api/entities/Asset/Compliance/Requirements";
+import { Compliance } from "@polymeshassociation/polymesh-sdk/api/entities/Asset/Base/Compliance";
+import { Requirements } from "@polymeshassociation/polymesh-sdk/api/entities/Asset/Base/Compliance/Requirements";
 
 //import { TargetTreatment } from '@polymathnetwork/polymesh-sdk/types';
 
 
 
-const mnemonicString = "riot arm extra another way tumble clump between city pottery chronic lumber";
-const mnemonicString2 = "run swarm rotate impact knife ice steel hip enough envelope pigeon recycle";
-const mnemonicString3 = "monkey orchard pear salon walnut genre obscure fuel van slim night flock";
+const mnemonicString = "riot arm extra another way tumble clump between city pottery chronic lumber";   //mega
+const mnemonicString2 = "run swarm rotate impact knife ice steel hip enough envelope pigeon recycle";    //shahzad
+const mnemonicString3 = "monkey orchard pear salon walnut genre obscure fuel van slim night flock";    //hassan sadiqi
+const mnemonicString4 = "dash beauty fetch excess admit embrace trouble save join topple slush fiscal";   //crypto wallet
+
 
 // 0x4d241b9bc81837e1dc6e92562d14cfd86da1fe995a57623d9c69a2e75bca0272  waqas
 // 0xfd38c10a0ed8c81212698d02afcb0abfc9c9a80b57619682e9feb6706f71daa5  shahzad
@@ -137,9 +138,10 @@ else if(args[0] == "claimDividendDistribution" )
 else if(args[0] == "payDividendDistribution" )    
     payDividendDistribution()  
 
+else if(args[0] == "removeStablecoinReceiptRestriction" )    
+    removeStablecoinReceiptRestriction()  
+    
 
-
-       
       
 
 
@@ -199,7 +201,7 @@ else if(args[0] == "payDividendDistribution" )
       console.log(" Account Exists with DID" +  shahzad.did  );       
     }*/
 
-    await api.disconnect();
+    //await api.disconnect();
   }
 
   // ---------------------------------------------------------
@@ -267,7 +269,7 @@ else if(args[0] == "payDividendDistribution" )
   async function transferShares() {
 
     console.log('Connecting to the node...\n\n');
-    let api: Polymesh = await getConnection(mnemonicString);
+    let api: Polymesh = await getConnection(mnemonicString3);
   
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     const identity = (await api.getSigningIdentity())!;
@@ -280,10 +282,11 @@ else if(args[0] == "payDividendDistribution" )
     })
 
 
-    const venue: Venue = await api.settlements.getVenue({ id: new BigNumber(468) });    
+    const venue: Venue = await api.settlements.getVenue({ id: new BigNumber(1694) });    
 
     // admin venue 468
     // investor's venur  503
+    // hassan sadiqi venue  1694
 
               console.log("Now going to send transaction");
         
@@ -295,23 +298,23 @@ else if(args[0] == "payDividendDistribution" )
               const instructionQ = await venue.addInstruction({
                 legs: [
                   {
-                    from: "0xfd38c10a0ed8c81212698d02afcb0abfc9c9a80b57619682e9feb6706f71daa5", // passing the Identity (or did) means the default portfolio will be used
-                    to: "0x4d241b9bc81837e1dc6e92562d14cfd86da1fe995a57623d9c69a2e75bca0272", // or you can pass a Portfolio
-                    amount: new BigNumber(30),
-                    asset: 'POLYMESH21',
+                    from: "0x7cc1b91e216b3ea3192fa9b5f6a49f7fd51f5873e16c607100ad5e40db643765", // passing the Identity (or did) means the default portfolio will be used
+                    to: "0x683d05728cfdece940be2a194b5b4099ac2f37fe4d1b161ebba9b84701a0d9c7", // or you can pass a Portfolio
+                    amount: new BigNumber(50),
+                    asset: 'STABLECOIN01',
                   },
                 ],
                 //endBlock: new BigNumber(10000000),
-                tradeDate: new Date('12/25/2023'),
+                tradeDate: new Date('12/25/2024'),
               });
 
               console.log('Creating Instruction...\n');
               const instruction = await instructionQ.run()
-        
+              console.log("instruction send");
               /* Pending Instructions can be fetched */
               // const pendingInstructions = await venue.getPendingInstructions();
 
-              const details = await instruction.details();
+              /*const details = await instruction.details();
               console.log(`Instruction Created! Creation Date: ${details.createdAt}  Status:${details.status}   instruction ID: ${instruction.id}  `);
 
               const affirmations = await instruction.getAffirmations();
@@ -326,7 +329,7 @@ else if(args[0] == "payDividendDistribution" )
               console.log("Legs Data .........");
               const legs = await instruction.getLegs();
               legs.data.forEach((obj2) => {
-                  console.log("asset:" + obj2.asset.ticker + " amount" + obj2.amount + " from:" + obj2.from.owner.did + " to:" + obj2.to.owner.did );
+                  console.log("asset:" + obj2.asset.ticker  + " from:" + obj2.from.owner.did + " to:" + obj2.to.owner.did );
               });
 
               console.log("statuses.......");
@@ -349,7 +352,7 @@ else if(args[0] == "payDividendDistribution" )
               */
 
 
-        await api.disconnect();
+        //await api.disconnect();
   }
   // 1. npx ts-node src/polymesh.ts transferSharesTwoLegSwap
   async function transferSharesTwoLegSwap() {
@@ -410,7 +413,7 @@ else if(args[0] == "payDividendDistribution" )
               console.log("Legs Data .........");
               const legs = await instruction.getLegs();
               legs.data.forEach((obj2) => {
-                  console.log("asset:" + obj2.asset.ticker + " amount" + obj2.amount + " from:" + obj2.from.owner.did + " to:" + obj2.to.owner.did );
+                  console.log("asset:" + obj2.asset.ticker +  " from:" + obj2.from.owner.did + " to:" + obj2.to.owner.did );
               });
 
               console.log("statuses.......");
@@ -527,7 +530,7 @@ else if(args[0] == "payDividendDistribution" )
     });
     
     console.log("Re-scheduling the instruction");
-    await targetInstruction?.reschedule();
+    //await targetInstruction?.reschedule();
 
     await api.disconnect();   
   }
@@ -756,7 +759,7 @@ else if(args[0] == "payDividendDistribution" )
   async function issueTokensToDistributor() {
       let api: Polymesh = await getConnection(mnemonicString);
 
-      let asset: Asset = await api.assets.getAsset({"ticker": "POLYMESH21"});
+      let asset: Asset = await api.assets.getFungibleAsset({"ticker": "POLYMESH21"});
       console.log("Asset TICKER - " + asset.ticker)
 
       const record = await asset.issuance.issue({amount: new BigNumber(2000)}); 
@@ -772,7 +775,7 @@ else if(args[0] == "payDividendDistribution" )
   async function redeemTokensToDistributor() {
     let api: Polymesh = await getConnection(mnemonicString);
 
-    let asset: Asset = await api.assets.getAsset({"ticker": "POLYMESH21"});
+    let asset: Asset = await api.assets.getFungibleAsset({"ticker": "POLYMESH21"});
     console.log("Asset TICKER - " + asset.ticker)
 
     const record = await asset.redeem({amount: new BigNumber(2000)}); 
@@ -792,7 +795,7 @@ else if(args[0] == "payDividendDistribution" )
 
       let api: Polymesh = await getConnection(mnemonicString);
       
-      let asset: Asset = await api.assets.getAsset({"ticker": "POLYMESH21"});
+      let asset: Asset = await api.assets.getFungibleAsset({"ticker": "POLYMESH21"});
 
       const data = await asset.settlements.canTransfer({to:"0x4d241b9bc81837e1dc6e92562d14cfd86da1fe995a57623d9c69a2e75bca0272", amount: new BigNumber("1".toString()) })
 
@@ -911,7 +914,7 @@ else if(args[0] == "payDividendDistribution" )
     //console.log(  asset.compliance  );
     
 
-
+/*
     const corporateActionAgents = await asset.corporateActions.getAgents();
 
     if (corporateActionAgents.length) {
@@ -921,7 +924,7 @@ else if(args[0] == "payDividendDistribution" )
       });
     } else 
       console.log(" NO AGENTS found ")
-
+*/
 
 
 
@@ -944,13 +947,13 @@ else if(args[0] == "payDividendDistribution" )
 
 
 
-
+/*
     const assHolds = await asset.assetHolders.get()
     console.log("All Asset Holders. . . . ")
     assHolds.data.forEach(element => {
        console.log( element.identity.did + " " + element.balance );
     });
-
+*/
 
     const comp2 = asset.compliance;
     //console.log("compliance")
@@ -1044,9 +1047,9 @@ else if(args[0] == "payDividendDistribution" )
           ]
       ]
     })
-    const updatedToken: Asset = await que.run();
+    //const updatedToken: Asset = await que.run();
 
-    await api.disconnect();
+    //await api.disconnect();
   }
 
   // ----------  for jurisdictions you need to find out what are the country 
@@ -1319,7 +1322,7 @@ async function setupDividends() {
       const asset = await api.assets.getAsset({ ticker });
       console.log(`Asset found! Current asset name is: ${(await asset.details()).name}`);
 
-  
+  /*
     const checkpointQueue = await asset.checkpoints.create();
     const checkpoint: Checkpoint = await checkpointQueue.run();
     const preDividendCheckpointId: string = checkpoint.id.toString(10);
@@ -1362,7 +1365,7 @@ async function setupDividends() {
     participants.forEach(({ identity: { did }, amount, paid }) => {
       console.log(`DID ${did} is owed ${amount.toFormat()}. Paid: ${paid}`);
     });
-  
+  */
   }
   
 // npx ts-node src/polymesh.ts getDividends
@@ -1382,7 +1385,7 @@ async function getDividends() {
 
 
 
-    console.log("going to create dividends");
+    /*console.log("going to create dividends");
     // this creates a Corporate Action under the hood and then uses it to create the Dividend Distribution
     const objects = await asset.corporateActions.distributions.get()
 
@@ -1390,7 +1393,7 @@ async function getDividends() {
     objects.forEach(obj => {
         console.log(obj.distribution.id.toString())
     })
-
+*/
 
 }
 
@@ -1410,7 +1413,7 @@ async function getSingleDividends() {
   //const originPortfolio = await identity.portfolios.getPortfolio({ portfolioId: new BigNumber(0) });
 
 
-
+/*
     console.log("going to create dividends");
     // this creates a Corporate Action under the hood and then uses it to create the Dividend Distribution
     const object = await asset.corporateActions.distributions.getOne({id: new BigNumber(9)});
@@ -1423,7 +1426,7 @@ async function getSingleDividends() {
     participants.forEach(({ identity: { did }, amount, paid }) => {
       console.log(`DID ${did} is owed ${amount.toFormat()}. Paid: ${paid}`);
     });
-
+*/
 
 }
 
@@ -1440,7 +1443,7 @@ async function deleteSingleDividends() {
   const asset = await api.assets.getAsset({ ticker });
   console.log(`Asset found! Current asset name is: ${(await asset.details()).name}`);
 
-
+/*
     console.log("going to delete dividends");
     // this creates a Corporate Action under the hood and then uses it to create the Dividend Distribution
     const object = await asset.corporateActions.distributions.getOne({id: new BigNumber(0)});
@@ -1448,7 +1451,7 @@ async function deleteSingleDividends() {
     const reclaimQ = await object.distribution.reclaimFunds();
     await reclaimQ.run();     
 
-    console.log("Funds reclaimed");
+    console.log("Funds reclaimed");*/
 }
 
 // npx ts-node src/polymesh.ts getReceiverDividendDistribution
@@ -1460,6 +1463,7 @@ async function getReceiverDividendDistribution() {
   const acmeAsset: Asset = await api.assets.getAsset({
     ticker: 'ASSET01',
   });
+/*  
   const acmeDividendWithDetails: DistributionWithDetails =
     await acmeAsset.corporateActions.distributions.getOne({
       id: new BigNumber("1"),
@@ -1472,7 +1476,7 @@ async function getReceiverDividendDistribution() {
   const claimQueue = await acmeDividend.claim(); // From the context of Alice, which is why we used apiAlice
   await claimQueue.run();  
 
-  console.log("Claim filled");
+  console.log("Claim filled");*/
 }
 
 // npx ts-node src/polymesh.ts claimDividendDistribution
@@ -1490,7 +1494,7 @@ async function claimDividendDistribution() {
   //const originPortfolio = await identity.portfolios.getPortfolio({ portfolioId: new BigNumber(0) });
 
 
-
+/*
     console.log("going to create dividends");
     // this creates a Corporate Action under the hood and then uses it to create the Dividend Distribution
     const object = await asset.corporateActions.distributions.getOne({id: new BigNumber(6)});
@@ -1500,7 +1504,7 @@ async function claimDividendDistribution() {
     const tmp = await object.distribution.claim();
     await tmp.run();
 
-    console.log("Claim is called")
+    console.log("Claim is called")*/
 }
 
 // npx ts-node src/polymesh.ts payDividendDistribution
@@ -1519,7 +1523,7 @@ async function payDividendDistribution() {
 
 
 
-    console.log("going to get dividends");
+    /*console.log("going to get dividends");
     // this creates a Corporate Action under the hood and then uses it to create the Dividend Distribution
     const object = await asset.corporateActions.distributions.getOne({id: new BigNumber(8)});
 
@@ -1527,11 +1531,33 @@ async function payDividendDistribution() {
 
     const tmp = await object.distribution.pay({ targets: ["0xfd38c10a0ed8c81212698d02afcb0abfc9c9a80b57619682e9feb6706f71daa5", "0x4d241b9bc81837e1dc6e92562d14cfd86da1fe995a57623d9c69a2e75bca0272"]});
     await tmp.run();
-    console.log("Pay is called")
+    console.log("Pay is called")*/
 }
 
 
+// npx ts-node src/polymesh.ts removeStablecoinReceiptRestriction
+async function removeStablecoinReceiptRestriction() {
+  let api: Polymesh = await getConnection(mnemonicString4);
 
+  const identity = (await api.getSigningIdentity())!;
+  console.log(`Connected! Signing Identity ID: ${identity.did}`);
+
+    const unSubscribe = await api._polkadotApi.tx.asset
+    .preApproveTicker(        
+        "STABLECOIN05"
+    ).signAndSend("5Fc9E7RLNvK5vxpErkAbstSoAYjYsDz1s3ZpsfvpbqcsXZ6y", (result) => {
+        console.log("............")
+        console.log( JSON.stringify(result) )
+        if( result.isFinalized )
+             console.log("fianlized");
+        if( result.isCompleted )
+            console.log("completed");
+        if(result.isError)
+            console.log("error");
+    });
+
+
+}
 
 
 

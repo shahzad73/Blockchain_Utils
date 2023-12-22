@@ -22,7 +22,8 @@ var service_address = "0x783b55DDf115d713c4CAf0944f42fC4eDd45387b";
 //var linkToBlockchainServer = "https://data-seed-prebsc-1-s1.binance.org:8545"      //Binanace chain testnet    not yet tested
 //var linkToBlockchainServer = "https://bsc-dataseed1.binance.org"    // Binance chain mainnet     
 //var linkToBlockchainServer = "https://test-rpc.libex.ai"    // Libex testnet     
-var linkToBlockchainServer = "https://mainnet.infura.io/v3/fe41724da6f24b76a782f376b2698ee8";
+//var linkToBlockchainServer = "https://mainnet.infura.io/v3/fe41724da6f24b76a782f376b2698ee8";
+var linkToBlockchainServer = "https://sepolia.base.org";
 //var dolloarValue = 2000;    // Ethereum
 
 var dolloarValue = 1861;       // mainnet 
@@ -231,15 +232,15 @@ async function checkWhitelistAddress() {
           
     var web3 = new Web3(Web3.givenProvider || linkToBlockchainServer);
     
-    var contract = new web3.eth.Contract(ERC1404Tokenv13.abi, "0xefb575226016b2FCEFe904926752e37C8249cfc3");
+    var contract = new web3.eth.Contract(ERC1404Tokenv13.abi, "0x0F294ea9202f42e5cd78B1F4Bb0E4429f6e0b224");
 
-            contract.methods.getKYCData("0x536062965be9590E747aC52747Db3F38Bb44DAEe").call()
+            contract.methods.getKYCData("0x6a44140c28629b1E20114122fb53101dB6953efC").call()
             .then ( (data: any) => { 
 
                 console.log( data );
 
             });
-    
+
 }
 
 
