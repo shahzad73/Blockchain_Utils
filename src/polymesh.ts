@@ -299,9 +299,9 @@ else if(args[0] == "removeStablecoinReceiptRestriction" )
                 legs: [
                   {
                     from: "0x7cc1b91e216b3ea3192fa9b5f6a49f7fd51f5873e16c607100ad5e40db643765", // passing the Identity (or did) means the default portfolio will be used
-                    to: "0x683d05728cfdece940be2a194b5b4099ac2f37fe4d1b161ebba9b84701a0d9c7", // or you can pass a Portfolio
-                    amount: new BigNumber(50),
-                    asset: 'STABLECOIN01',
+                    to: "0x4d241b9bc81837e1dc6e92562d14cfd86da1fe995a57623d9c69a2e75bca0272", // or you can pass a Portfolio
+                    amount: new BigNumber(1000),
+                    asset: 'STABLECOIN06',
                   },
                 ],
                 //endBlock: new BigNumber(10000000),
@@ -1537,6 +1537,7 @@ async function payDividendDistribution() {
 
 // npx ts-node src/polymesh.ts removeStablecoinReceiptRestriction
 async function removeStablecoinReceiptRestriction() {
+
   let api: Polymesh = await getConnection(mnemonicString4);
 
   const identity = (await api.getSigningIdentity())!;
@@ -1544,7 +1545,7 @@ async function removeStablecoinReceiptRestriction() {
 
     const unSubscribe = await api._polkadotApi.tx.asset
     .preApproveTicker(        
-        "STABLECOIN05"
+        "STABLECOIN06"
     ).signAndSend("5Fc9E7RLNvK5vxpErkAbstSoAYjYsDz1s3ZpsfvpbqcsXZ6y", (result) => {
         console.log("............")
         console.log( JSON.stringify(result) )

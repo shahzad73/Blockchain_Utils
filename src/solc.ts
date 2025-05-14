@@ -4,8 +4,6 @@ import async from 'async';
 const solc = require('solc');
 const fs = require('fs');
 
-import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
-
 
 var args = process.argv.slice(2);
 
@@ -58,7 +56,6 @@ if(args[0] == "compile2") {
   const contractPath = path.resolve(__dirname, '../contract.sol');
   const contractSource = fs.readFileSync(contractPath, 'utf8');
 
-
   interface SolidityInput {
     language: string;
     sources: {
@@ -74,7 +71,7 @@ if(args[0] == "compile2") {
       };
     };
   }
-  
+
   const input: SolidityInput = {
     language: 'Solidity',
     sources: {
@@ -90,30 +87,19 @@ if(args[0] == "compile2") {
       },
     },
   };
-  
-// Read OpenZeppelin contract files and add them to the sources
-const openZeppelinContractsPath = __dirname + '/../node_modules/@openzeppelin/contracts/token/';
-const openZeppelinContractFiles = fs.readdirSync(openZeppelinContractsPath);
-
-openZeppelinContractFiles.forEach((file: string) => {
-  const filePath = path.join(openZeppelinContractsPath, file);
-  if (fs.statSync(filePath).isFile()) {
-    const fileContent = fs.readFileSync(filePath, 'utf-8');
-    input.sources[file] = { content: fileContent };
-  }
-});
 
 
   const output = JSON.parse(solc.compile(JSON.stringify(input)));
-  
+
   if (output.errors) {
       console.error(output.errors);
   } else {
-      const contractBytecode = output.contracts['contract.sol']['MyToken'].evm.bytecode.object;
-      const contractAbi = output.contracts['contract.sol']['MyToken'].abi;
-  
-      console.log('Bytecode:', contractBytecode);
-      console.log('ABI:', JSON.stringify(contractAbi, null, 2));
+
+      console.log("...................ABI......................")
+      console.log( output.contracts['contract.sol']['ERC20Token'].abi )
+      console.log("............................................")
+      console.log( output.contracts['contract.sol']['ERC20Token'].evm.bytecode.object )
+            
   }
 
 

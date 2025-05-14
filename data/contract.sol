@@ -6,7 +6,7 @@ pragma solidity ^0.8.0;
 
 
 contract ERC1404TokenMinKYC is IERC20Token, IERC1404 {
-	
+
 	// Set buy and sell restrictions on investors.  
 	// date is Linux Epoch datetime
 	// Both date must be less than current date time to allow the respective operation. Like to get tokens from others, receiver's buy restriction
@@ -15,7 +15,7 @@ contract ERC1404TokenMinKYC is IERC20Token, IERC1404 {
 	// this condition is checked in detectTransferRestriction
     mapping (address => uint256) private _buyRestriction;  
 	mapping (address => uint256) private _sellRestriction;	
-	
+
 	mapping (address => uint256) private _balances;
     mapping(address => mapping(address => uint256)) private _allowances;
 	address private _owner;

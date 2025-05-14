@@ -140,7 +140,7 @@ async function smartContractTransCost() {
       var gasPrice = await web3.eth.getGasPrice();
 
       let estimateGasPromise = web3.eth.estimateGas({
-          data: contract.methods.modifyKYCData('0x1a8929fbE9abEc00CDfCda8907408848cBeb5300', 1, 1).encodeABI()
+          data: contract.methods.modifyKYCData("0x1a8929fbE9abEc00CDfCda8907408848cBeb5300", 1, 1).encodeABI()
       });
       const allPromises = Promise.all([estimateGasPromise]);
       var gas = await allPromises;
